@@ -1,0 +1,271 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.home-trusted-wrapper {
+  width: 100%;
+  padding: 20px;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Outer Card Container */
+.home-trusted-container {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  background-color: #f4f5f7;
+  border-radius: 20px;
+  padding: 55px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  gap: 30px;
+}
+
+/* Light Green Decorative Curved Overlay */
+.home-trusted-green-bg {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 46%;
+  height: 82%;
+  background-color: #d2f6ce;
+  border-top-left-radius: 260px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* --- LEFT CONTENT SECTION --- */
+.home-trusted-left-content {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  max-width: 500px;
+}
+
+/* Trusted Expertise Badge */
+.home-trusted-badge {
+  display: inline-block;
+  background-color: #ffffff;
+  color: #121316;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Hover: White to Green */
+.home-trusted-badge:hover {
+  background-color: #55e153;
+  color: #ffffff;
+}
+
+/* Section Title */
+.home-trusted-title {
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #0d0e11;
+  margin-bottom: 18px;
+  letter-spacing: -0.6px;
+}
+
+/* Description Text */
+.home-trusted-description {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #71777d;
+  margin-bottom: 28px;
+}
+
+/* Feature Checklist */
+.home-trusted-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.home-trusted-features li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-trusted-check-icon {
+  width: 22px;
+  height: 22px;
+  background-color: #55e153;
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.home-trusted-feature-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0d0e11;
+}
+
+/* CTA Button */
+.home-trusted-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #55e153;
+  color: #0d0e11;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 26px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Hover: Green to Light White */
+.home-trusted-btn:hover {
+  background-color: #f2fbf2;
+  color: #0d0e11;
+  border-color: #55e153;
+}
+
+.home-trusted-arrow {
+  font-size: 16px;
+  transition: transform 0.25s ease;
+}
+
+.home-trusted-btn:hover .home-trusted-arrow {
+  transform: translateX(4px);
+}
+
+/* --- RIGHT GALLERY GRID --- */
+.home-trusted-right-grid {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.home-trusted-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Pill / Stadium Card Styling */
+.home-trusted-card {
+  width: 175px;
+  border-radius: 80px;
+  overflow: hidden;
+  background-color: #e0e0e0;
+}
+
+.home-trusted-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Heights matching visual layout */
+.home-trusted-card-tall {
+  height: 350px;
+}
+
+.home-trusted-card-medium {
+  height: 210px;
+}
+
+.home-trusted-card-small {
+  height: 165px;
+}
+
+/* Column Alignments */
+.home-trusted-col-1 {
+  align-self: center;
+}
+
+.home-trusted-col-2 {
+  padding-bottom: 25px;
+}
+
+.home-trusted-col-3 {
+  padding-top: 15px;
+}
+
+/* --- RESPONSIVE BREAKPOINTS --- */
+@media (max-width: 1100px) {
+  .home-trusted-container {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 40px 30px;
+  }
+
+  .home-trusted-green-bg {
+    width: 100%;
+    height: 45%;
+    border-top-left-radius: 140px;
+  }
+
+  .home-trusted-left-content {
+    max-width: 100%;
+  }
+
+  .home-trusted-right-grid {
+    width: 100%;
+    justify-content: center;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .home-trusted-title {
+    font-size: 28px;
+  }
+
+  .home-trusted-card {
+    width: 105px;
+    border-radius: 50px;
+  }
+
+  .home-trusted-card-tall {
+    height: 220px;
+  }
+
+  .home-trusted-card-medium {
+    height: 130px;
+  }
+
+  .home-trusted-card-small {
+    height: 105px;
+  }
+
+  .home-trusted-right-grid {
+    gap: 10px;
+  }
+
+  .home-trusted-col {
+    gap: 10px;
+  }
+}

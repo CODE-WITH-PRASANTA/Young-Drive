@@ -1,0 +1,364 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* Main Wrapper */
+.featured-listings-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 60px 24px 80px 24px;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  box-sizing: border-box;
+}
+
+.featured-listings-container {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/* Header Styling */
+.featured-listings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 36px;
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.section-title {
+  font-size: 38px;
+  font-weight: 800;
+  color: #0c0f12;
+  margin: 0;
+  letter-spacing: -0.8px;
+}
+
+.section-subtitle {
+  font-size: 15px;
+  color: #71717a;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* View More Button: Green -> Light White / Off-White on Hover */
+.view-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #5be161;
+  color: #0c0f12;
+  border: 1px solid #5be161;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.view-more-btn:hover {
+  background-color: #f7f9fb; /* Light white background on point */
+  color: #0c0f12;
+  border-color: #e4e4e7;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* 4-Column Grid */
+.featured-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+/* Individual Car Card (INCREASED BOX HEIGHT) */
+/* Ensure the card allows child elements to position smoothly */
+/* Card with smooth hover physics */
+.featured-car-card {
+  background: #ffffff;
+  border: 1px solid #eaeaea;
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  
+  /* Smooth hardware-accelerated transitions */
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease;
+  will-change: transform, box-shadow;
+}
+
+/* Card Hover State (Smooth Lift + Glow Shadow) */
+.featured-car-card:hover {
+  transform: translateY(-8px);
+  border-color: #d1d5db;
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.12),
+              0 10px 15px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Image box strictly clips image */
+.car-image-container {
+  width: 100%;
+  height: 220px;
+  position: relative;
+  overflow: hidden;
+  background-color: #f4f5f7;
+}
+
+/* Smooth Image Scale on Hover */
+.car-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.featured-car-card:hover .car-image {
+  transform: scale(1.05); /* Subtle inner image zoom */
+}
+
+/* Rating Wrapper handles negative spacing overlap */
+.rating-badge-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -16px;
+  position: relative;
+  z-index: 20;
+}
+
+.rating-badge {
+  background: #ffffff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #f0f0f2;
+  transition: box-shadow 0.3s ease;
+}
+
+.featured-car-card:hover .rating-badge {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+}
+
+.rating-score {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0c0f12;
+  line-height: 1;
+}
+
+.rating-count {
+  font-size: 12px;
+  color: #71717a;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* Card Body spacing adjustment */
+.car-card-body {
+  padding: 16px 20px 22px 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+/* Hover effect on car card */
+.featured-car-card:hover {
+  transform: translateY(-1px) scale(1.01);
+  border-color: #d1d5db;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.08);
+}
+
+/* Image Container (INCREASED IMAGE HEIGHT FROM 190px TO 230px) */
+.car-image-container {
+  position: relative;
+  width: 100%;
+  height: 230px; /* Increased image box height */
+  background-color: #f4f5f7;
+  overflow: hidden;
+}
+
+.car-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.featured-car-card:hover .car-image {
+  transform: scale(1.04);
+}
+
+.rating-badge {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  z-index: 2;
+  border: 1px solid #f4f4f5;
+}
+
+.star-icon {
+  color: #22c55e;
+  font-size: 14px;
+}
+
+.rating-score {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0c0f12;
+}
+
+.rating-count {
+  font-size: 12px;
+  color: #71717a;
+  font-weight: 500;
+}
+
+/* Card Body Details (INCREASED PADDING) */
+.car-card-body {
+  padding: 28px 20px 22px 20px; /* Increased top & side padding */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.car-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0c0f12;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.3px;
+}
+
+.location-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #71717a;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 18px;
+}
+
+.card-divider {
+  border: none;
+  border-top: 1px solid #f4f4f5;
+  margin: 0 0 18px 0;
+}
+
+/* Specs Items */
+.specs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 10px;
+  margin-bottom: 18px;
+}
+
+.spec-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #27272a;
+  font-weight: 600;
+}
+
+.spec-item svg {
+  color: #71717a;
+}
+
+/* Card Footer */
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.price-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.price-amount {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0c0f12;
+}
+
+.price-period {
+  font-size: 12px;
+  color: #71717a;
+  font-weight: 500;
+}
+
+/* Book Now Button */
+.book-now-btn {
+  background-color: #f4f5f7;
+  color: #0c0f12;
+  border: 1px solid #e4e4e7;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.book-now-btn:hover {
+  background-color: #5be161;
+  color: #000000;
+  border-color: #5be161;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(91, 225, 97, 0.3);
+}
+
+/* --- RESPONSIVE MEDIA QUERIES --- */
+@media (max-width: 1100px) {
+  .featured-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .featured-listings-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .section-title {
+    font-size: 28px;
+  }
+
+  .featured-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .featured-car-card {
+    min-height: auto;
+  }
+}

@@ -10,7 +10,7 @@
 
 /* Rounded Dark Card Container */
 .calculate-container {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
   border-radius: 10px;
   background-color: #0c0f12;
@@ -207,26 +207,30 @@
 /* Bottom Stats & Badge Area */
 .calc-bottom-wrapper {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 .stats-grid {
   display: flex;
-  gap: 48px;
+  align-items: center;
+  gap: 48px; /* Increased spacing between stats */
 }
 
 .stat-item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 12px; /* Gap between the big number and text */
 }
 
 .stat-number {
-  font-size: 32px;
+  font-size: 38px; /* Bigger font size to match reference */
   font-weight: 800;
   color: #ffffff;
-  letter-spacing: -0.5px;
+  line-height: 1;
 }
 
 .stat-label {
@@ -238,14 +242,13 @@
 
 /* Floating White Badge */
 .social-proof-badge {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 12px 20px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 12px 24px; /* Increased padding inside badge */
   display: flex;
   align-items: center;
-  gap: 14px;
-  color: #0c0f12;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  gap: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
 .avatar-group {
@@ -254,12 +257,12 @@
 }
 
 .avatar-img {
-  width: 32px;
-  height: 32px;
+  width: 38px;  /* Increased avatar image size */
+  height: 38px;
   border-radius: 50%;
-  border: 2px solid #ffffff;
   object-fit: cover;
-  margin-left: -10px;
+  border: 2px solid #ffffff;
+  margin-left: -12px; /* Overlapping effect */
 }
 
 .avatar-img:first-child {
@@ -267,31 +270,37 @@
 }
 
 .avatar-plus-btn {
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background-color: #5be161;
-  color: #000000;
+  color: #0c0f12;
+  
+  /* PERFECT CENTERING FIX */
+  display: grid;
+  place-items: center;
+  padding-bottom: 2px; /* Offsets character font-baseline */
+  
+  font-size: 20px;
   font-weight: 700;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  line-height: 0; /* Prevents line-height from pushing it down */
   border: 2px solid #ffffff;
   margin-left: -10px;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .badge-text {
-  font-size: 12px;
-  color: #3f3f46;
+  font-size: 14px;
+  color: #1a1a1a;
   margin: 0;
   line-height: 1.4;
-  max-width: 170px;
+  white-space: nowrap;
 }
 
 .badge-text strong {
-  color: #0c0f12;
-  font-weight: 800;
+  font-weight: 700;
+  color: #000000;
 }
 
 /* --- RESPONSIVE MEDIA QUERIES --- */
