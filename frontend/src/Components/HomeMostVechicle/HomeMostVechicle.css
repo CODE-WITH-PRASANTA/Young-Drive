@@ -1,0 +1,306 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* --- MAIN SECTION BACKGROUND (Pure White Full-Width) --- */
+.most-vehicles-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 50px 0;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #121212;
+}
+
+.most-vehicles-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* --- HEADER --- */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #0f1216;
+  letter-spacing: -0.5px;
+}
+
+.section-subtitle {
+  font-size: 14px;
+  color: #808080;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* --- NAVIGATION ARROWS (With Smooth Green Hover Effect) --- */
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background-color: #eef0f3;
+  color: #333333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  /* Smooth transition for background, color, and scale */
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.nav-btn:hover {
+  background-color: #5be161; /* Signature Green */
+  color: #000000;
+  transform: translateY(-2px);
+}
+
+/* --- VEHICLES GRID --- */
+.vehicles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 12px;
+}
+
+/* Hide scrollbar */
+.vehicles-grid::-webkit-scrollbar {
+  display: none;
+}
+.vehicles-grid {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* --- VEHICLE CARD --- */
+.vehicle-card {
+  background: #ffffff;
+  border: 1px solid #eef0f3;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.vehicle-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.07);
+}
+
+/* --- CARD IMAGE & RATING BADGE --- */
+.card-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background-color: #f8f9fa;
+  overflow: hidden;
+}
+
+.vehicle-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.rating-badge {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.star-icon {
+  color: #5be161;
+  font-size: 11px;
+}
+
+.rating-score {
+  color: #111111;
+  font-weight: 700;
+}
+
+.reviews-count {
+  color: #888888;
+}
+
+/* --- CARD CONTENT --- */
+.card-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.vehicle-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111111;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vehicle-location {
+  font-size: 13px;
+  color: #777777;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.location-icon {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.card-divider {
+  border: none;
+  border-top: 1px solid #f0f2f5;
+  margin: 16px 0;
+}
+
+/* --- SPECS GRID --- */
+.specs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.spec-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #222222;
+}
+
+.spec-icon {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* --- CARD FOOTER & BOOK BUTTON --- */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.price-container {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.price-label {
+  font-size: 12px;
+  color: #888888;
+  font-weight: 500;
+}
+
+.price-amount {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111111;
+}
+
+/* --- BOOK NOW BUTTON (Smooth Green Hover Effect) --- */
+.book-btn {
+  background-color: #f3f5f8;
+  color: #111111;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  /* Smooth transition for green color change */
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.book-btn:hover {
+  background-color: #5be161; /* Signature Green */
+  color: #000000;
+  transform: translateY(-1px);
+}
+
+/* --- LOAD MORE BUTTON --- */
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.load-more-btn {
+  background-color: #5be161;
+  color: #000000;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(91, 225, 97, 0.25);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.load-more-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+.refresh-icon {
+  font-size: 14px;
+}
+
+/* --- RESPONSIVE MEDIA QUERIES --- */
+@media (max-width: 1024px) {
+  .vehicles-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .most-vehicles-container {
+    padding: 0 16px;
+  }
+
+  .section-title {
+    font-size: 24px;
+  }
+
+  .vehicles-grid {
+    grid-template-columns: 1fr;
+  }
+}

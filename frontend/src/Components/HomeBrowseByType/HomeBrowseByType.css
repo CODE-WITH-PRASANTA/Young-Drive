@@ -1,0 +1,273 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* --- MAIN SECTION --- */
+.browse-type-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 60px 24px 100px 24px;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  box-sizing: border-box;
+}
+
+.browse-type-container {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/* --- HEADER SECTION --- */
+.browse-type-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 36px;
+}
+
+.header-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.section-title {
+  font-size: 38px;
+  font-weight: 800;
+  color: #0f1216;
+  margin: 0;
+  letter-spacing: -0.8px;
+}
+
+.section-subtitle {
+  font-size: 15px;
+  color: #777777;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* --- VIEW MORE BUTTON --- */
+.view-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #5be161;
+  color: #000000;
+  border: 1px solid #5be161;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.view-more-btn:hover {
+  background-color: #f4f5f7;
+  color: #121212;
+  border-color: #e0e0e0;
+  transform: translateY(-2px);
+}
+
+.btn-arrow {
+  font-size: 16px;
+  transition: transform 0.2s ease;
+}
+
+.view-more-btn:hover .btn-arrow {
+  transform: translateX(3px);
+}
+
+/* --- CAR GRID --- */
+.car-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 90px;
+}
+
+/* --- PROFESSIONAL CAR CARD HOVER --- */
+.car-card {
+  background: #ffffff;
+  border: 1px solid #eaeaea;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease;
+  cursor: pointer;
+}
+
+/* Elegant box elevation on hover without affecting internal arrow */
+.car-card:hover {
+  transform: translateY(-4px);
+  border-color: #dcdcdc;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.car-image-wrapper {
+  width: 100%;
+  height: 140px;
+  background-color: #f4f5f7;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.car-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.car-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f1216;
+  margin: 0 0 14px 0;
+}
+
+/* --- CARD FOOTER --- */
+.car-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.vehicle-count-badge {
+  background-color: #f4f5f7;
+  color: #666666;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 10px;
+}
+
+/* --- CARD ARROW BUTTON --- */
+.card-arrow-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #f4f5f7;
+  color: #121212;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Change color ONLY when pointing directly on the round arrow button */
+.card-arrow-btn:hover {
+  background-color: #5be161;
+  color: #000000;
+  transform: scale(1.12);
+}
+
+/* --- HOW IT WORKS SECTION --- */
+.how-it-works-container {
+  text-align: center;
+  padding-top: 20px;
+}
+
+.how-tag {
+  font-size: 13px;
+  font-weight: 700;
+  color: #71717a;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: inline-block;
+}
+
+.how-title {
+  font-size: 38px;
+  font-weight: 800;
+  color: #0c0f12;
+  line-height: 1.25;
+  letter-spacing: -0.8px;
+  margin: 0 0 60px 0;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.step-icon-wrapper {
+  color: #0f1216;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+}
+
+.step-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0c0f12;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.3px;
+}
+
+.step-desc {
+  font-size: 14px;
+  color: #71717a;
+  line-height: 1.55;
+  margin: 0;
+  font-weight: 500;
+  max-width: 250px;
+}
+
+/* --- RESPONSIVE MEDIA QUERIES --- */
+@media (max-width: 1100px) {
+  .car-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .steps-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .browse-type-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .car-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .section-title,
+  .how-title {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .browse-type-section {
+    padding: 36px 16px;
+  }
+
+  .car-cards-grid,
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+}
