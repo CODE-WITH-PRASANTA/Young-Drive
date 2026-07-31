@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import MainLayout from "./Layout/MainLayout/MainLayout";
 
 
 const App = () => {
@@ -7,7 +8,7 @@ const App = () => {
     <BrowserRouter>
       <Routes>
 
-        
+        <Route path="/" element={<MainLayout/>}/>
        
 
       </Routes>
