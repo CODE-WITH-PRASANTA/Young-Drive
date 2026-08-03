@@ -6,6 +6,7 @@ import VehicleManagement from "./Components/Profile/VehicleManagement/VehicleMan
 import FeatureListing from "./Components/Profile/FeatureListing/FeatureListing";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import AllBookings from "./Components/AllBookings/AllBookings";
+import VehicleList from "./Components/VehicleList/VehicleList";
 
 function App() {
   return (
@@ -28,17 +29,12 @@ function App() {
           
           {/* Direct Route Aliases mapped to your sidebar menu */}
           <Route path="vehicles" element={<VehicleManagement />} />
-          <Route path="bookings/requests" element={<div>Booking Requests Page</div>} />
+         
           <Route path="bookings/all" element={<AllBookings />}/>
-          <Route path="bookings/calendar" element={<div>Calendar Page</div>} />
-          <Route path="customers" element={<div>Customers Page</div>} />
-          <Route path="drivers" element={<div>Drivers Page</div>} />
-          <Route path="payments" element={<div>Payments Page</div>} />
-          <Route path="reviews" element={<div>Reviews Page</div>} />
-          <Route path="coupons" element={<div>Coupons Page</div>} />
-          <Route path="locations" element={<div>Locations Page</div>} />
-          <Route path="reports" element={<div>Reports Page</div>} />
-          <Route path="settings" element={<div>Settings Page</div>} />
+          
+          <Route path="vechilelist" element={<VehicleList />} />
+
+
         </Route>
 
         {/* Catch-all redirect */}

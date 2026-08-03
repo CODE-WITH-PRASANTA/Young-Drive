@@ -48,6 +48,7 @@ const menuConfig = [
   { type: 'link', icon: <MapPin size={20} />, text: 'Locations', path: '/locations' },
   { type: 'link', icon: <BarChart3 size={20} />, text: 'Reports', path: '/reports' },
   { type: 'link', icon: <Settings size={20} />, text: 'Settings', path: '/settings' },
+  { type: 'link', icon: <Car size={20} />, text: 'Vehiclelist', path: '/vechilelist' },
 ];
 
 const Sidebar = ({
