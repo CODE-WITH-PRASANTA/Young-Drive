@@ -24,9 +24,9 @@ import './Sidebar.css';
 
 const MOBILE_BREAKPOINT = 768;
 
-// Configured with exact paths matching App.jsx
+// All paths formatted cleanly to match App.jsx exactly
 const menuConfig = [
-  { type: 'link', icon: <LayoutDashboard size={20} />, text: 'Dashboard', path: '/' },
+  { type: 'link', icon: <LayoutDashboard size={20} />, text: 'Dashboard', path: '/dashboard' },
   { type: 'link', icon: <Car size={20} />, text: 'Vehicle Management', path: '/vehicle-management' },
   { type: 'link', icon: <ListFilter size={20} />, text: 'Feature Listing', path: '/feature-listing' },
   {

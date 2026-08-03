@@ -20,6 +20,7 @@ const Home = () => {
       <HomeFeatureList/>
       <HomeTrusted/>
       
+      
     </div>
   )
 }
