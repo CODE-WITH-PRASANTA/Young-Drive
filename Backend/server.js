@@ -4,18 +4,22 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const bookingRoutes = require("./routes/bookingRoutes");
 
 // Required Middlewares
 app.use(cors());
-app.use(express.json()); // <--- CRITICAL: Parses incoming JSON body data
+app.use(express.json()); // Parses incoming JSON body data
 
 // Import Routes
+const bookingRoutes = require("./routes/bookingRoutes");
+const vehicleRoutes = require("./routes/vehicleRoutes");
 
+// Route Endpoints
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/vehicles", vehicleRoutes);
 
 const PORT = process.env.PORT || 5000;
 
+// Database Connection & Server Listener
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {

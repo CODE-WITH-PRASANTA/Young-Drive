@@ -7,6 +7,7 @@ import FeatureListing from "./Components/Profile/FeatureListing/FeatureListing";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import AllBookings from "./Components/AllBookings/AllBookings";
 import VehicleList from "./Components/VehicleList/VehicleList";
+import AddNewVehicle from "./Components/AddNewVehicle/AddNewVehicle";
 
 function App() {
   return (
@@ -33,6 +34,9 @@ function App() {
           <Route path="bookings/all" element={<AllBookings />}/>
           
           <Route path="vechilelist" element={<VehicleList />} />
+          <Route path="addvehicle" element={<AddNewVehicle/>} />
+
+
 
 
         </Route>

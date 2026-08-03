@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import API from "../../api/axios";
 
 // Feather Icons
 import {
@@ -23,109 +24,11 @@ import { FaCar } from "react-icons/fa";
 
 import "./VehicleList.css";
 
-// Initial Mock Data
-const INITIAL_VEHICLES = [
-  {
-    id: 1,
-    name: "Audi A3 1.6 TDI S line",
-    plate: "MH12 AB 1234",
-    brand: "Audi",
-    type: "Sedan",
-    fuel: "Diesel",
-    transmission: "Automatic",
-    priceDay: "$498.25",
-    priceMonth: "$9,800",
-    status: "Available",
-    mileage: "25,100 miles",
-    addedOn: "May 12, 2025",
-    image:
-      "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: 2,
-    name: "Mercedes-Benz C220d",
-    plate: "MH12 CD 5678",
-    brand: "Mercedes-Benz",
-    type: "Sedan",
-    fuel: "Diesel",
-    transmission: "Automatic",
-    priceDay: "$525.50",
-    priceMonth: "$10,500",
-    status: "Booked",
-    mileage: "32,200 miles",
-    addedOn: "May 10, 2025",
-    image:
-      "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: 3,
-    name: "Volkswagen Golf GTD",
-    plate: "MH12 EF 9012",
-    brand: "Volkswagen",
-    type: "Hatchback",
-    fuel: "Diesel",
-    transmission: "Automatic",
-    priceDay: "$450.75",
-    priceMonth: "$8,900",
-    status: "Maintenance",
-    mileage: "18,750 miles",
-    addedOn: "May 09, 2025",
-    image:
-      "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: 4,
-    name: "Volvo S60 D4 R-Design",
-    plate: "MH12 GH 3456",
-    brand: "Volvo",
-    type: "Sedan",
-    fuel: "Diesel",
-    transmission: "Automatic",
-    priceDay: "$480.00",
-    priceMonth: "$9,200",
-    status: "Available",
-    mileage: "27,300 miles",
-    addedOn: "May 08, 2025",
-    image:
-      "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: 5,
-    name: "Hyundai Creta SX",
-    plate: "MH12 IJ 7890",
-    brand: "Hyundai",
-    type: "SUV",
-    fuel: "Petrol",
-    transmission: "Manual",
-    priceDay: "$550.00",
-    priceMonth: "$11,000",
-    status: "Unavailable",
-    mileage: "21,400 miles",
-    addedOn: "May 07, 2025",
-    image:
-      "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: 6,
-    name: "Jaguar XE 2.0d R-Sport",
-    plate: "MH12 KL 2468",
-    brand: "Jaguar",
-    type: "Sedan",
-    fuel: "Diesel",
-    transmission: "Automatic",
-    priceDay: "$575.25",
-    priceMonth: "$12,000",
-    status: "Available",
-    mileage: "15,600 miles",
-    addedOn: "May 06, 2025",
-    image:
-      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=400",
-  },
-];
-
 const VehicleList = () => {
-  // State Management
-  const [vehicles, setVehicles] = useState(INITIAL_VEHICLES);
+  // Main Data States
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedVehicles, setSelectedVehicles] = useState([]);
 
   // Filter Input States
@@ -133,8 +36,6 @@ const VehicleList = () => {
   const [brandFilter, setBrandFilter] = useState("All Brands");
   const [typeFilter, setTypeFilter] = useState("All Types");
   const [statusFilter, setStatusFilter] = useState("All Status");
-
-  // More Filters Toggle & Custom State
   const [showMoreFilters, setShowMoreFilters] = useState(false);
   const [fuelFilter, setFuelFilter] = useState("All");
 
@@ -155,7 +56,39 @@ const VehicleList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // Filter Logic Application
+  // 1. Fetch Vehicles from Express API
+  const fetchVehicles = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await API.get("/vehicles");
+      if (response.data.success) {
+        setVehicles(response.data.data);
+      }
+    } catch (err) {
+      console.error("Error fetching vehicles:", err);
+      setError("Failed to fetch vehicles from backend.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchVehicles();
+  }, [fetchVehicles]);
+
+  // Extract unique brands and types dynamically from database for filter dropdowns
+  const uniqueBrands = useMemo(() => {
+    const brands = new Set(vehicles.map((v) => v.vehicleBrand).filter(Boolean));
+    return ["All Brands", ...Array.from(brands)];
+  }, [vehicles]);
+
+  const uniqueTypes = useMemo(() => {
+    const types = new Set(vehicles.map((v) => v.vehicleType).filter(Boolean));
+    return ["All Types", ...Array.from(types)];
+  }, [vehicles]);
+
+  // Filter Actions
   const handleApplyFilters = () => {
     setAppliedFilters({
       search: searchTerm,
@@ -186,25 +119,28 @@ const VehicleList = () => {
   // Filtered List Computation
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((item) => {
+      const name = `${item.vehicleBrand || ""} ${item.vehicleModel || ""} ${item.variantLine || ""}`;
+      const plate = item.registrationNumber || "";
       const matchesSearch =
-        item.name.toLowerCase().includes(appliedFilters.search.toLowerCase()) ||
-        item.plate.toLowerCase().includes(appliedFilters.search.toLowerCase());
+        name.toLowerCase().includes(appliedFilters.search.toLowerCase()) ||
+        plate.toLowerCase().includes(appliedFilters.search.toLowerCase());
+
       const matchesBrand =
-        appliedFilters.brand === "All Brands" || item.brand === appliedFilters.brand;
+        appliedFilters.brand === "All Brands" || item.vehicleBrand === appliedFilters.brand;
       const matchesType =
-        appliedFilters.type === "All Types" || item.type === appliedFilters.type;
+        appliedFilters.type === "All Types" || item.vehicleType === appliedFilters.type;
       const matchesStatus =
-        appliedFilters.status === "All Status" || item.status === appliedFilters.status;
+        appliedFilters.status === "All Status" || item.availabilityStatus === appliedFilters.status;
       const matchesFuel =
-        appliedFilters.fuel === "All" || item.fuel === appliedFilters.fuel;
+        appliedFilters.fuel === "All" || item.fuelType === appliedFilters.fuel;
 
       return matchesSearch && matchesBrand && matchesType && matchesStatus && matchesFuel;
     });
   }, [vehicles, appliedFilters]);
 
-  // Dynamic Pagination Calculations
+  // Pagination Calculation
   const totalPages = Math.ceil(filteredVehicles.length / itemsPerPage) || 1;
-  
+
   const currentData = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return filteredVehicles.slice(start, start + itemsPerPage);
@@ -216,10 +152,10 @@ const VehicleList = () => {
     }
   };
 
-  // Checkbox Selection Handlers
+  // Checkbox Selection
   const handleSelectAll = (e) => {
     if (e.target.checked) {
-      setSelectedVehicles(currentData.map((v) => v.id));
+      setSelectedVehicles(currentData.map((v) => v._id));
     } else {
       setSelectedVehicles([]);
     }
@@ -231,26 +167,36 @@ const VehicleList = () => {
     );
   };
 
-  // CRUD Actions
-  const handleDelete = (id) => {
+  // Delete Vehicle API Integration
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this vehicle?")) {
-      setVehicles((prev) => prev.filter((item) => item.id !== id));
-      setSelectedVehicles((prev) => prev.filter((item) => item !== id));
+      try {
+        const res = await API.delete(`/vehicles/${id}`);
+        if (res.data.success) {
+          setVehicles((prev) => prev.filter((item) => item._id !== id));
+          setSelectedVehicles((prev) => prev.filter((item) => item !== id));
+          alert("Vehicle deleted successfully.");
+        }
+      } catch (err) {
+        console.error("Delete Error:", err);
+        alert("Failed to delete vehicle.");
+      }
     }
   };
 
+  // Export CSV Action
   const handleExport = () => {
     const dataToExport = selectedVehicles.length
-      ? vehicles.filter((v) => selectedVehicles.includes(v.id))
+      ? vehicles.filter((v) => selectedVehicles.includes(v._id))
       : filteredVehicles;
 
     const csvContent =
       "data:text/csv;charset=utf-8," +
-      ["Name,Plate,Type,Status,Price/Day,Mileage"]
+      ["Brand,Model,Variant,Plate,Type,Status,DailyRent,SecurityDeposit"]
         .concat(
           dataToExport.map(
             (v) =>
-              `"${v.name}","${v.plate}","${v.type}","${v.status}","${v.priceDay}","${v.mileage}"`
+              `"${v.vehicleBrand}","${v.vehicleModel}","${v.variantLine}","${v.registrationNumber}","${v.vehicleType}","${v.availabilityStatus}","${v.dailyRentPrice}","${v.securityDeposit}"`
           )
         )
         .join("\n");
@@ -264,12 +210,32 @@ const VehicleList = () => {
     document.body.removeChild(link);
   };
 
-  const handleEditSave = (e) => {
+  // Edit Save API Integration
+  const handleEditSave = async (e) => {
     e.preventDefault();
-    setVehicles((prev) =>
-      prev.map((v) => (v.id === editModalVehicle.id ? editModalVehicle : v))
-    );
-    setEditModalVehicle(null);
+    try {
+      const res = await API.put(`/vehicles/${editModalVehicle._id}`, editModalVehicle);
+      if (res.data.success) {
+        setVehicles((prev) =>
+          prev.map((v) => (v._id === editModalVehicle._id ? res.data.data : v))
+        );
+        setEditModalVehicle(null);
+        alert("Vehicle details updated successfully!");
+      }
+    } catch (err) {
+      console.error("Update error:", err);
+      alert("Failed to update vehicle details.");
+    }
+  };
+
+  // Format Helper for Dates
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "N/A";
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
 
   return (
@@ -311,7 +277,7 @@ const VehicleList = () => {
           <div>
             <div className="VehicleList__stat-label">Available</div>
             <div className="VehicleList__stat-value">
-              {vehicles.filter((v) => v.status === "Available").length}
+              {vehicles.filter((v) => v.availabilityStatus === "Available").length}
             </div>
             <div className="VehicleList__stat-sub">Ready to Rent</div>
           </div>
@@ -324,7 +290,7 @@ const VehicleList = () => {
           <div>
             <div className="VehicleList__stat-label">Unavailable</div>
             <div className="VehicleList__stat-value">
-              {vehicles.filter((v) => v.status === "Unavailable" || v.status === "Booked").length}
+              {vehicles.filter((v) => v.availabilityStatus === "Unavailable").length}
             </div>
             <div className="VehicleList__stat-sub">Not Available</div>
           </div>
@@ -337,7 +303,7 @@ const VehicleList = () => {
           <div>
             <div className="VehicleList__stat-label">Maintenance</div>
             <div className="VehicleList__stat-value">
-              {vehicles.filter((v) => v.status === "Maintenance").length}
+              {vehicles.filter((v) => v.availabilityStatus === "Maintenance").length}
             </div>
             <div className="VehicleList__stat-sub">Under Service</div>
           </div>
@@ -355,7 +321,7 @@ const VehicleList = () => {
         </div>
       </div>
 
-      {/* Control / Filter Bar */}
+      {/* Filter Toolbar */}
       <div className="VehicleList__filters-wrapper">
         <div className="VehicleList__filters">
           <div className="VehicleList__search-box">
@@ -368,31 +334,33 @@ const VehicleList = () => {
             />
           </div>
 
+          {/* Dynamic Brand Dropdown */}
           <select
             value={brandFilter}
             onChange={(e) => setBrandFilter(e.target.value)}
             className="VehicleList__select"
           >
-            <option value="All Brands">All Brands</option>
-            <option value="Audi">Audi</option>
-            <option value="Mercedes-Benz">Mercedes-Benz</option>
-            <option value="Volkswagen">Volkswagen</option>
-            <option value="Volvo">Volvo</option>
-            <option value="Hyundai">Hyundai</option>
-            <option value="Jaguar">Jaguar</option>
+            {uniqueBrands.map((brand) => (
+              <option key={brand} value={brand}>
+                {brand}
+              </option>
+            ))}
           </select>
 
+          {/* Dynamic Category/Type Dropdown */}
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
             className="VehicleList__select"
           >
-            <option value="All Types">All Types</option>
-            <option value="Sedan">Sedan</option>
-            <option value="Hatchback">Hatchback</option>
-            <option value="SUV">SUV</option>
+            {uniqueTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
           </select>
 
+          {/* Availability Status Dropdown */}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -400,9 +368,8 @@ const VehicleList = () => {
           >
             <option value="All Status">All Status</option>
             <option value="Available">Available</option>
-            <option value="Booked">Booked</option>
-            <option value="Maintenance">Maintenance</option>
             <option value="Unavailable">Unavailable</option>
+            <option value="Maintenance">Maintenance</option>
           </select>
 
           <button
@@ -423,7 +390,7 @@ const VehicleList = () => {
           </button>
         </div>
 
-        {/* Collapsible More Filters Panel */}
+        {/* Collapsible Panel */}
         {showMoreFilters && (
           <div className="VehicleList__more-panel">
             <div className="VehicleList__more-group">
@@ -437,6 +404,7 @@ const VehicleList = () => {
                 <option value="Diesel">Diesel</option>
                 <option value="Petrol">Petrol</option>
                 <option value="Electric">Electric</option>
+                <option value="Hybrid">Hybrid</option>
               </select>
             </div>
           </div>
@@ -445,115 +413,134 @@ const VehicleList = () => {
 
       {/* Main Table */}
       <div className="VehicleList__table-container">
-        <table className="VehicleList__table">
-          <thead>
-            <tr>
-              <th style={{ width: "40px" }}>
-                <input
-                  type="checkbox"
-                  onChange={handleSelectAll}
-                  checked={
-                    currentData.length > 0 &&
-                    currentData.every((v) => selectedVehicles.includes(v.id))
-                  }
-                />
-              </th>
-              <th>VEHICLE</th>
-              <th>CATEGORY</th>
-              <th>PRICE</th>
-              <th>STATUS</th>
-              <th>MILEAGE</th>
-              <th>ADDED ON</th>
-              <th style={{ textAlign: "right" }}>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentData.length > 0 ? (
-              currentData.map((v) => (
-                <tr key={v.id}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedVehicles.includes(v.id)}
-                      onChange={() => handleSelectOne(v.id)}
-                    />
-                  </td>
-                  <td>
-                    <div className="VehicleList__cell-vehicle">
-                      <img
-                        src={v.image}
-                        alt={v.name}
-                        className="VehicleList__car-thumb"
-                      />
-                      <div>
-                        <div className="VehicleList__car-name">{v.name}</div>
-                        <div className="VehicleList__car-plate">{v.plate}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="VehicleList__cell-category">
-                      <div className="VehicleList__category-title">
-                        <FaCar className="VehicleList__type-icon" /> {v.type}
-                      </div>
-                      <div className="VehicleList__category-sub">
-                        {v.fuel} • {v.transmission}
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="VehicleList__price-primary">
-                      {v.priceDay} <span className="VehicleList__price-unit">/ Day</span>
-                    </div>
-                    <div className="VehicleList__price-secondary">
-                      {v.priceMonth} / Month
-                    </div>
-                  </td>
-                  <td>
-                    <span
-                      className={`VehicleList__badge VehicleList__badge--${v.status.toLowerCase()}`}
-                    >
-                      {v.status}
-                    </span>
-                  </td>
-                  <td className="VehicleList__text-muted">{v.mileage}</td>
-                  <td className="VehicleList__text-muted">{v.addedOn}</td>
-                  <td>
-                    <div className="VehicleList__actions">
-                      <button
-                        className="VehicleList__action-btn VehicleList__action-btn--view"
-                        title="View Details"
-                        onClick={() => setViewModalVehicle(v)}
-                      >
-                        <FiEye />
-                      </button>
-                      <button
-                        className="VehicleList__action-btn VehicleList__action-btn--edit"
-                        title="Edit Vehicle"
-                        onClick={() => setEditModalVehicle(v)}
-                      >
-                        <FiEdit />
-                      </button>
-                      <button
-                        className="VehicleList__action-btn VehicleList__action-btn--delete"
-                        title="Delete Vehicle"
-                        onClick={() => handleDelete(v.id)}
-                      >
-                        <FiTrash2 />
-                      </button>
-                    </div>
+        {loading ? (
+          <div className="VehicleList__loading">Loading vehicles from database...</div>
+        ) : error ? (
+          <div className="VehicleList__error">{error}</div>
+        ) : (
+          <table className="VehicleList__table">
+            <thead>
+              <tr>
+                <th style={{ width: "40px" }}>
+                  <input
+                    type="checkbox"
+                    onChange={handleSelectAll}
+                    checked={
+                      currentData.length > 0 &&
+                      currentData.every((v) => selectedVehicles.includes(v._id))
+                    }
+                  />
+                </th>
+                <th>VEHICLE</th>
+                <th>CATEGORY</th>
+                <th>PRICE</th>
+                <th>STATUS</th>
+                <th>MILEAGE</th>
+                <th>ADDED ON</th>
+                <th style={{ textAlign: "right" }}>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentData.length > 0 ? (
+                currentData.map((v) => {
+                  const name = `${v.vehicleBrand} ${v.vehicleModel} ${v.variantLine || ""}`;
+                  const thumb =
+                    v.images && v.images.length > 0
+                      ? v.images[0]
+                      : "https://via.placeholder.com/100x70?text=No+Image";
+
+                  return (
+                    <tr key={v._id}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedVehicles.includes(v._id)}
+                          onChange={() => handleSelectOne(v._id)}
+                        />
+                      </td>
+                      <td>
+                        <div className="VehicleList__cell-vehicle">
+                          <img
+                            src={thumb}
+                            alt={name}
+                            className="VehicleList__car-thumb"
+                            onError={(e) => {
+                              e.target.src = "https://via.placeholder.com/100x70?text=No+Image";
+                            }}
+                          />
+                          <div>
+                            <div className="VehicleList__car-name">{name}</div>
+                            <div className="VehicleList__car-plate">{v.registrationNumber}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="VehicleList__cell-category">
+                          <div className="VehicleList__category-title">
+                            <FaCar className="VehicleList__type-icon" /> {v.vehicleType}
+                          </div>
+                          <div className="VehicleList__category-sub">
+                            {v.fuelType} • {v.transmission}
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="VehicleList__price-primary">
+                          ₹{v.dailyRentPrice?.toLocaleString()} <span className="VehicleList__price-unit">/ Day</span>
+                        </div>
+                        <div className="VehicleList__price-secondary">
+                          ₹{v.monthlyRentPrice?.toLocaleString()} / Month
+                        </div>
+                      </td>
+                      <td>
+                        <span
+                          className={`VehicleList__badge VehicleList__badge--${(
+                            v.availabilityStatus || "Available"
+                          ).toLowerCase()}`}
+                        >
+                          {v.availabilityStatus}
+                        </span>
+                      </td>
+                      <td className="VehicleList__text-muted">{v.mileage || "N/A"}</td>
+                      <td className="VehicleList__text-muted">{formatDate(v.createdAt)}</td>
+                      <td>
+                        <div className="VehicleList__actions">
+                          <button
+                            className="VehicleList__action-btn VehicleList__action-btn--view"
+                            title="View Details"
+                            onClick={() => setViewModalVehicle(v)}
+                          >
+                            <FiEye />
+                          </button>
+                          <button
+                            className="VehicleList__action-btn VehicleList__action-btn--edit"
+                            title="Edit Vehicle"
+                            onClick={() => setEditModalVehicle(v)}
+                          >
+                            <FiEdit />
+                          </button>
+                          <button
+                            className="VehicleList__action-btn VehicleList__action-btn--delete"
+                            title="Delete Vehicle"
+                            onClick={() => handleDelete(v._id)}
+                          >
+                            <FiTrash2 />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="8" className="VehicleList__no-data">
+                    No vehicles found matching criteria.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="8" className="VehicleList__no-data">
-                  No vehicles found matching criteria.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Footer & Dynamic Pagination Controls */}
@@ -566,7 +553,6 @@ const VehicleList = () => {
         </div>
 
         <div className="VehicleList__pagination">
-          {/* Previous Page Button */}
           <button
             className="VehicleList__page-nav"
             disabled={currentPage === 1}
@@ -575,7 +561,6 @@ const VehicleList = () => {
             <FiChevronLeft />
           </button>
 
-          {/* Dynamic Page Number Buttons */}
           {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((page) => (
             <button
               key={page}
@@ -588,7 +573,6 @@ const VehicleList = () => {
             </button>
           ))}
 
-          {/* Next Page Button */}
           <button
             className="VehicleList__page-nav"
             disabled={currentPage === totalPages || totalPages === 0}
@@ -602,10 +586,7 @@ const VehicleList = () => {
       {/* VIEW DETAILS MODAL */}
       {viewModalVehicle && (
         <div className="VehicleList__modal-overlay" onClick={() => setViewModalVehicle(null)}>
-          <div
-            className="VehicleList__modal"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="VehicleList__modal" onClick={(e) => e.stopPropagation()}>
             <div className="VehicleList__modal-header">
               <h3>Vehicle Details</h3>
               <button
@@ -617,41 +598,58 @@ const VehicleList = () => {
             </div>
             <div className="VehicleList__modal-body">
               <img
-                src={viewModalVehicle.image}
-                alt={viewModalVehicle.name}
+                src={
+                  viewModalVehicle.images && viewModalVehicle.images.length > 0
+                    ? viewModalVehicle.images[0]
+                    : "https://via.placeholder.com/400x250?text=No+Image"
+                }
+                alt={viewModalVehicle.vehicleModel}
                 className="VehicleList__modal-img"
+                onError={(e) => {
+                  e.target.src = "https://via.placeholder.com/400x250?text=No+Image";
+                }}
               />
               <div className="VehicleList__modal-info">
-                <h2>{viewModalVehicle.name}</h2>
-                <p className="VehicleList__modal-plate">{viewModalVehicle.plate}</p>
+                <h2>{`${viewModalVehicle.vehicleBrand} ${viewModalVehicle.vehicleModel}`}</h2>
+                <p className="VehicleList__modal-plate">{viewModalVehicle.registrationNumber}</p>
 
                 <div className="VehicleList__modal-grid">
                   <div>
-                    <strong>Category:</strong> {viewModalVehicle.type}
+                    <strong>Variant:</strong> {viewModalVehicle.variantLine}
+                  </div>
+                  <div>
+                    <strong>Category:</strong> {viewModalVehicle.vehicleType}
                   </div>
                   <div>
                     <strong>Transmission:</strong> {viewModalVehicle.transmission}
                   </div>
                   <div>
-                    <strong>Fuel Type:</strong> {viewModalVehicle.fuel}
+                    <strong>Fuel Type:</strong> {viewModalVehicle.fuelType}
+                  </div>
+                  <div>
+                    <strong>Year:</strong> {viewModalVehicle.yearOfManufacture}
+                  </div>
+                  <div>
+                    <strong>Color:</strong> {viewModalVehicle.color}
                   </div>
                   <div>
                     <strong>Status:</strong>{" "}
-                    <span className={`VehicleList__badge VehicleList__badge--${viewModalVehicle.status.toLowerCase()}`}>
-                      {viewModalVehicle.status}
+                    <span
+                      className={`VehicleList__badge VehicleList__badge--${(
+                        viewModalVehicle.availabilityStatus || "Available"
+                      ).toLowerCase()}`}
+                    >
+                      {viewModalVehicle.availabilityStatus}
                     </span>
                   </div>
                   <div>
-                    <strong>Daily Rate:</strong> {viewModalVehicle.priceDay}
+                    <strong>Daily Rate:</strong> ₹{viewModalVehicle.dailyRentPrice}
                   </div>
                   <div>
-                    <strong>Monthly Rate:</strong> {viewModalVehicle.priceMonth}
+                    <strong>Deposit:</strong> ₹{viewModalVehicle.securityDeposit}
                   </div>
                   <div>
-                    <strong>Mileage:</strong> {viewModalVehicle.mileage}
-                  </div>
-                  <div>
-                    <strong>Added On:</strong> {viewModalVehicle.addedOn}
+                    <strong>Added On:</strong> {formatDate(viewModalVehicle.createdAt)}
                   </div>
                 </div>
               </div>
@@ -678,23 +676,34 @@ const VehicleList = () => {
             </div>
             <form onSubmit={handleEditSave} className="VehicleList__modal-form">
               <div className="VehicleList__form-group">
-                <label>Vehicle Name</label>
+                <label>Vehicle Brand</label>
                 <input
                   type="text"
-                  value={editModalVehicle.name}
+                  value={editModalVehicle.vehicleBrand || ""}
                   onChange={(e) =>
-                    setEditModalVehicle({ ...editModalVehicle, name: e.target.value })
+                    setEditModalVehicle({ ...editModalVehicle, vehicleBrand: e.target.value })
                   }
                   required
                 />
               </div>
               <div className="VehicleList__form-group">
-                <label>License Plate</label>
+                <label>Vehicle Model</label>
                 <input
                   type="text"
-                  value={editModalVehicle.plate}
+                  value={editModalVehicle.vehicleModel || ""}
                   onChange={(e) =>
-                    setEditModalVehicle({ ...editModalVehicle, plate: e.target.value })
+                    setEditModalVehicle({ ...editModalVehicle, vehicleModel: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="VehicleList__form-group">
+                <label>Registration Number</label>
+                <input
+                  type="text"
+                  value={editModalVehicle.registrationNumber || ""}
+                  onChange={(e) =>
+                    setEditModalVehicle({ ...editModalVehicle, registrationNumber: e.target.value })
                   }
                   required
                 />
@@ -702,24 +711,23 @@ const VehicleList = () => {
               <div className="VehicleList__form-group">
                 <label>Status</label>
                 <select
-                  value={editModalVehicle.status}
+                  value={editModalVehicle.availabilityStatus || "Available"}
                   onChange={(e) =>
-                    setEditModalVehicle({ ...editModalVehicle, status: e.target.value })
+                    setEditModalVehicle({ ...editModalVehicle, availabilityStatus: e.target.value })
                   }
                 >
                   <option value="Available">Available</option>
-                  <option value="Booked">Booked</option>
-                  <option value="Maintenance">Maintenance</option>
                   <option value="Unavailable">Unavailable</option>
+                  <option value="Maintenance">Maintenance</option>
                 </select>
               </div>
               <div className="VehicleList__form-group">
-                <label>Daily Price</label>
+                <label>Daily Price (₹)</label>
                 <input
-                  type="text"
-                  value={editModalVehicle.priceDay}
+                  type="number"
+                  value={editModalVehicle.dailyRentPrice || 0}
                   onChange={(e) =>
-                    setEditModalVehicle({ ...editModalVehicle, priceDay: e.target.value })
+                    setEditModalVehicle({ ...editModalVehicle, dailyRentPrice: e.target.value })
                   }
                   required
                 />
