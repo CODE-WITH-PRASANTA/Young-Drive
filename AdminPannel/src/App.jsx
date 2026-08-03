@@ -5,6 +5,7 @@ import MainLayout from "./Layout/MainLayout/MainLayout";
 import VehicleManagement from "./Components/Profile/VehicleManagement/VehicleManagement";
 import FeatureListing from "./Components/Profile/FeatureListing/FeatureListing";
 import AllBookings from "./Components/AllBookings/AllBookings";
+import VehicleList from "./Components/VehicleList/VehicleList";
 
 function App() {
   return (
@@ -35,6 +36,9 @@ function App() {
           <Route path="locations" element={<div>Locations Page</div>} />
           <Route path="reports" element={<div>Reports Page</div>} />
           <Route path="settings" element={<div>Settings Page</div>} />
+          <Route path="vechilelist" element={<VehicleList />} />
+
+
         </Route>
 
         {/* Catch-all Fallback */}

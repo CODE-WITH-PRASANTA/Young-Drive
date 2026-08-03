@@ -38,6 +38,8 @@ const menuConfig = [
       { text: 'Booking Requests', path: '/bookings/requests', badge: 5 },
       { text: 'All Bookings', path: '/bookings/all' },
       { text: 'Calendar', path: '/bookings/calendar' },
+
+
     ]
   },
   { type: 'link', icon: <Users size={20} />, text: 'Customers', path: '/customers' },
@@ -48,6 +50,8 @@ const menuConfig = [
   { type: 'link', icon: <MapPin size={20} />, text: 'Locations', path: '/locations' },
   { type: 'link', icon: <BarChart3 size={20} />, text: 'Reports', path: '/reports' },
   { type: 'link', icon: <Settings size={20} />, text: 'Settings', path: '/settings' },
+
+
 ];
 
 const Sidebar = ({
