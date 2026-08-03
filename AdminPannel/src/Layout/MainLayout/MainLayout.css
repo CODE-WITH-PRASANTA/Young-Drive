@@ -1,0 +1,126 @@
+/* =========================================================
+   MAIN LAYOUT — widths kept in lockstep with Sidebar.css
+   (--sb-width-full: 264px, --sb-width-collapsed: 80px,
+    --sb-width-tablet: 240px at <=1200px, off-canvas at <=768px)
+   ========================================================= */
+
+:root {
+  --ml-sidebar-full: 264px;
+  --ml-sidebar-collapsed: 80px;
+  --ml-sidebar-tablet: 240px;
+  --ml-content-max: 1600px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+.MainLayout {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #f8fafc;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.MainLayout-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: var(--ml-sidebar-full);
+  transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 0; /* prevents flex children from blowing out the layout */
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Sidebar collapsed on desktop */
+.MainLayout.sidebar-collapsed .MainLayout-container {
+  margin-left: var(--ml-sidebar-collapsed);
+}
+
+.MainLayout-content {
+  padding: 24px;
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Keeps line-lengths sane on ultra-wide monitors without hard-capping
+   the layout on normal screens */
+.MainLayout-content-inner {
+  max-width: var(--ml-content-max);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.MainLayout-placeholder {
+  background-color: #ffffff;
+  border: 1px solid #e6f4f1;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  color: #64748b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.MainLayout-placeholder h2 {
+  color: #0d9488;
+  margin-bottom: 10px;
+}
+
+/* ===========================================================
+   RESPONSIVE BREAKPOINTS
+   (mirrors Sidebar.css exactly so content never overlaps or gaps)
+   =========================================================== */
+
+/* --- Small laptops / tablets landscape: Sidebar auto-tightens to 240px --- */
+@media (max-width: 1200px) {
+  .MainLayout-container {
+    margin-left: var(--ml-sidebar-tablet);
+  }
+  .MainLayout.sidebar-collapsed .MainLayout-container {
+    margin-left: var(--ml-sidebar-collapsed);
+  }
+}
+
+@media (max-width: 1024px) {
+  .MainLayout-content {
+    padding: 20px;
+  }
+}
+
+/* --- Mobile: Sidebar becomes an off-canvas drawer, content is full width --- */
+@media (max-width: 768px) {
+  .MainLayout-container,
+  .MainLayout.sidebar-collapsed .MainLayout-container {
+    margin-left: 0;
+  }
+
+  .MainLayout-content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .MainLayout-content {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .MainLayout-content {
+    padding: 10px;
+  }
+}
+
+/* --- Reduced motion --- */
+@media (prefers-reduced-motion: reduce) {
+  .MainLayout-container {
+    transition: none !important;
+  }
+}

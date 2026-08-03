@@ -1,0 +1,856 @@
+/* =========================================================
+   DRIVE-X — PREMIUM RESPONSIVE TOPBAR
+   ========================================================= */
+
+:root {
+  --tb-bg: #ffffff;
+  --tb-surface: #f7f8fa;
+  --tb-border: #e9ecf1;
+  --tb-text: #0f172a;
+  --tb-muted: #7c8698;
+  --tb-red: #ef4444;
+  --tb-red-dark: #dc2626;
+  --tb-red-gradient: linear-gradient(135deg, #ff5b5b 0%, #e11d1d 55%, #b5121b 100%);
+  --tb-red-tint: #fef2f2;
+  --tb-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+  --tb-shadow-lg: 0 18px 40px -8px rgba(15, 23, 42, 0.16);
+  --tb-radius: 12px;
+  --tb-height: 68px;
+  --tb-transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.Topbar {
+  min-height: var(--tb-height);
+  background: var(--tb-bg);
+  border-bottom: 1px solid var(--tb-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 120;
+  gap: 16px;
+  box-shadow: var(--tb-shadow-sm);
+}
+
+/* ---------------------------------------------------------
+   Focus visibility (keyboard users) — applied to every
+   interactive control in the bar
+   --------------------------------------------------------- */
+.Topbar-icon-btn:focus-visible,
+.Topbar-search-clear:focus-visible,
+.Topbar-search-close:focus-visible,
+.Topbar-user:focus-visible,
+.Topbar-menu-item:focus-visible,
+.Topbar-popover-footer a:focus-visible,
+.Topbar-search-input:focus-visible {
+  outline: 2px solid var(--tb-red);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ---------------------------------------------------------
+   Left cluster: hamburger + search
+   --------------------------------------------------------- */
+.Topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.Topbar-icon-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tb-surface);
+  border: 1px solid var(--tb-border);
+  color: var(--tb-muted);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background var(--tb-transition), color var(--tb-transition), border-color var(--tb-transition), transform var(--tb-transition);
+}
+
+.Topbar-icon-btn:hover {
+  color: #ffffff;
+  background: var(--tb-red-gradient);
+  border-color: transparent;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.28);
+}
+
+.Topbar-icon-btn:active {
+  transform: translateY(0);
+}
+
+.Topbar-icon-btn.is-active {
+  color: var(--tb-red);
+  background: var(--tb-red-tint);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.Topbar-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--tb-surface);
+  border: 1px solid var(--tb-border);
+  border-radius: 999px;
+  padding: 0 8px 0 14px;
+  height: 42px;
+  width: 100%;
+  max-width: 360px;
+  transition: border-color var(--tb-transition), box-shadow var(--tb-transition), max-width var(--tb-transition);
+}
+
+.Topbar-search:focus-within {
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.08);
+  background: #ffffff;
+}
+
+.Topbar-search-icon {
+  color: var(--tb-muted);
+  flex-shrink: 0;
+}
+
+.Topbar-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--tb-text);
+  height: 100%;
+}
+
+.Topbar-search-input::placeholder {
+  color: #a2acbd;
+}
+
+.Topbar-kbd {
+  flex-shrink: 0;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--tb-muted);
+  background: #ffffff;
+  border: 1px solid var(--tb-border);
+  padding: 4px 8px;
+  border-radius: 7px;
+  white-space: nowrap;
+}
+
+.Topbar-search-clear {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: #eef0f4;
+  color: var(--tb-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.Topbar-search-clear:hover {
+  background: var(--tb-red-tint);
+  color: var(--tb-red);
+}
+
+.Topbar-search-close {
+  display: none;
+}
+
+.Topbar-search-trigger {
+  display: none;
+}
+
+.Topbar-search-backdrop {
+  display: none;
+}
+
+.Topbar-popover-backdrop {
+  display: none;
+}
+
+/* ---------------------------------------------------------
+   Right cluster
+   --------------------------------------------------------- */
+.Topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  transition: opacity 0.15s ease;
+}
+
+.Topbar-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--tb-border);
+  margin: 0 2px;
+}
+
+.Topbar-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  background: var(--tb-red-gradient);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 2px solid #ffffff;
+  animation: tb-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes tb-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45); }
+  50% { box-shadow: 0 0 0 4px rgba(239, 68, 68, 0); }
+}
+
+/* ---------------------------------------------------------
+   Popovers (notifications / messages / user menu)
+   --------------------------------------------------------- */
+.Topbar-popover-wrap {
+  position: relative;
+}
+
+.Topbar-popover {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  background: #ffffff;
+  border: 1px solid var(--tb-border);
+  border-radius: 16px;
+  box-shadow: var(--tb-shadow-lg);
+  overflow: hidden;
+  z-index: 130;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.98);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+}
+
+.Topbar-popover.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.Topbar-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f3f7;
+}
+
+.Topbar-popover-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--tb-text);
+}
+
+.Topbar-popover-count {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--tb-red);
+  background: var(--tb-red-tint);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.Topbar-popover-list {
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.Topbar-popover-list::-webkit-scrollbar { width: 5px; }
+.Topbar-popover-list::-webkit-scrollbar-thumb {
+  background: #e6e9ef;
+  border-radius: 10px;
+}
+
+.Notification-item,
+.Message-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f5f6f9;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.Notification-item:hover,
+.Message-item:hover {
+  background: var(--tb-surface);
+}
+
+.Notification-item:last-child,
+.Message-item:last-child {
+  border-bottom: none;
+}
+
+.Notification-icon-wrap {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Notification-icon-wrap.info { background: #eff6ff; color: #3b82f6; }
+.Notification-icon-wrap.warning { background: #fffbeb; color: #f59e0b; }
+.Notification-icon-wrap.payment { background: var(--tb-red-tint); color: var(--tb-red); }
+.Notification-icon-wrap.order { background: #f0fdf4; color: #22c55e; }
+
+.Message-avatar {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.Notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.Notification-title-text {
+  margin: 0 0 2px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--tb-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.Notification-subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: var(--tb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.Notification-time {
+  font-size: 11px;
+  color: #a2acbd;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.Topbar-empty {
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--tb-muted);
+  font-size: 13px;
+  margin: 0;
+}
+
+.Topbar-popover-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #f1f3f7;
+  text-align: center;
+}
+
+.Topbar-popover-footer a {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--tb-red);
+  text-decoration: none;
+}
+
+.Topbar-popover-footer a:hover {
+  color: var(--tb-red-dark);
+}
+
+/* ---------------------------------------------------------
+   User menu
+   --------------------------------------------------------- */
+.Topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  padding: 5px 12px 5px 5px;
+  border-radius: 999px;
+  transition: background var(--tb-transition), border-color var(--tb-transition);
+}
+
+.Topbar-user:hover,
+.Topbar-user.is-active {
+  background: var(--tb-surface);
+  border-color: var(--tb-border);
+}
+
+.Topbar-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+}
+
+.Topbar-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px var(--tb-border);
+}
+
+.Topbar-avatar-fallback {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tb-red-gradient);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.Topbar-avatar-status {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #ffffff;
+}
+
+.Topbar-user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.Topbar-username {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--tb-text);
+  white-space: nowrap;
+}
+
+.Topbar-role {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--tb-muted);
+  white-space: nowrap;
+}
+
+.Topbar-chevron {
+  color: var(--tb-muted);
+  transition: transform 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.Topbar-chevron.rotated {
+  transform: rotate(180deg);
+  color: var(--tb-red);
+}
+
+.Topbar-user-menu {
+  width: 220px;
+  padding: 8px;
+}
+
+.Topbar-user-menu-header {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px 12px;
+  border-bottom: 1px solid #f1f3f7;
+  margin-bottom: 6px;
+}
+
+.Topbar-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374357;
+  text-decoration: none;
+  border-radius: 9px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.Topbar-menu-item:hover {
+  background: var(--tb-red-tint);
+  color: var(--tb-red-dark);
+}
+
+.Topbar-menu-item.logout {
+  color: var(--tb-red-dark);
+}
+
+.Topbar-menu-item.logout:hover {
+  background: #fee2e2;
+}
+
+.Topbar-menu-divider {
+  height: 1px;
+  background: #f1f3f7;
+  margin: 6px 0;
+}
+
+/* ===========================================================
+   RESPONSIVE BREAKPOINTS
+   =========================================================== */
+
+/* --- Ultra-wide monitors: let the search breathe a little more --- */
+@media (min-width: 1440px) {
+  .Topbar-search {
+    max-width: 440px;
+  }
+}
+
+@media (max-width: 900px) {
+  .Topbar {
+    padding: 10px 16px;
+  }
+  .Topbar-search {
+    max-width: 260px;
+  }
+}
+
+/* --- Tablet / mobile: collapse inline search into a full-width overlay ---
+   Positioned `fixed` (not absolute-inside-parent) so it always spans the
+   ENTIRE header edge-to-edge regardless of where it lives in the DOM —
+   the hamburger and right-hand icons are genuinely covered, not just faded. */
+@media (max-width: 720px) {
+  .Topbar-search {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    max-width: none;
+    height: var(--tb-height);
+    margin: 0 auto;
+    padding: 0 14px;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid var(--tb-border);
+    box-shadow: var(--tb-shadow-sm);
+    z-index: 250;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+  }
+
+  .Topbar-search.mobile-active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    background: #ffffff;
+  }
+
+  .Topbar-search-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.25);
+    z-index: 240;
+    animation: tb-fade-in 0.18s ease;
+  }
+
+  @keyframes tb-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .Topbar-search-close {
+    align-items: center;
+    justify-content: center;
+    color: var(--tb-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+  }
+
+  .Topbar-search-trigger {
+    display: flex;
+  }
+  .Topbar-search-trigger.is-hidden {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .Topbar-kbd {
+    display: none;
+  }
+
+  .Topbar-right.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .Topbar-user-info {
+    display: none;
+  }
+
+  .Topbar-user {
+    padding: 4px;
+  }
+
+  .Topbar-chevron {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .Topbar {
+    padding: 8px 12px;
+  }
+
+  .Topbar-right {
+    gap: 6px;
+  }
+
+  .Topbar-icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .Topbar-divider {
+    display: none;
+  }
+
+  /* IMPORTANT: set width directly (not left+right+auto). The popover's
+     containing block is the tiny icon wrapper it hangs off, not the
+     viewport — combining left/right with width:auto sizes it against
+     that ~40px wrapper instead of the screen, collapsing it to a sliver
+     and wrapping every word onto its own line. */
+  .Topbar-popover {
+    right: 0;
+    width: min(90vw, 320px);
+    max-width: min(90vw, 320px);
+  }
+
+  .Topbar-popover.Topbar-user-menu {
+    right: -2px;
+  }
+
+  .Topbar-popover-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.28);
+    z-index: 125; /* below .Topbar-popover (130), above page content */
+    animation: tb-fade-in 0.18s ease;
+  }
+}
+
+@media (max-width: 360px) {
+  .Topbar-icon-btn {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+/* --- Short / landscape viewports: keep popovers on-screen and scrollable --- */
+@media (max-height: 480px) {
+  .Topbar-popover {
+    top: calc(100% + 8px);
+  }
+  .Topbar-popover-list {
+    max-height: 45vh;
+  }
+}
+
+/* --- Reduced motion --- */
+@media (prefers-reduced-motion: reduce) {
+  .Topbar-icon-btn,
+  .Topbar-popover,
+  .Topbar-search,
+  .Topbar-chevron,
+  .Topbar-badge,
+  .Topbar-search-backdrop,
+  .Topbar-popover-backdrop {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+/* ===========================================================
+   FIXED RESPONSIVE & MOBILE POPOVERS
+   =========================================================== */
+
+@media (max-width: 720px) {
+  /* Search overlay fixed spanning header */
+  .Topbar-search {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    max-width: none;
+    height: var(--tb-height);
+    margin: 0;
+    padding: 0 14px;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid var(--tb-border);
+    box-shadow: var(--tb-shadow-sm);
+    z-index: 250;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+  }
+
+  .Topbar-search.mobile-active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    background: #ffffff;
+  }
+
+  .Topbar-search-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.25);
+    z-index: 240;
+    animation: tb-fade-in 0.18s ease;
+  }
+
+  @keyframes tb-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .Topbar-search-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tb-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+  }
+
+  .Topbar-search-trigger {
+    display: flex;
+  }
+  .Topbar-search-trigger.is-hidden {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .Topbar-kbd {
+    display: none;
+  }
+
+  .Topbar-right.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .Topbar-user-info,
+  .Topbar-chevron {
+    display: none;
+  }
+
+  .Topbar-user {
+    padding: 4px;
+  }
+
+  /* -------------------------------------------------------
+     FIX: MOBILE POPOVER POSITIONING (Prevents left-side overflow)
+     ------------------------------------------------------- */
+  .Topbar-popover {
+    position: fixed !important;
+    top: calc(var(--tb-height) + 8px) !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: calc(100vw - 24px) !important;
+    max-width: 380px !important;
+    margin: 0 auto !important;
+    z-index: 260 !important;
+    border-radius: 18px !important;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.25) !important;
+  }
+
+  .Topbar-popover-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.35);
+    backdrop-filter: blur(2px);
+    z-index: 255;
+    animation: tb-fade-in 0.18s ease;
+  }
+}
+
+@media (max-width: 480px) {
+  .Topbar {
+    padding: 8px 12px;
+  }
+
+  .Topbar-right {
+    gap: 6px;
+  }
+
+  .Topbar-icon-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .Topbar-divider {
+    display: none;
+  }
+
+  .Topbar-popover-list {
+    max-height: 300px;
+  }
+}

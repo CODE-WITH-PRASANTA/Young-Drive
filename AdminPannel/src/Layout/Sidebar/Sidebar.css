@@ -1,0 +1,709 @@
+/* =========================================================
+   DRIVE-X — PREMIUM RESPONSIVE DARK SIDEBAR
+   ========================================================= */
+
+:root {
+  --sb-bg: #0a0f1a;
+  --sb-bg-glass: rgba(11, 17, 30, 0.92);
+  --sb-card-bg: #121a29;
+  --sb-border: #1a2436;
+  --sb-text-muted: #8492a6;
+  --sb-text-main: #d0d7de;
+  --sb-red-primary: #ef4444;
+  --sb-red-secondary: #ff6b6b;
+  --sb-red-glow: rgba(239, 68, 68, 0.45);
+  --sb-red-gradient: linear-gradient(135deg, #ff5b5b 0%, #e11d1d 55%, #b5121b 100%);
+  --sb-hover-bg: rgba(255, 255, 255, 0.045);
+  --sb-width-full: 264px;
+  --sb-width-collapsed: 80px;
+  --sb-width-tablet: 240px;
+  --sb-radius: 14px;
+  --sb-transition: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.Sidebar {
+  width: var(--sb-width-full);
+  height: 100dvh;
+  background:
+    radial-gradient(120% 60% at 0% 0%, rgba(239, 68, 68, 0.10) 0%, transparent 55%),
+    var(--sb-bg);
+  border-right: 1px solid var(--sb-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  transition: width var(--sb-transition), left var(--sb-transition), transform var(--sb-transition);
+  overflow-x: hidden;
+  user-select: none;
+  will-change: width, transform;
+}
+
+.Sidebar.collapsed {
+  width: var(--sb-width-collapsed);
+}
+
+/* Scoped scrollbar (Firefox) */
+.Sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: #263449 transparent;
+}
+
+/* ---------------------------------------------------------
+   Header / Brand
+   --------------------------------------------------------- */
+.Sidebar-header {
+  height: 76px;
+  min-height: 76px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  position: relative;
+}
+
+.Sidebar.collapsed .Sidebar-header {
+  padding: 0 16px;
+  justify-content: center;
+}
+
+.Sidebar-logo-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 12px;
+  background: var(--sb-red-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px var(--sb-red-glow);
+}
+
+.Sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.brand-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.brand-accent {
+  color: var(--sb-red-primary);
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: var(--sb-text-muted);
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.Sidebar-collapse-btn {
+  position: absolute;
+  right: -13px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--sb-card-bg);
+  border: 1px solid var(--sb-border);
+  color: var(--sb-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 5;
+}
+
+.Sidebar-collapse-btn:hover {
+  color: #fff;
+  border-color: var(--sb-red-primary);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+}
+
+/* ---------------------------------------------------------
+   Nav
+   --------------------------------------------------------- */
+.Sidebar-nav {
+  flex: 1;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-y: auto;
+  overflow-x: visible;
+}
+
+.Sidebar-nav::-webkit-scrollbar {
+  width: 5px;
+}
+.Sidebar-nav::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+.Sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: #2a3a52;
+}
+
+.Sidebar-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 11px 13px;
+  color: var(--sb-text-muted);
+  text-decoration: none;
+  border-radius: var(--sb-radius);
+  background: transparent;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  gap: 12px;
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.Sidebar-link:hover {
+  background: var(--sb-hover-bg);
+  color: #ffffff;
+}
+
+.Sidebar-link:focus-visible,
+.Sidebar-sublink:focus-visible,
+.Sidebar-flyout-link:focus-visible,
+.Sidebar-collapse-btn:focus-visible,
+.logout-btn:focus-visible,
+.upgrade-btn:focus-visible,
+.Sidebar-close-btn:focus-visible {
+  outline: 2px solid var(--sb-red-secondary);
+  outline-offset: 2px;
+}
+
+.Sidebar-link.parent-active,
+.Sidebar-link.active {
+  background: var(--sb-red-gradient);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 6px 18px var(--sb-red-glow);
+}
+
+.Sidebar-link.active::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
+  border-radius: 4px;
+  background: var(--sb-red-secondary);
+}
+
+.Sidebar.collapsed .Sidebar-link.active::before {
+  display: none;
+}
+
+.Sidebar-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+}
+
+.Sidebar-dot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sb-red-secondary);
+  border: 2px solid var(--sb-bg);
+}
+
+.Sidebar-text {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.Sidebar-chevron {
+  transition: transform 0.22s ease;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+.Sidebar-chevron.rotated {
+  transform: rotate(180deg);
+}
+
+/* Badges */
+.Sidebar-badge {
+  background: var(--sb-red-primary);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 12px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+/* Dropdown / submenu */
+.Sidebar-dropdown-wrapper {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.Sidebar-submenu {
+  position: relative;
+  padding-left: 34px;
+  margin-top: 4px;
+  margin-bottom: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: sb-expand 0.2s ease;
+}
+
+@keyframes sb-expand {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.submenu-tree-line {
+  position: absolute;
+  left: 22px;
+  top: 2px;
+  bottom: 10px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--sb-red-primary), rgba(239, 68, 68, 0.15));
+  border-radius: 2px;
+}
+
+.Sidebar-sublink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 13px;
+  font-size: 13.5px;
+  color: var(--sb-text-muted);
+  text-decoration: none;
+  border-radius: 10px;
+  transition: all 0.18s ease;
+}
+
+.Sidebar-sublink:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.Sidebar-sublink.active {
+  color: #ffffff;
+  background: rgba(239, 68, 68, 0.12);
+  font-weight: 600;
+  border: 1px solid rgba(239, 68, 68, 0.28);
+}
+
+/* Flyout popover (collapsed rail, desktop only) */
+.Sidebar-flyout {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 0;
+  min-width: 200px;
+  background: var(--sb-card-bg);
+  border: 1px solid var(--sb-border);
+  border-radius: var(--sb-radius);
+  padding: 10px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  z-index: 50;
+  animation: sb-fade-in 0.15s ease;
+}
+
+@keyframes sb-fade-in {
+  from { opacity: 0; transform: translateX(-4px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.Sidebar-flyout-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--sb-text-muted);
+  padding: 4px 10px 8px;
+  font-weight: 700;
+}
+
+.Sidebar-flyout-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 10px;
+  font-size: 13.5px;
+  color: var(--sb-text-main);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.Sidebar-flyout-link:hover {
+  background: var(--sb-hover-bg);
+  color: #fff;
+}
+
+.Sidebar-flyout-link.active {
+  background: var(--sb-red-gradient);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------
+   Upgrade Card
+   --------------------------------------------------------- */
+.Sidebar-upgrade-card {
+  position: relative;
+  overflow: hidden;
+  margin: 10px 14px 4px;
+  padding: 18px 16px;
+  background: linear-gradient(160deg, var(--sb-card-bg) 0%, #0f1725 100%);
+  border: 1px solid var(--sb-border);
+  border-radius: 18px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.Sidebar-upgrade-card:hover {
+  border-color: rgba(239, 68, 68, 0.35);
+  transform: translateY(-2px);
+}
+
+.upgrade-shine {
+  position: absolute;
+  top: -60%;
+  left: -60%;
+  width: 60%;
+  height: 220%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  transform: rotate(20deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.Sidebar-upgrade-card:hover .upgrade-shine {
+  left: 140%;
+}
+
+.upgrade-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffd76a;
+  background: rgba(255, 215, 106, 0.12);
+  box-shadow: 0 0 0 6px rgba(255, 215, 106, 0.06);
+}
+
+.Sidebar-upgrade-card h4 {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.Sidebar-upgrade-card p {
+  color: var(--sb-text-muted);
+  font-size: 11.5px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.upgrade-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 0;
+  background: var(--sb-red-gradient);
+  border: none;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px var(--sb-red-glow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.upgrade-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px var(--sb-red-glow);
+}
+.upgrade-btn:active {
+  transform: translateY(0);
+}
+
+/* ---------------------------------------------------------
+   Profile Footer
+   --------------------------------------------------------- */
+.Sidebar-footer {
+  height: 74px;
+  min-height: 74px;
+  padding: 0 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.Sidebar.collapsed .Sidebar-footer {
+  justify-content: center;
+  padding: 0 8px;
+}
+
+.Sidebar-user-avatar {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 50%;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.Sidebar-user-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.Sidebar-status-dot {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2ecc71;
+  border: 2px solid var(--sb-bg);
+}
+
+.Sidebar-user-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.user-name {
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  color: var(--sb-text-muted);
+  font-size: 11px;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--sb-text-muted);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+}
+
+.logout-btn:hover {
+  color: #ffffff;
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ---------------------------------------------------------
+   Mobile drawer plumbing (shared defaults)
+   --------------------------------------------------------- */
+.Sidebar-backdrop {
+  display: none;
+}
+
+.Sidebar-close-btn {
+  display: none;
+}
+
+/* ===========================================================
+   RESPONSIVE BREAKPOINTS
+   =========================================================== */
+
+/* --- Large desktop / default already covers >1200px --- */
+
+/* --- Small laptops / tablets landscape: auto-tighten rail --- */
+@media (max-width: 1200px) {
+  .Sidebar {
+    width: var(--sb-width-tablet);
+  }
+  .Sidebar.collapsed {
+    width: var(--sb-width-collapsed);
+  }
+}
+
+/* --- Tablets (portrait) --- */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .Sidebar-upgrade-card {
+    padding: 14px 12px;
+  }
+  .Sidebar-header {
+    height: 68px;
+  }
+}
+
+/* --- Mobile: off-canvas drawer --- */
+@media (max-width: 768px) {
+  .Sidebar {
+    width: min(84vw, 300px);
+    max-width: 320px;
+    left: calc(-1 * min(84vw, 300px) - 20px);
+    box-shadow: none;
+  }
+
+  /* On mobile the "collapsed" concept doesn't apply — always full width drawer */
+  .Sidebar.collapsed {
+    width: min(84vw, 300px);
+  }
+
+  .Sidebar.mobile-open {
+    left: 0;
+    box-shadow: 12px 0 40px rgba(0, 0, 0, 0.55);
+  }
+
+  .Sidebar-collapse-btn {
+    display: none;
+  }
+
+  .Sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 190;
+    animation: sb-fade-in-backdrop 0.2s ease;
+  }
+
+  @keyframes sb-fade-in-backdrop {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .Sidebar-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 16px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--sb-border);
+    color: var(--sb-text-muted);
+    cursor: pointer;
+    z-index: 5;
+  }
+
+  .Sidebar-close-btn:hover {
+    color: #fff;
+    border-color: var(--sb-red-primary);
+  }
+
+  /* Flyouts don't make sense on touch screens */
+  .Sidebar-flyout {
+    display: none;
+  }
+
+  /* Roomier touch targets */
+  .Sidebar-link {
+    padding: 13px 14px;
+    font-size: 14.5px;
+  }
+
+  .Sidebar-sublink {
+    padding: 11px 14px;
+  }
+}
+
+/* --- Very small phones --- */
+@media (max-width: 380px) {
+  .Sidebar {
+    width: 88vw;
+    left: calc(-88vw - 20px);
+  }
+  .Sidebar-header {
+    padding: 0 14px;
+  }
+  .Sidebar-upgrade-card {
+    margin: 8px 10px 4px;
+  }
+}
+
+/* --- Short viewports: keep footer/upgrade reachable --- */
+@media (max-height: 620px) {
+  .Sidebar-upgrade-card {
+    display: none;
+  }
+}
+
+/* --- Reduced motion --- */
+@media (prefers-reduced-motion: reduce) {
+  .Sidebar,
+  .Sidebar-link,
+  .Sidebar-chevron,
+  .Sidebar-submenu,
+  .Sidebar-flyout,
+  .upgrade-shine,
+  .Sidebar-upgrade-card,
+  .upgrade-btn {
+    transition: none !important;
+    animation: none !important;
+  }
+}
