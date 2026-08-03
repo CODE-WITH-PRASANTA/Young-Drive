@@ -6,6 +6,7 @@ import VehicleManagement from "./Components/Profile/VehicleManagement/VehicleMan
 import FeatureListing from "./Components/Profile/FeatureListing/FeatureListing";
 import AllBookings from "./Components/AllBookings/AllBookings";
 import VehicleList from "./Components/VehicleList/VehicleList";
+import AddNewVehicle from "./Components/AddNewVehicle/AddNewVehicle";
 
 function App() {
   return (
@@ -37,6 +38,9 @@ function App() {
           <Route path="reports" element={<div>Reports Page</div>} />
           <Route path="settings" element={<div>Settings Page</div>} />
           <Route path="vechilelist" element={<VehicleList />} />
+          <Route path="newvechile" element={<AddNewVehicle/>} />
+
+
 
 
         </Route>
