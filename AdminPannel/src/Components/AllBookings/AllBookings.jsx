@@ -297,9 +297,6 @@ const AllBookings = () => {
                 <option>Completed</option>
                 <option>Pending</option>
               </select>
-              <button className="AllBookings-btn-secondary"><FaCalendarAlt /> May 12 - May 18, 2025</button>
-              <button className="AllBookings-btn-secondary"><FaFilter /> More Filters</button>
-              <button className="AllBookings-btn-icon"><FaRedo /> Reset</button>
             </div>
           </div>
 

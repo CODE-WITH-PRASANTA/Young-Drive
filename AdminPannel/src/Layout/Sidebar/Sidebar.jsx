@@ -17,14 +17,18 @@ import {
   ChevronRight,
   Crown,
   LogOut,
-  X
+  X,
+  ListFilter
 } from "lucide-react";
 import './Sidebar.css';
 
 const MOBILE_BREAKPOINT = 768;
 
+// Configured with exact paths matching App.jsx
 const menuConfig = [
   { type: 'link', icon: <LayoutDashboard size={20} />, text: 'Dashboard', path: '/' },
+  { type: 'link', icon: <Car size={20} />, text: 'Vehicle Management', path: '/vehicle-management' },
+  { type: 'link', icon: <ListFilter size={20} />, text: 'Feature Listing', path: '/feature-listing' },
   {
     type: 'dropdown',
     icon: <Calendar size={20} />,
@@ -36,7 +40,6 @@ const menuConfig = [
       { text: 'Calendar', path: '/bookings/calendar' },
     ]
   },
-  { type: 'link', icon: <Car size={20} />, text: 'Vehicles', path: '/vehicles' },
   { type: 'link', icon: <Users size={20} />, text: 'Customers', path: '/customers' },
   { type: 'link', icon: <UserCheck size={20} />, text: 'Drivers', path: '/drivers' },
   { type: 'link', icon: <CreditCard size={20} />, text: 'Payments', path: '/payments' },
@@ -59,27 +62,24 @@ const Sidebar = ({
   const activeParent = menuConfig.find(
     (item) =>
       item.type === 'dropdown' &&
-      item.children.some((child) => location.pathname.startsWith(child.path))
+      item.children.some((child) => location.pathname === child.path)
   );
 
   const [openSubMenu, setOpenSubMenu] = useState(activeParent ? activeParent.text : null);
-  const [flyout, setFlyout] = useState(null); // for collapsed-desktop hover popovers
+  const [flyout, setFlyout] = useState(null);
 
-  // Keep the correct submenu expanded as the route changes
   useEffect(() => {
     const match = menuConfig.find(
       (item) =>
         item.type === 'dropdown' &&
-        item.children.some((child) => location.pathname.startsWith(child.path))
+        item.children.some((child) => location.pathname === child.path)
     );
     if (match) setOpenSubMenu(match.text);
   }, [location.pathname]);
 
-  // Auto-close the mobile drawer whenever the route changes
   useEffect(() => {
     if (window.innerWidth <= MOBILE_BREAKPOINT) onClose();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname]);
+  }, [location.pathname, onClose]);
 
   const toggleSubMenu = (title) => {
     setOpenSubMenu((prev) => (prev === title ? null : title));
@@ -89,7 +89,6 @@ const Sidebar = ({
     if (window.innerWidth <= MOBILE_BREAKPOINT) onClose();
   }, [onClose]);
 
-  // Close on Escape, lock body scroll while the mobile drawer is open
   useEffect(() => {
     if (!isMobileOpen) return undefined;
 
@@ -106,7 +105,6 @@ const Sidebar = ({
     };
   }, [isMobileOpen, onClose]);
 
-  // If the viewport grows back past mobile size, make sure the drawer state resets
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > MOBILE_BREAKPOINT && isMobileOpen) onClose();
@@ -116,7 +114,7 @@ const Sidebar = ({
   }, [isMobileOpen, onClose]);
 
   const isChildActive = (item) =>
-    item.children?.some((child) => location.pathname.startsWith(child.path));
+    item.children?.some((child) => location.pathname === child.path);
 
   return (
     <>
@@ -135,7 +133,7 @@ const Sidebar = ({
           <X size={20} />
         </button>
 
-        {/* Brand / Header */}
+        {/* Brand Header */}
         <div className="Sidebar-header">
           <div className="Sidebar-logo-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -165,7 +163,7 @@ const Sidebar = ({
 
         {/* Navigation */}
         <nav className="Sidebar-nav">
-          {menuConfig.map((item, index) => {
+          {menuConfig.map((item) => {
             if (item.type === 'link') {
               const isActive = location.pathname === item.path;
               return (
@@ -214,7 +212,7 @@ const Sidebar = ({
                   )}
                 </button>
 
-                {/* Expanded desktop / mobile submenu */}
+                {/* Submenu Dropdown */}
                 {!isCollapsed && isSubOpen && (
                   <div className="Sidebar-submenu">
                     <div className="submenu-tree-line" />
@@ -236,7 +234,7 @@ const Sidebar = ({
                   </div>
                 )}
 
-                {/* Flyout popover when the rail is collapsed on desktop */}
+                {/* Collapsed Rail Flyout */}
                 {showFlyout && (
                   <div className="Sidebar-flyout">
                     <div className="Sidebar-flyout-title">{item.text}</div>
@@ -279,7 +277,7 @@ const Sidebar = ({
           <div className="Sidebar-user-avatar">
             <img
               src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
-              alt=""
+              alt="User Avatar"
             />
             <span className="Sidebar-status-dot" aria-hidden="true" />
           </div>
