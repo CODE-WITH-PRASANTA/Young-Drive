@@ -8,6 +8,7 @@ import {
 import MainLayout from "./Layout/MainLayout/MainLayout";
 import VehicleManagement from "./Components/Profile/VehicleManagement/VehicleManagement";
 import FeatureListing from "./Components/Profile/FeatureListing/FeatureListing";
+import AllBookings from "./Components/AllBookings/AllBookings";
 
 function App() {
   return (
@@ -17,6 +18,9 @@ function App() {
         <Route path="/" element={<MainLayout />}>
           <Route path="vehicle-management" element={<VehicleManagement />} />
           <Route path="feature-listing" element={<FeatureListing />} />
+          <Route path="/allbookings" element={<AllBookings />} />
+
+
         </Route>
 
         {/* Fallback redirect for unmatched routes */}
