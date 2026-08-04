@@ -39,7 +39,7 @@ const VehicleList = () => {
   const [showMoreFilters, setShowMoreFilters] = useState(false);
   const [fuelFilter, setFuelFilter] = useState("All");
 
-  // Active Applied Filters
+  // Active Applied Filters State
   const [appliedFilters, setAppliedFilters] = useState({
     search: "",
     brand: "All Brands",
@@ -56,7 +56,7 @@ const VehicleList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // 1. Fetch Vehicles from Express API
+  // 1. Fetch Vehicles from Express API Endpoint
   const fetchVehicles = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -77,18 +77,28 @@ const VehicleList = () => {
     fetchVehicles();
   }, [fetchVehicles]);
 
-  // Extract unique brands and types dynamically from database for filter dropdowns
+  // Extract unique brands dynamically from database for filter dropdown
   const uniqueBrands = useMemo(() => {
-    const brands = new Set(vehicles.map((v) => v.vehicleBrand).filter(Boolean));
+    const brands = new Set(
+      vehicles.map((v) => v.vehicleBrand).filter(Boolean)
+    );
     return ["All Brands", ...Array.from(brands)];
   }, [vehicles]);
 
+  // Extract unique vehicle types dynamically from database for filter dropdown
   const uniqueTypes = useMemo(() => {
-    const types = new Set(vehicles.map((v) => v.vehicleType).filter(Boolean));
+    const types = new Set(
+      vehicles.map((v) => v.vehicleType).filter(Boolean)
+    );
     return ["All Types", ...Array.from(types)];
   }, [vehicles]);
 
-  // Filter Actions
+  // Reset page to 1 whenever any filter changes so users don't get stuck on empty pages
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, brandFilter, typeFilter, statusFilter, fuelFilter]);
+
+  // Filter Button Actions
   const handleApplyFilters = () => {
     setAppliedFilters({
       search: searchTerm,
@@ -116,29 +126,50 @@ const VehicleList = () => {
     setCurrentPage(1);
   };
 
-  // Filtered List Computation
+  // Real-time Dynamic Filter Calculation
   const filteredVehicles = useMemo(() => {
     return vehicles.filter((item) => {
-      const name = `${item.vehicleBrand || ""} ${item.vehicleModel || ""} ${item.variantLine || ""}`;
-      const plate = item.registrationNumber || "";
-      const matchesSearch =
-        name.toLowerCase().includes(appliedFilters.search.toLowerCase()) ||
-        plate.toLowerCase().includes(appliedFilters.search.toLowerCase());
+      const brand = item.vehicleBrand || "";
+      const model = item.vehicleModel || "";
+      const variant = item.variantLine || "";
+      const name = `${brand} ${model} ${variant}`.toLowerCase();
+      const plate = (item.registrationNumber || "").toLowerCase();
+      const query = searchTerm.trim().toLowerCase();
 
+      // 1. Search Query Match
+      const matchesSearch = !query || name.includes(query) || plate.includes(query);
+
+      // 2. Brand Match
       const matchesBrand =
-        appliedFilters.brand === "All Brands" || item.vehicleBrand === appliedFilters.brand;
+        brandFilter === "All Brands" ||
+        brand.toLowerCase() === brandFilter.toLowerCase();
+
+      // 3. Category/Type Match
       const matchesType =
-        appliedFilters.type === "All Types" || item.vehicleType === appliedFilters.type;
+        typeFilter === "All Types" ||
+        (item.vehicleType || "").toLowerCase() === typeFilter.toLowerCase();
+
+      // 4. Availability Status Match
       const matchesStatus =
-        appliedFilters.status === "All Status" || item.availabilityStatus === appliedFilters.status;
+        statusFilter === "All Status" ||
+        (item.availabilityStatus || "").toLowerCase() === statusFilter.toLowerCase();
+
+      // 5. Fuel Type Match
       const matchesFuel =
-        appliedFilters.fuel === "All" || item.fuelType === appliedFilters.fuel;
+        fuelFilter === "All" ||
+        (item.fuelType || "").toLowerCase() === fuelFilter.toLowerCase();
 
-      return matchesSearch && matchesBrand && matchesType && matchesStatus && matchesFuel;
+      return (
+        matchesSearch &&
+        matchesBrand &&
+        matchesType &&
+        matchesStatus &&
+        matchesFuel
+      );
     });
-  }, [vehicles, appliedFilters]);
+  }, [vehicles, searchTerm, brandFilter, typeFilter, statusFilter, fuelFilter]);
 
-  // Pagination Calculation
+  // Pagination Computations
   const totalPages = Math.ceil(filteredVehicles.length / itemsPerPage) || 1;
 
   const currentData = useMemo(() => {
@@ -152,7 +183,7 @@ const VehicleList = () => {
     }
   };
 
-  // Checkbox Selection
+  // Checkbox Select Logic
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       setSelectedVehicles(currentData.map((v) => v._id));
@@ -167,7 +198,7 @@ const VehicleList = () => {
     );
   };
 
-  // Delete Vehicle API Integration
+  // Delete Vehicle Endpoint Integration
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this vehicle?")) {
       try {
@@ -184,7 +215,7 @@ const VehicleList = () => {
     }
   };
 
-  // Export CSV Action
+  // CSV Export Action
   const handleExport = () => {
     const dataToExport = selectedVehicles.length
       ? vehicles.filter((v) => selectedVehicles.includes(v._id))
@@ -210,7 +241,7 @@ const VehicleList = () => {
     document.body.removeChild(link);
   };
 
-  // Edit Save API Integration
+  // Edit Submit API Integration
   const handleEditSave = async (e) => {
     e.preventDefault();
     try {
@@ -228,7 +259,7 @@ const VehicleList = () => {
     }
   };
 
-  // Format Helper for Dates
+  // Date Formatting Helper
   const formatDate = (dateStr) => {
     if (!dateStr) return "N/A";
     return new Date(dateStr).toLocaleDateString("en-US", {

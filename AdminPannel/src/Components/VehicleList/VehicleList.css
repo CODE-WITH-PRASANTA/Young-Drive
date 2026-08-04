@@ -1,255 +1,498 @@
+/* ==========================================================================
+   VehicleList.css
+   Fleet dashboard styling — palette, spacing and states tuned for a clean
+   admin/SaaS look. The filter toolbar (search / brand / type / status /
+   more filters / reset / apply) is the focal point of this pass.
+   ========================================================================== */
+
 :root {
-  --primary-color: #4f46e5;
-  --primary-hover: #4338ca;
-  --bg-main: #f8fafc;
-  --border-color: #e2e8f0;
-  --text-dark: #1e293b;
-  --text-muted: #64748b;
-  --card-bg: #ffffff;
+  --vl-bg: #f4f6fb;
+  --vl-surface: #ffffff;
+  --vl-border: #e4e7ee;
+  --vl-border-strong: #d6dae4;
+  --vl-text: #1b2130;
+  --vl-text-muted: #6b7280;
+  --vl-text-faint: #9aa1b1;
+
+  --vl-primary: #5b4ff5;
+  --vl-primary-hover: #4a3fe0;
+  --vl-primary-soft: #edecfe;
+
+  --vl-green: #16a34a;
+  --vl-green-soft: #e7f8ee;
+  --vl-yellow: #d97706;
+  --vl-yellow-soft: #fff4e5;
+  --vl-red: #dc2626;
+  --vl-red-soft: #fdecec;
+  --vl-purple: #7c3aed;
+  --vl-purple-soft: #f2ebfe;
+  --vl-blue: #2563eb;
+  --vl-blue-soft: #e8f0fe;
+
+  --vl-radius-sm: 8px;
+  --vl-radius-md: 12px;
+  --vl-radius-lg: 16px;
+  --vl-radius-pill: 999px;
+
+  --vl-shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --vl-shadow-md: 0 4px 12px rgba(16, 24, 40, 0.06);
+  --vl-shadow-lg: 0 12px 28px rgba(16, 24, 40, 0.09);
+
+  --vl-transition: 150ms ease;
 }
 
-/* Base Container */
 .VehicleList {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, sans-serif;
-  background-color: var(--bg-main);
-  padding: 24px;
-  color: var(--text-dark);
+  box-sizing: border-box;
   min-height: 100vh;
+  padding: 28px clamp(16px, 3vw, 36px) 60px;
+  background: var(--vl-bg);
+  color: var(--vl-text);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
-/* Header */
+.VehicleList *,
+.VehicleList *::before,
+.VehicleList *::after {
+  box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Header                                                                  */
+/* ---------------------------------------------------------------------- */
+
 .VehicleList__header {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
   margin-bottom: 24px;
 }
 
 .VehicleList__title {
-  font-size: 24px;
-  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 0 4px 0;
+  gap: 10px;
+  margin: 0 0 6px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .VehicleList__title-icon {
+  color: var(--vl-primary);
   font-size: 20px;
 }
 
 .VehicleList__breadcrumb {
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--vl-text-muted);
 }
 
 .VehicleList__breadcrumb span {
-  color: var(--primary-color);
-  font-weight: 500;
+  color: var(--vl-text);
+  font-weight: 600;
+}
+
+.VehicleList__header-actions {
+  display: flex;
+  gap: 10px;
 }
 
 .VehicleList__btn-export {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: #ffffff;
-  border: 1px solid var(--border-color);
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 500;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--vl-surface);
+  border: 1px solid var(--vl-border-strong);
+  border-radius: var(--vl-radius-sm);
+  color: var(--vl-text);
   font-size: 14px;
-  color: var(--text-dark);
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  box-shadow: var(--vl-shadow-sm);
+  transition: background var(--vl-transition), border-color var(--vl-transition), transform var(--vl-transition);
 }
 
 .VehicleList__btn-export:hover {
-  background: #f1f5f9;
+  background: #f8f9fc;
+  border-color: var(--vl-primary);
+  color: var(--vl-primary);
 }
 
-/* Stat Cards */
+.VehicleList__btn-export:active {
+  transform: translateY(1px);
+}
+
+/* ---------------------------------------------------------------------- */
+/* KPI Stat Cards                                                          */
+/* ---------------------------------------------------------------------- */
+
 .VehicleList__stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .VehicleList__stat-card {
-  background: var(--card-bg);
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
+  padding: 18px 20px;
+  background: var(--vl-surface);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-md);
+  box-shadow: var(--vl-shadow-sm);
+  transition: box-shadow var(--vl-transition), transform var(--vl-transition);
+}
+
+.VehicleList__stat-card:hover {
+  box-shadow: var(--vl-shadow-md);
+  transform: translateY(-1px);
 }
 
 .VehicleList__stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  border-radius: var(--vl-radius-sm);
+  font-size: 18px;
 }
 
-.VehicleList__stat-icon--blue { background: #eff6ff; color: #2563eb; }
-.VehicleList__stat-icon--green { background: #f0fdf4; color: #16a34a; }
-.VehicleList__stat-icon--yellow { background: #fefce8; color: #ca8a04; }
-.VehicleList__stat-icon--red { background: #fef2f2; color: #dc2626; }
-.VehicleList__stat-icon--purple { background: #faf5ff; color: #9333ea; }
+.VehicleList__stat-icon--blue {
+  background: var(--vl-blue-soft);
+  color: var(--vl-blue);
+}
+.VehicleList__stat-icon--green {
+  background: var(--vl-green-soft);
+  color: var(--vl-green);
+}
+.VehicleList__stat-icon--yellow {
+  background: var(--vl-yellow-soft);
+  color: var(--vl-yellow);
+}
+.VehicleList__stat-icon--red {
+  background: var(--vl-red-soft);
+  color: var(--vl-red);
+}
+.VehicleList__stat-icon--purple {
+  background: var(--vl-purple-soft);
+  color: var(--vl-purple);
+}
 
 .VehicleList__stat-label {
-  font-size: 13px;
-  color: var(--text-muted);
+  font-size: 12.5px;
+  color: var(--vl-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .VehicleList__stat-value {
   font-size: 22px;
   font-weight: 700;
-  margin: 2px 0;
+  line-height: 1.3;
 }
 
 .VehicleList__stat-sub {
-  font-size: 11px;
-  color: var(--text-muted);
+  font-size: 12px;
+  color: var(--vl-text-faint);
 }
 
-/* Filter Controls */
+/* ---------------------------------------------------------------------- */
+/* Filter Toolbar — primary focus of this pass                            */
+/* ---------------------------------------------------------------------- */
+
 .VehicleList__filters-wrapper {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
+  background: var(--vl-surface);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-lg);
+  box-shadow: var(--vl-shadow-sm);
   padding: 16px;
   margin-bottom: 20px;
 }
 
 .VehicleList__filters {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
   align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
+/* Search box grows to fill remaining space, everything else keeps its
+   natural width so the row reads like a single continuous control bar. */
 .VehicleList__search-box {
   position: relative;
-  flex: 1;
-  min-width: 200px;
+  flex: 1 1 260px;
+  min-width: 220px;
+  display: flex;
+  align-items: center;
 }
 
 .VehicleList__search-icon {
   position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
+  left: 14px;
+  color: var(--vl-text-faint);
+  font-size: 15px;
+  pointer-events: none;
 }
 
 .VehicleList__search-box input {
   width: 100%;
-  padding: 8px 12px 8px 36px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  outline: none;
+  height: 42px;
+  padding: 0 14px 0 40px;
+  border: 1px solid var(--vl-border-strong);
+  border-radius: var(--vl-radius-pill);
+  background: #fbfbfd;
   font-size: 14px;
+  color: var(--vl-text);
+  outline: none;
+  transition: border-color var(--vl-transition), box-shadow var(--vl-transition), background var(--vl-transition);
 }
 
+.VehicleList__search-box input::placeholder {
+  color: var(--vl-text-faint);
+}
+
+.VehicleList__search-box input:hover {
+  border-color: var(--vl-border-strong);
+  background: #f6f7fb;
+}
+
+.VehicleList__search-box input:focus {
+  border-color: var(--vl-primary);
+  background: var(--vl-surface);
+  box-shadow: 0 0 0 3px var(--vl-primary-soft);
+}
+
+/* Dropdown selects — uniform sizing, custom chevron so all browsers match */
 .VehicleList__select {
-  padding: 8px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background: white;
+  height: 42px;
+  padding: 0 34px 0 14px;
+  border: 1px solid var(--vl-border-strong);
+  border-radius: var(--vl-radius-pill);
+  background-color: #fbfbfd;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'><path d='M1 1L5 5L9 1' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   font-size: 14px;
-  outline: none;
+  color: var(--vl-text);
   cursor: pointer;
+  min-width: 132px;
+  max-width: 190px;
+  transition: border-color var(--vl-transition), box-shadow var(--vl-transition), background-color var(--vl-transition);
 }
 
+.VehicleList__select:hover {
+  border-color: var(--vl-primary);
+  background-color: #f6f7fb;
+}
+
+.VehicleList__select:focus {
+  outline: none;
+  border-color: var(--vl-primary);
+  box-shadow: 0 0 0 3px var(--vl-primary-soft);
+}
+
+/* Shared button base for the three toolbar action buttons */
 .VehicleList__btn-more,
-.VehicleList__btn-reset {
+.VehicleList__btn-reset,
+.VehicleList__btn-apply {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border: 1px solid var(--border-color);
-  background: white;
-  border-radius: 6px;
+  justify-content: center;
+  gap: 7px;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: var(--vl-radius-pill);
   font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
+  transition: background var(--vl-transition), border-color var(--vl-transition),
+    color var(--vl-transition), transform var(--vl-transition), box-shadow var(--vl-transition);
+}
+
+.VehicleList__btn-more:active,
+.VehicleList__btn-reset:active,
+.VehicleList__btn-apply:active {
+  transform: translateY(1px);
+}
+
+/* More Filters — outline style, toggles to filled when the panel is open */
+.VehicleList__btn-more {
+  background: var(--vl-surface);
+  border: 1px solid var(--vl-border-strong);
+  color: var(--vl-text);
+}
+
+.VehicleList__btn-more:hover {
+  border-color: var(--vl-primary);
+  color: var(--vl-primary);
+  background: var(--vl-primary-soft);
 }
 
 .VehicleList__btn-more--active {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+  background: var(--vl-primary-soft);
+  border-color: var(--vl-primary);
+  color: var(--vl-primary);
 }
 
+/* Reset — quiet/ghost, de-emphasized next to Apply */
+.VehicleList__btn-reset {
+  background: transparent;
+  border: 1px solid var(--vl-border-strong);
+  color: var(--vl-text-muted);
+}
+
+.VehicleList__btn-reset:hover {
+  background: #f6f7fb;
+  border-color: var(--vl-border-strong);
+  color: var(--vl-text);
+}
+
+/* Apply Filters — the single primary action in the bar */
 .VehicleList__btn-apply {
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
+  background: var(--vl-primary);
+  border: 1px solid var(--vl-primary);
+  color: #fff;
+  padding: 0 22px;
+  box-shadow: 0 2px 8px rgba(91, 79, 245, 0.28);
 }
 
 .VehicleList__btn-apply:hover {
-  background: var(--primary-hover);
+  background: var(--vl-primary-hover);
+  border-color: var(--vl-primary-hover);
+  box-shadow: 0 4px 12px rgba(91, 79, 245, 0.35);
 }
 
+/* Collapsible "More Filters" panel */
 .VehicleList__more-panel {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border-color);
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--vl-border);
+  animation: vl-panel-in 160ms ease;
+}
+
+@keyframes vl-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .VehicleList__more-group {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  gap: 10px;
 }
 
-/* Table */
+.VehicleList__more-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--vl-text-muted);
+  white-space: nowrap;
+}
+
+.VehicleList__more-group .VehicleList__select {
+  min-width: 150px;
+}
+
+/* Responsive collapse for the toolbar — stacks predictably on narrow
+   screens instead of overflowing or squashing the search box. */
+@media (max-width: 900px) {
+  .VehicleList__filters {
+    gap: 8px;
+  }
+  .VehicleList__search-box {
+    flex-basis: 100%;
+  }
+  .VehicleList__select {
+    flex: 1 1 140px;
+  }
+}
+
+@media (max-width: 560px) {
+  .VehicleList__btn-more,
+  .VehicleList__btn-reset,
+  .VehicleList__btn-apply {
+    flex: 1 1 auto;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Table                                                                   */
+/* ---------------------------------------------------------------------- */
+
 .VehicleList__table-container {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
+  background: var(--vl-surface);
+  border: 1px solid var(--vl-border);
+  border-radius: var(--vl-radius-lg);
+  box-shadow: var(--vl-shadow-sm);
   overflow-x: auto;
 }
 
 .VehicleList__table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 780px;
+}
+
+.VehicleList__table thead th {
   text-align: left;
-  font-size: 14px;
-}
-
-.VehicleList__table th {
-  background: #f8fafc;
-  padding: 12px 16px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.VehicleList__table td {
   padding: 14px 16px;
-  border-bottom: 1px solid var(--border-color);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--vl-text-faint);
+  background: #fafbfd;
+  border-bottom: 1px solid var(--vl-border);
+  white-space: nowrap;
+}
+
+.VehicleList__table tbody td {
+  padding: 14px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--vl-border);
   vertical-align: middle;
+}
+
+.VehicleList__table tbody tr:hover {
+  background: #fafbff;
 }
 
 .VehicleList__table tbody tr:last-child td {
   border-bottom: none;
 }
 
-/* Cells formatting */
+.VehicleList__loading,
+.VehicleList__error,
+.VehicleList__no-data {
+  padding: 48px 16px;
+  text-align: center;
+  color: var(--vl-text-muted);
+  font-size: 14px;
+}
+
+.VehicleList__error {
+  color: var(--vl-red);
+}
+
 .VehicleList__cell-vehicle {
   display: flex;
   align-items: center;
@@ -257,69 +500,88 @@
 }
 
 .VehicleList__car-thumb {
-  width: 60px;
-  height: 40px;
+  width: 64px;
+  height: 46px;
+  border-radius: 8px;
   object-fit: cover;
-  border-radius: 6px;
-  background: #e2e8f0;
+  border: 1px solid var(--vl-border);
+  background: #f1f2f6;
+  flex-shrink: 0;
 }
 
 .VehicleList__car-name {
   font-weight: 600;
-  color: var(--text-dark);
+  color: var(--vl-text);
 }
 
 .VehicleList__car-plate {
-  font-size: 12px;
-  color: var(--text-muted);
+  font-size: 12.5px;
+  color: var(--vl-text-muted);
+  margin-top: 2px;
 }
 
 .VehicleList__category-title {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: 500;
-}
-
-.VehicleList__category-sub {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.VehicleList__price-primary {
   font-weight: 600;
 }
 
+.VehicleList__type-icon {
+  color: var(--vl-primary);
+  font-size: 13px;
+}
+
+.VehicleList__category-sub {
+  font-size: 12.5px;
+  color: var(--vl-text-muted);
+  margin-top: 2px;
+}
+
+.VehicleList__price-primary {
+  font-weight: 700;
+}
+
 .VehicleList__price-unit {
-  font-weight: normal;
-  font-size: 12px;
-  color: var(--text-muted);
+  font-weight: 400;
+  color: var(--vl-text-muted);
+  font-size: 12.5px;
 }
 
 .VehicleList__price-secondary {
-  font-size: 12px;
-  color: var(--text-muted);
+  font-size: 12.5px;
+  color: var(--vl-text-muted);
+  margin-top: 2px;
 }
 
 .VehicleList__text-muted {
-  color: var(--text-muted);
+  color: var(--vl-text-muted);
 }
 
-/* Badges */
 .VehicleList__badge {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 12px;
+  padding: 5px 12px;
+  border-radius: var(--vl-radius-pill);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
+  text-transform: capitalize;
 }
 
-.VehicleList__badge--available { background: #dcfce7; color: #15803d; }
-.VehicleList__badge--booked { background: #dbeafe; color: #1d4ed8; }
-.VehicleList__badge--maintenance { background: #f3e8ff; color: #6b21a8; }
-.VehicleList__badge--unavailable { background: #fef9c3; color: #a16207; }
+.VehicleList__badge--available {
+  background: var(--vl-green-soft);
+  color: var(--vl-green);
+}
 
-/* Actions */
+.VehicleList__badge--unavailable {
+  background: var(--vl-red-soft);
+  color: var(--vl-red);
+}
+
+.VehicleList__badge--maintenance {
+  background: var(--vl-yellow-soft);
+  color: var(--vl-yellow);
+}
+
 .VehicleList__actions {
   display: flex;
   justify-content: flex-end;
@@ -329,183 +591,251 @@
 .VehicleList__action-btn {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
-  border: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--vl-border);
+  background: var(--vl-surface);
+  color: var(--vl-text-muted);
   cursor: pointer;
-  font-size: 14px;
-  transition: opacity 0.2s;
+  transition: background var(--vl-transition), color var(--vl-transition), border-color var(--vl-transition);
 }
 
-.VehicleList__action-btn:hover {
-  opacity: 0.8;
+.VehicleList__action-btn--view:hover {
+  background: var(--vl-blue-soft);
+  color: var(--vl-blue);
+  border-color: var(--vl-blue);
 }
 
-.VehicleList__action-btn--view { background: #e0e7ff; color: #4338ca; }
-.VehicleList__action-btn--edit { background: #e0f2fe; color: #0369a1; }
-.VehicleList__action-btn--delete { background: #fee2e2; color: #b91c1c; }
-
-.VehicleList__no-data {
-  text-align: center;
-  padding: 30px;
-  color: var(--text-muted);
+.VehicleList__action-btn--edit:hover {
+  background: var(--vl-purple-soft);
+  color: var(--vl-purple);
+  border-color: var(--vl-purple);
 }
 
-/* Footer & Pagination */
+.VehicleList__action-btn--delete:hover {
+  background: var(--vl-red-soft);
+  color: var(--vl-red);
+  border-color: var(--vl-red);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Footer / Pagination                                                     */
+/* ---------------------------------------------------------------------- */
+
 .VehicleList__footer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-top: 16px;
-  font-size: 14px;
-  color: var(--text-muted);
+}
+
+.VehicleList__footer-info {
+  font-size: 13px;
+  color: var(--vl-text-muted);
 }
 
 .VehicleList__pagination {
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
 }
 
-.VehicleList__page-btn,
-.VehicleList__page-nav {
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--border-color);
-  background: white;
-  border-radius: 6px;
-  display: flex;
+.VehicleList__page-nav,
+.VehicleList__page-btn {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  border-radius: 8px;
+  border: 1px solid var(--vl-border-strong);
+  background: var(--vl-surface);
+  color: var(--vl-text);
   font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--vl-transition), color var(--vl-transition), border-color var(--vl-transition);
 }
 
-.VehicleList__page-btn--active {
-  background: var(--primary-color);
-  color: white;
-  border-color: var(--primary-color);
+.VehicleList__page-nav:hover:not(:disabled),
+.VehicleList__page-btn:hover {
+  border-color: var(--vl-primary);
+  color: var(--vl-primary);
 }
 
 .VehicleList__page-nav:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
-/* Modals */
+.VehicleList__page-btn--active {
+  background: var(--vl-primary);
+  border-color: var(--vl-primary);
+  color: #fff;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Modals                                                                   */
+/* ---------------------------------------------------------------------- */
+
 .VehicleList__modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
+  inset: 0;
+  background: rgba(17, 20, 30, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
   z-index: 1000;
-  padding: 16px;
+  animation: vl-fade-in 150ms ease;
+}
+
+@keyframes vl-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .VehicleList__modal {
-  background: white;
-  border-radius: 12px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius-lg);
   width: 100%;
-  max-width: 500px;
-  overflow: hidden;
-  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--vl-shadow-lg);
+}
+
+.VehicleList__modal--edit {
+  max-width: 480px;
 }
 
 .VehicleList__modal-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color);
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--vl-border);
 }
 
 .VehicleList__modal-header h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: 17px;
+  font-weight: 700;
 }
 
 .VehicleList__modal-close {
-  background: transparent;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
-  font-size: 18px;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--vl-text-muted);
   cursor: pointer;
-  color: var(--text-muted);
+  transition: background var(--vl-transition), color var(--vl-transition);
+}
+
+.VehicleList__modal-close:hover {
+  background: var(--vl-red-soft);
+  color: var(--vl-red);
 }
 
 .VehicleList__modal-body {
-  padding: 20px;
+  padding: 22px;
 }
 
 .VehicleList__modal-img {
   width: 100%;
-  height: 200px;
+  height: 220px;
   object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  border-radius: var(--vl-radius-md);
+  border: 1px solid var(--vl-border);
+  margin-bottom: 18px;
+}
+
+.VehicleList__modal-info h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
 }
 
 .VehicleList__modal-plate {
-  color: var(--text-muted);
-  margin-top: -10px;
-  margin-bottom: 16px;
+  color: var(--vl-text-muted);
+  font-size: 13.5px;
+  margin: 0 0 16px;
 }
 
 .VehicleList__modal-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 20px;
   font-size: 14px;
 }
 
-/* Modal Form Controls */
+.VehicleList__modal-grid strong {
+  font-weight: 600;
+  color: var(--vl-text-muted);
+  margin-right: 4px;
+}
+
 .VehicleList__modal-form {
-  padding: 20px;
+  padding: 22px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .VehicleList__form-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .VehicleList__form-group label {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--vl-text-muted);
 }
 
 .VehicleList__form-group input,
 .VehicleList__form-group select {
-  padding: 8px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--vl-border-strong);
+  border-radius: var(--vl-radius-sm);
   font-size: 14px;
+  color: var(--vl-text);
+  background: #fbfbfd;
+  outline: none;
+  transition: border-color var(--vl-transition), box-shadow var(--vl-transition);
+}
+
+.VehicleList__form-group input:focus,
+.VehicleList__form-group select:focus {
+  border-color: var(--vl-primary);
+  box-shadow: 0 0 0 3px var(--vl-primary-soft);
+  background: var(--vl-surface);
 }
 
 .VehicleList__modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 10px;
+  margin-top: 4px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .VehicleList__filters {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .VehicleList__footer {
-    flex-direction: column;
-    gap: 12px;
+.VehicleList__modal-footer .VehicleList__btn-reset,
+.VehicleList__modal-footer .VehicleList__btn-apply {
+  height: 40px;
+}
+
+@media (max-width: 480px) {
+  .VehicleList__modal-grid {
+    grid-template-columns: 1fr;
   }
 }

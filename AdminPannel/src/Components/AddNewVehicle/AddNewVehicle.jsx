@@ -30,22 +30,23 @@ const FEATURE_OPTIONS = [
   "Cruise Control",
 ];
 
+// Clean initial form state without dummy values
 const INITIAL_FORM_STATE = {
   vehicleBrand: "",
   vehicleModel: "",
   variantLine: "",
   vehicleType: "",
-  fuelType: "Petrol",
-  transmission: "Automatic",
+  fuelType: "",
+  transmission: "",
   yearOfManufacture: "",
   registrationNumber: "",
   seatingCapacity: "",
-  color: "White",
+  color: "",
   mileage: "",
-  doors: "4 Doors",
+  doors: "",
   description: "",
   keyFeatures: [],
-  insuranceProvider: "HDFC Ergo",
+  insuranceProvider: "",
   policyNumber: "",
   validTill: "",
   dailyRentPrice: "",
@@ -53,7 +54,7 @@ const INITIAL_FORM_STATE = {
   monthlyRentPrice: "",
   securityDeposit: "",
   extraKmCharge: "",
-  minimumBookingDays: "1 Day",
+  minimumBookingDays: "",
   availabilityStatus: "Available",
 };
 
@@ -221,7 +222,7 @@ const AddNewVehicle = () => {
                   name="vehicleBrand"
                   value={formData.vehicleBrand}
                   onChange={handleChange}
-                  placeholder="e.g. Audi"
+                  placeholder="Enter brand (e.g. Audi)"
                   required
                 />
               </div>
@@ -235,7 +236,7 @@ const AddNewVehicle = () => {
                   name="vehicleModel"
                   value={formData.vehicleModel}
                   onChange={handleChange}
-                  placeholder="e.g. A3"
+                  placeholder="Enter model (e.g. A3)"
                   required
                 />
               </div>
@@ -249,7 +250,7 @@ const AddNewVehicle = () => {
                   name="variantLine"
                   value={formData.variantLine}
                   onChange={handleChange}
-                  placeholder="e.g. 1.6 TDI S line"
+                  placeholder="Enter variant (e.g. 1.6 TDI)"
                   required
                 />
               </div>
@@ -265,7 +266,7 @@ const AddNewVehicle = () => {
                   name="vehicleType"
                   value={formData.vehicleType}
                   onChange={handleChange}
-                  placeholder="e.g. Sedan"
+                  placeholder="Enter type (e.g. Sedan, SUV)"
                   required
                 />
               </div>
@@ -280,7 +281,9 @@ const AddNewVehicle = () => {
                     name="fuelType"
                     value={formData.fuelType}
                     onChange={handleChange}
+                    required
                   >
+                    <option value="" disabled>Select Fuel Type</option>
                     <option value="Petrol">Petrol</option>
                     <option value="Diesel">Diesel</option>
                     <option value="Electric">Electric</option>
@@ -299,7 +302,9 @@ const AddNewVehicle = () => {
                     name="transmission"
                     value={formData.transmission}
                     onChange={handleChange}
+                    required
                   >
+                    <option value="" disabled>Select Transmission</option>
                     <option value="Automatic">Automatic</option>
                     <option value="Manual">Manual</option>
                   </select>
@@ -317,7 +322,7 @@ const AddNewVehicle = () => {
                   name="yearOfManufacture"
                   value={formData.yearOfManufacture}
                   onChange={handleChange}
-                  placeholder="e.g. 2024"
+                  placeholder="YYYY"
                   required
                 />
               </div>
@@ -331,7 +336,7 @@ const AddNewVehicle = () => {
                   name="registrationNumber"
                   value={formData.registrationNumber}
                   onChange={handleChange}
-                  placeholder="e.g. MH12 AB 1234"
+                  placeholder="Enter registration number"
                   required
                 />
               </div>
@@ -360,12 +365,15 @@ const AddNewVehicle = () => {
                   name="color"
                   value={formData.color}
                   onChange={handleChange}
+                  required
                 >
+                  <option value="" disabled>Select Color</option>
                   <option value="White">White</option>
                   <option value="Black">Black</option>
                   <option value="Silver">Silver</option>
                   <option value="Red">Red</option>
                   <option value="Blue">Blue</option>
+                  <option value="Grey">Grey</option>
                 </select>
               </div>
 
@@ -376,7 +384,7 @@ const AddNewVehicle = () => {
                   name="mileage"
                   value={formData.mileage}
                   onChange={handleChange}
-                  placeholder="e.g. 25,100 miles"
+                  placeholder="e.g. 25,100 km"
                 />
               </div>
 
@@ -387,6 +395,7 @@ const AddNewVehicle = () => {
                   value={formData.doors}
                   onChange={handleChange}
                 >
+                  <option value="" disabled>Select Doors</option>
                   <option value="2 Doors">2 Doors</option>
                   <option value="4 Doors">4 Doors</option>
                   <option value="5 Doors">5 Doors</option>
@@ -452,6 +461,7 @@ const AddNewVehicle = () => {
                     value={formData.insuranceProvider}
                     onChange={handleChange}
                   >
+                    <option value="" disabled>Select Provider</option>
                     <option value="HDFC Ergo">HDFC Ergo</option>
                     <option value="Bajaj Allianz">Bajaj Allianz</option>
                     <option value="ICICI Lombard">ICICI Lombard</option>
@@ -466,7 +476,7 @@ const AddNewVehicle = () => {
                     name="policyNumber"
                     value={formData.policyNumber}
                     onChange={handleChange}
-                    placeholder="e.g. HDFC12345678"
+                    placeholder="Enter policy number"
                   />
                 </div>
 
@@ -509,7 +519,7 @@ const AddNewVehicle = () => {
                 style={{ display: "none" }}
               />
               <span className="AddNewVehicle__upload-hint">
-                Max 10MB per image, converted to WebP automatically
+                Max 10MB per image
               </span>
             </div>
 
@@ -562,11 +572,12 @@ const AddNewVehicle = () => {
                 <div className="AddNewVehicle__price-input">
                   <span>₹</span>
                   <input
-                    type="text"
+                    type="number"
+                    step="0.01"
                     name="dailyRentPrice"
                     value={formData.dailyRentPrice}
                     onChange={handleChange}
-                    placeholder="e.g. 4,500.00"
+                    placeholder="0.00"
                     required
                   />
                 </div>
@@ -577,11 +588,12 @@ const AddNewVehicle = () => {
                 <div className="AddNewVehicle__price-input">
                   <span>₹</span>
                   <input
-                    type="text"
+                    type="number"
+                    step="0.01"
                     name="weeklyRentPrice"
                     value={formData.weeklyRentPrice}
                     onChange={handleChange}
-                    placeholder="e.g. 28,000.00"
+                    placeholder="0.00"
                   />
                 </div>
               </div>
@@ -591,11 +603,12 @@ const AddNewVehicle = () => {
                 <div className="AddNewVehicle__price-input">
                   <span>₹</span>
                   <input
-                    type="text"
+                    type="number"
+                    step="0.01"
                     name="monthlyRentPrice"
                     value={formData.monthlyRentPrice}
                     onChange={handleChange}
-                    placeholder="e.g. 95,000.00"
+                    placeholder="0.00"
                   />
                 </div>
               </div>
@@ -609,11 +622,12 @@ const AddNewVehicle = () => {
                 <div className="AddNewVehicle__price-input">
                   <span>₹</span>
                   <input
-                    type="text"
+                    type="number"
+                    step="0.01"
                     name="securityDeposit"
                     value={formData.securityDeposit}
                     onChange={handleChange}
-                    placeholder="e.g. 10,000.00"
+                    placeholder="0.00"
                     required
                   />
                 </div>
@@ -624,11 +638,12 @@ const AddNewVehicle = () => {
                 <div className="AddNewVehicle__price-input">
                   <span>₹</span>
                   <input
-                    type="text"
+                    type="number"
+                    step="0.01"
                     name="extraKmCharge"
                     value={formData.extraKmCharge}
                     onChange={handleChange}
-                    placeholder="e.g. 15.00"
+                    placeholder="0.00"
                   />
                 </div>
               </div>
