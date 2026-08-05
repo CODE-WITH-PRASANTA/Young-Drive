@@ -1,0 +1,800 @@
+/* ========================================================
+   FEATURE LISTING STYLES (40% / 60% SPLIT & CONTAINER BOUNDED DROPDOWN)
+   ======================================================== */
+.FeatureListing-container {
+  background-color: #f4f6f8;
+  color: #1a1d20;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  padding: 28px;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.FeatureListing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.FeatureListing-header h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin: 0;
+  color: #111827;
+}
+
+.FeatureListing-breadcrumb {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.FeatureListing-breadcrumb span {
+  color: #10b981;
+  font-weight: 600;
+}
+
+/* Main Grid Layout: Exactly 40% / 60% Split */
+.FeatureListing-grid {
+  display: grid;
+  grid-template-columns: 40% 60%;
+  gap: 24px;
+  align-items: start;
+}
+
+.FeatureListing-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  box-sizing: border-box;
+  min-width: 0;
+  position: relative;
+  /* CRITICAL FIX: Ensures absolute/native popup menus stay locked inside the form card */
+  contain: paint; 
+}
+
+.FeatureListing-card-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 18px 0;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.FeatureListing-icon-accent {
+  color: #10b981;
+}
+
+.FeatureListing-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.FeatureListing-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.FeatureListing-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.required {
+  color: #ef4444;
+}
+
+/* Dropzone */
+.FeatureListing-dropzone {
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  background-color: #f9fafb;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.FeatureListing-dropzone:hover {
+  border-color: #10b981;
+  background-color: rgba(16, 185, 129, 0.03);
+}
+
+.FeatureListing-drop-icon {
+  font-size: 1.8rem;
+  color: #10b981;
+  margin-bottom: 4px;
+}
+
+.FeatureListing-dropzone p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #4b5563;
+}
+
+.FeatureListing-browse-btn {
+  color: #10b981;
+  font-weight: 700;
+  font-size: 0.8rem;
+  margin: 2px 0;
+  text-decoration: underline;
+}
+
+.FeatureListing-dropzone small {
+  font-size: 0.68rem;
+  color: #9ca3af;
+  text-align: center;
+}
+
+/* Thumbnails */
+.FeatureListing-image-thumbnails {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.FeatureListing-thumb-box {
+  width: 55px;
+  height: 42px;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #e5e7eb;
+}
+
+.FeatureListing-thumb-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.FeatureListing-thumb-remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  cursor: pointer;
+}
+
+.FeatureListing-thumb-add {
+  width: 55px;
+  height: 42px;
+  border: 1px dashed #d1d5db;
+  border-radius: 6px;
+  background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: #6b7280;
+  cursor: pointer;
+  gap: 2px;
+}
+
+.FeatureListing-thumb-add:hover {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+/* Form Grids */
+.FeatureListing-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.FeatureListing-form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.FeatureListing-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.FeatureListing-field label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.spec-label-icon {
+  color: #6b7280;
+  font-size: 0.7rem;
+}
+
+.FeatureListing-field input {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  outline: none;
+  background: #ffffff;
+  color: #111827;
+  width: 100%;
+  box-sizing: border-box;
+  height: 34px;
+}
+
+/* RESPONSIVE & BOUNDED SELECT WRAPPER FIX */
+.FeatureListing-select-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.FeatureListing-select-wrapper::after {
+  content: '▼';
+  font-size: 0.55rem;
+  color: #6b7280;
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+}
+
+.FeatureListing-field select,
+.FeatureListing-filter-bar select,
+.FeatureListing-sort-group select,
+.bulk-select-wrap select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding: 6px 26px 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  outline: none;
+  background: #ffffff;
+  color: #111827;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  height: 34px;
+  line-height: normal;
+  /* CRITICAL FIX: Forces dropdown width restrictions so popup list does not blow past screen boundaries */
+  max-width: 100%;
+  text-overflow: ellipsis;
+}
+
+.FeatureListing-field input:focus,
+.FeatureListing-field select:focus,
+.FeatureListing-filter-bar select:focus,
+.FeatureListing-sort-group select:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+}
+
+.FeatureListing-input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.FeatureListing-input-with-icon input {
+  padding-right: 30px;
+}
+
+.input-suffix-icon {
+  position: absolute;
+  right: 10px;
+  color: #9ca3af;
+  font-size: 0.8rem;
+}
+
+.FeatureListing-specs-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #111827;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 4px;
+  margin-top: 4px;
+}
+
+.helper-text {
+  font-size: 0.65rem;
+  color: #9ca3af;
+}
+
+/* Editor */
+.FeatureListing-editor-wrapper {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.FeatureListing-editor-toolbar {
+  background: #f3f4f6;
+  padding: 6px;
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid #d1d5db;
+  flex-wrap: wrap;
+}
+
+.FeatureListing-editor-toolbar button {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  color: #374151;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.FeatureListing-editor-toolbar button:hover {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+}
+
+.FeatureListing-editor-wrapper textarea {
+  width: 100%;
+  border: none;
+  padding: 10px;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 0.8rem;
+  outline: none;
+  resize: vertical;
+}
+
+/* Action Buttons Side by Side */
+.FeatureListing-form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.FeatureListing-btn-save {
+  background-color: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 8px 14px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex: 1;
+  min-width: 120px;
+  height: 34px;
+}
+
+.FeatureListing-btn-save:hover {
+  background-color: #059669;
+}
+
+.FeatureListing-btn-save-another {
+  background-color: #ffffff;
+  color: #10b981;
+  border: 1px solid #10b981;
+  padding: 8px 14px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  flex: 1;
+  min-width: 130px;
+  height: 34px;
+}
+
+.FeatureListing-btn-save-another:hover {
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+.FeatureListing-btn-reset {
+  background-color: #ffffff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 34px;
+}
+
+.FeatureListing-btn-reset:hover {
+  background-color: #f3f4f6;
+}
+
+/* Table Filters & Controls */
+.FeatureListing-table-controls {
+  margin-bottom: 16px;
+}
+
+.FeatureListing-filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.FeatureListing-search-box {
+  position: relative;
+  flex: 1;
+  min-width: 150px;
+}
+
+.FeatureListing-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+.FeatureListing-search-box input {
+  width: 100%;
+  padding: 6px 8px 6px 30px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  box-sizing: border-box;
+  height: 34px;
+}
+
+.filter-select-wrap {
+  width: 130px;
+}
+
+.FeatureListing-sort-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  padding: 0 8px;
+  border-radius: 8px;
+  height: 34px;
+  box-sizing: border-box;
+}
+
+.sort-label {
+  font-size: 0.72rem;
+  color: #6b7280;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sort-select-wrap {
+  width: 130px;
+}
+
+.FeatureListing-btn-filter {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #374151;
+  height: 34px;
+  box-sizing: border-box;
+}
+
+/* Table Setup */
+.FeatureListing-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.FeatureListing-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.8rem;
+  min-width: 750px;
+}
+
+.FeatureListing-table th,
+.FeatureListing-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+.FeatureListing-table th {
+  background-color: #f9fafb;
+  color: #4b5563;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.FeatureListing-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.FeatureListing-table tbody tr.selected-row {
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+.FeatureListing-table-img {
+  width: 55px;
+  height: 38px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+}
+
+.FeatureListing-car-cell h4 {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.FeatureListing-car-meta {
+  margin: 2px 0 0 0;
+  font-size: 0.7rem;
+  color: #4b5563;
+}
+
+.FeatureListing-car-submeta {
+  margin: 1px 0 0 0;
+  font-size: 0.65rem;
+  color: #9ca3af;
+}
+
+.FeatureListing-location-cell {
+  font-size: 0.75rem;
+  color: #4b5563;
+  white-space: nowrap;
+}
+
+.location-pin {
+  color: #10b981;
+  margin-right: 3px;
+}
+
+.FeatureListing-price-cell strong {
+  color: #111827;
+  font-size: 0.85rem;
+}
+
+.FeatureListing-price-cell span {
+  font-size: 0.65rem;
+  color: #9ca3af;
+}
+
+.FeatureListing-rating-cell {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.star-icon {
+  color: #f59e0b;
+}
+
+.reviews-count {
+  font-size: 0.65rem;
+  color: #9ca3af;
+}
+
+.FeatureListing-badge {
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.FeatureListing-badge.active {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.FeatureListing-badge.inactive {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.FeatureListing-order-pill {
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.FeatureListing-action-btns {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.FeatureListing-action-btns button {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.7rem;
+}
+
+.btn-edit { color: #10b981; }
+.btn-edit:hover { background-color: #10b981; color: #ffffff; border-color: #10b981; }
+
+.btn-delete { color: #ef4444; }
+.btn-delete:hover { background-color: #ef4444; color: #ffffff; border-color: #ef4444; }
+
+.FeatureListing-empty-cell {
+  text-align: center;
+  color: #9ca3af;
+  padding: 20px !important;
+}
+
+/* Pagination Footer */
+.FeatureListing-table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bulk-select-wrap {
+  width: 140px;
+}
+
+.FeatureListing-pagination-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.FeatureListing-pagination-info {
+  font-size: 0.72rem;
+  color: #6b7280;
+}
+
+.FeatureListing-pagination {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.FeatureListing-pagination button {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  color: #374151;
+}
+
+.FeatureListing-pagination button.active {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+  font-weight: 700;
+}
+
+.FeatureListing-pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ========================================================
+   RESPONSIVE OPTIMIZATIONS FOR IPAD Pro & ANDROID WEBVIEWS
+   ======================================================== */
+@media screen and (max-width: 1366px) {
+  .FeatureListing-container {
+    padding: 16px;
+  }
+  
+  .FeatureListing-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .FeatureListing-container {
+    padding: 12px;
+  }
+
+  .FeatureListing-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .FeatureListing-card {
+    padding: 16px;
+  }
+
+  .FeatureListing-form-grid,
+  .FeatureListing-form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .FeatureListing-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .FeatureListing-search-box {
+    width: 100%;
+  }
+
+  .filter-select-wrap,
+  .sort-select-wrap,
+  .bulk-select-wrap {
+    width: 100%;
+  }
+
+  .FeatureListing-sort-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .FeatureListing-table-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .FeatureListing-pagination-container {
+    margin-left: 0;
+    justify-content: space-between;
+  }
+}
