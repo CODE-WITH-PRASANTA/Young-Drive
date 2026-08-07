@@ -1,24 +1,51 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
 import MainLayout from "./Layout/MainLayout/MainLayout";
 import VehicleManagement from "./Components/Profile/VehicleManagement/VehicleManagement";
 import FeatureListing from "./Components/Profile/FeatureListing/FeatureListing";
+import Dashboard from "./Pages/Dashboard/Dashboard";
+import AllBookings from "./Components/AllBookings/AllBookings";
+import VehicleList from "./Components/VehicleList/VehicleList";
+import AddNewVehicle from "./Components/AddNewVehicle/AddNewVehicle";
 
-
-const App = () => {
+function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/vehicle-management" element={<VehicleManagement />} />
-        <Route path="/feature-listing" element={<FeatureListing />} />
+        {/* Parent layout wraps all pages */}
+        <Route path="/" element={<MainLayout />}>
+          {/* Default view when landing on '/' */}
+          <Route index element={<Dashboard />} />
+
+          {/* Clean, relative nested paths (NO leading slashes) */}
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="vehicle-management" element={<VehicleManagement />} />
+          <Route path="feature-listing" element={<FeatureListing />} />
+          
 
 
-        <Route path="/" element={<MainLayout/>}/>
-       
- 
+
+          {/* Bookings Submenu Routes */}
+          
+          {/* Direct Route Aliases mapped to your sidebar menu */}
+          <Route path="vehicles" element={<VehicleManagement />} />
+         
+          <Route path="bookings/all" element={<AllBookings />}/>
+          
+          <Route path="vechilelist" element={<VehicleList />} />
+          <Route path="addvehicle" element={<AddNewVehicle/>} />
+
+
+
+
+        </Route>
+
+        {/* Catch-all redirect */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   );
-};
+}
 
 export default App;

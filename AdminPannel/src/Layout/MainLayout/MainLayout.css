@@ -1,310 +1,262 @@
-/* --- Main Layout Styles --- */
-.main-layout {
+/* =========================================================
+   MAIN LAYOUT — widths kept in lockstep with Sidebar.css
+   (--sb-width-full: 264px, --sb-width-collapsed: 80px,
+    --sb-width-tablet: 240px at <=1200px, off-canvas at <=768px)
+   ========================================================= */
+
+:root {
+  --ml-sidebar-full: 264px;
+  --ml-sidebar-collapsed: 80px;
+  --ml-sidebar-tablet: 240px;
+  --ml-content-max: 1600px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+.MainLayout {
   display: flex;
-  height: 100vh;
-  background-color: #f4f7f6;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #f8fafc;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  overflow: hidden;
 }
 
-.main-content-wrapper {
+.MainLayout-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  margin-left: var(--ml-sidebar-full);
+  transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 0; /* prevents flex children from blowing out the layout */
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
-.main-content {
+/* Sidebar collapsed on desktop */
+.MainLayout.sidebar-collapsed .MainLayout-container {
+  margin-left: var(--ml-sidebar-collapsed);
+}
+
+.MainLayout-content {
+  padding: 24px;
   flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  background-color: #f4f7f6;
-}
-
-/* --- Sidebar Styles --- */
-.sidebar {
-  width: 260px;
-  background-color: #1e1e2d;
-  color: #a2a3b7;
-  display: flex;
-  flex-direction: column;
-  transition: width 0.3s ease;
-  height: 100vh;
-  z-index: 100;
-  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
-}
-
-.sidebar.collapsed {
-  width: 80px;
-}
-
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 15px;
-  border-bottom: 1px solid #2b2b40;
-}
-
-.sidebar-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  color: #ffffff;
-  font-weight: bold;
-  font-size: 1.2rem;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.sidebar-logo-img {
-  width: 35px;
-  height: 35px;
-  object-fit: contain;
-}
-
-.sidebar.collapsed .sidebar-logo span {
-  display: none;
-}
-
-.sidebar-menu {
-  list-style: none;
-  padding: 15px 0;
-  margin: 0;
-  flex: 1;
-  overflow-y: auto;
-}
-
-.sidebar-item {
-  margin: 4px 12px;
-}
-
-.sidebar-link {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 12px 15px;
-  color: #a2a3b7;
-  text-decoration: none;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-
-.sidebar-link:hover,
-.sidebar-link.active {
-  background-color: #36364e;
-  color: #ffffff;
-}
-
-.sidebar-icon {
-  font-size: 1.2rem;
-  min-width: 25px;
-  text-align: center;
-}
-
-.sidebar.collapsed .sidebar-text {
-  display: none;
-}
-
-/* --- Topbar Styles --- */
-.topbar {
-  height: 70px;
-  background-color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 25px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  z-index: 99;
-}
-
-.topbar-left {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.topbar-toggle-btn {
-  background: none;
-  border: none;
-  font-size: 1.3rem;
-  cursor: pointer;
-  color: #3f4254;
-  padding: 8px;
-  border-radius: 6px;
-  transition: background 0.2s;
-}
-
-.topbar-toggle-btn:hover {
-  background-color: #f1f1f4;
-}
-
-.topbar-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #3f4254;
-  margin: 0;
-}
-
-.topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-/* Notification Component */
-.topbar-notification-wrapper {
-  position: relative;
-}
-
-.topbar-notification-btn {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  color: #3f4254;
-  position: relative;
-  padding: 8px;
-  border-radius: 50%;
-  transition: background 0.2s;
-}
-
-.topbar-notification-btn:hover {
-  background-color: #f1f1f4;
-}
-
-.notification-badge {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background-color: #f1416c;
-  color: #ffffff;
-  font-size: 0.65rem;
-  padding: 2px 5px;
-  border-radius: 10px;
-  font-weight: bold;
-}
-
-.notification-popup {
-  position: absolute;
-  right: 0;
-  top: 45px;
-  width: 280px;
-  background-color: #ffffff;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  padding: 15px;
-  border: 1px solid #ebedf3;
-  z-index: 1000;
-}
-
-.notification-header {
-  font-weight: 600;
-  font-size: 0.95rem;
-  margin-bottom: 10px;
-  color: #3f4254;
-  border-bottom: 1px solid #ebedf3;
-  padding-bottom: 8px;
-}
-
-.notification-item {
-  font-size: 0.85rem;
-  color: #7e8299;
-  padding: 8px 0;
-  border-bottom: 1px dashed #ebedf3;
-}
-
-.notification-item:last-child {
-  border-bottom: none;
-}
-
-/* Profile Component */
-.topbar-profile-wrapper {
-  position: relative;
-}
-
-.topbar-profile-btn {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 5px 10px;
-  border-radius: 6px;
-  transition: background 0.2s;
-}
-
-.topbar-profile-btn:hover {
-  background-color: #f1f1f4;
-}
-
-.topbar-profile-img {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.topbar-profile-name {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #3f4254;
-}
-
-.profile-dropdown {
-  position: absolute;
-  right: 0;
-  top: 50px;
-  width: 180px;
-  background-color: #ffffff;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  padding: 8px 0;
-  border: 1px solid #ebedf3;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-}
-
-.profile-dropdown-item {
-  padding: 10px 15px;
-  color: #3f4254;
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: background 0.2s;
-  display: block;
-  border: none;
-  background: none;
-  text-align: left;
   width: 100%;
-  cursor: pointer;
+  box-sizing: border-box;
 }
 
-.profile-dropdown-item:hover {
-  background-color: #f1f1f4;
-  color: #009ef7;
+/* Keeps line-lengths sane on ultra-wide monitors without hard-capping
+   the layout on normal screens */
+.MainLayout-content-inner {
+  max-width: var(--ml-content-max);
+  margin: 0 auto;
+  width: 100%;
 }
 
-/* --- Responsive Media Queries --- */
+.MainLayout-placeholder {
+  background-color: #ffffff;
+  border: 1px solid #e6f4f1;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  color: #64748b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.MainLayout-placeholder h2 {
+  color: #0d9488;
+  margin-bottom: 10px;
+}
+
+/* ===========================================================
+   RESPONSIVE BREAKPOINTS
+   (mirrors Sidebar.css exactly so content never overlaps or gaps)
+   =========================================================== */
+
+/* --- Small laptops / tablets landscape: Sidebar auto-tightens to 240px --- */
+@media (max-width: 1200px) {
+  .MainLayout-container {
+    margin-left: var(--ml-sidebar-tablet);
+  }
+  .MainLayout.sidebar-collapsed .MainLayout-container {
+    margin-left: var(--ml-sidebar-collapsed);
+  }
+}
+
+@media (max-width: 1024px) {
+  .MainLayout-content {
+    padding: 20px;
+  }
+}
+
+/* --- Mobile: Sidebar becomes an off-canvas drawer, content is full width --- */
 @media (max-width: 768px) {
-  .sidebar {
+  .MainLayout-container,
+  .MainLayout.sidebar-collapsed .MainLayout-container {
+    margin-left: 0;
+  }
+
+  .MainLayout-content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .MainLayout-content {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .MainLayout-content {
+    padding: 10px;
+  }
+}
+
+/* --- Reduced motion --- */
+@media (prefers-reduced-motion: reduce) {
+  .MainLayout-container {
+    transition: none !important;
+  }
+}
+/* ===========================================================
+   FIXED RESPONSIVE & MOBILE POPOVERS
+   =========================================================== */
+
+@media (max-width: 720px) {
+  /* Search overlay fixed spanning header */
+  .Topbar-search {
     position: fixed;
-    left: -260px;
-  }
-
-  .sidebar.mobile-open {
+    top: 0;
     left: 0;
-    width: 260px;
+    right: 0;
+    width: 100vw;
+    max-width: none;
+    height: var(--tb-height);
+    margin: 0;
+    padding: 0 14px;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid var(--tb-border);
+    box-shadow: var(--tb-shadow-sm);
+    z-index: 250;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
   }
 
-  .sidebar.collapsed {
-    left: -260px;
+  .Topbar-search.mobile-active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    background: #ffffff;
   }
 
-  .topbar-title {
-    font-size: 1rem;
+  .Topbar-search-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.25);
+    z-index: 240;
+    animation: tb-fade-in 0.18s ease;
+  }
+
+  @keyframes tb-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .Topbar-search-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tb-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+  }
+
+  .Topbar-search-trigger {
+    display: flex;
+  }
+  .Topbar-search-trigger.is-hidden {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .Topbar-kbd {
+    display: none;
+  }
+
+  .Topbar-right.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .Topbar-user-info,
+  .Topbar-chevron {
+    display: none;
+  }
+
+  .Topbar-user {
+    padding: 4px;
+  }
+
+  /* -------------------------------------------------------
+     FIX: MOBILE POPOVER POSITIONING (Prevents left-side overflow)
+     ------------------------------------------------------- */
+  .Topbar-popover {
+    position: fixed !important;
+    top: calc(var(--tb-height) + 8px) !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: calc(100vw - 24px) !important;
+    max-width: 380px !important;
+    margin: 0 auto !important;
+    z-index: 260 !important;
+    border-radius: 18px !important;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.25) !important;
+  }
+
+  .Topbar-popover-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.35);
+    backdrop-filter: blur(2px);
+    z-index: 255;
+    animation: tb-fade-in 0.18s ease;
+  }
+}
+
+@media (max-width: 480px) {
+  .Topbar {
+    padding: 8px 12px;
+  }
+
+  .Topbar-right {
+    gap: 6px;
+  }
+
+  .Topbar-icon-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .Topbar-divider {
+    display: none;
+  }
+
+  .Topbar-popover-list {
+    max-height: 300px;
   }
 }
