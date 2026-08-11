@@ -8,6 +8,8 @@ import Dashboard from "./Pages/Dashboard/Dashboard";
 import AllBookings from "./Components/AllBookings/AllBookings";
 import VehicleList from "./Components/VehicleList/VehicleList";
 import AddNewVehicle from "./Components/AddNewVehicle/AddNewVehicle";
+import BookingRequest from "./Components/BookingRequest/BookingRequest";
+import BookingCalender from "./Components/BookingCalender/BookingCalender";
 
 function App() {
   return (
@@ -35,6 +37,8 @@ function App() {
           
           <Route path="vechilelist" element={<VehicleList />} />
           <Route path="addvehicle" element={<AddNewVehicle/>} />
+          <Route path="/bookings/requests" element={<BookingRequest/>} />
+          <Route path="/bookings/calendar" element={<BookingCalender/>} />
 
 
 
