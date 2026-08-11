@@ -21,15 +21,24 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/vehicles", vehicleRoutes);
 app.use('/api/listings', listingRoutes);
 
+const reviewRoutes = require('./routes/reviewRoutes');
+
 const PORT = process.env.PORT || 5000;
 
-// Database Connection & Server Listener
-mongoose
-  .connect(process.env.MONGO_URI)
+// Middleware
+app.use(cors());
+
+// INCREASE PAYLOAD LIMIT HERE (default is 1mb)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Routes
+app.use('/api/reviews', reviewRoutes);
+
+// Database Connection
+mongoose.connect('mongodb://127.0.0.1:27017/reviews_db')
   .then(() => {
-    console.log('✅ Connected to MongoDB: Young-drive');
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
+    console.log('MongoDB Connected Successfully');
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
-  .catch((err) => console.error('❌ DB Error:', err));
+  .catch((err) => console.error('Database connection error:', err));
