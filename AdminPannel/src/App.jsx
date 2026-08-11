@@ -8,6 +8,10 @@ import Dashboard from "./Pages/Dashboard/Dashboard";
 import AllBookings from "./Components/AllBookings/AllBookings";
 import VehicleList from "./Components/VehicleList/VehicleList";
 import AddNewVehicle from "./Components/AddNewVehicle/AddNewVehicle";
+import Payments from "./Components/Payments/Payments";
+import Reviews from "./Components/Reviews/Reviews";
+import Locations from "./Components/Locations/Locations";
+import MyProfile from "./Components/MyProfile/MyProfile";
 import BookingRequest from "./Components/BookingRequest/BookingRequest";
 import BookingCalender from "./Components/BookingCalender/BookingCalender";
 
@@ -37,6 +41,11 @@ function App() {
           
           <Route path="vechilelist" element={<VehicleList />} />
           <Route path="addvehicle" element={<AddNewVehicle/>} />
+           <Route path="/payments" element={<Payments/>} />
+            <Route path="/reviews" element={<Reviews/>} />
+             <Route path="/locations" element={<Locations/>} />
+             <Route path="/settings" element={<MyProfile/>} />
+        
           <Route path="/bookings/requests" element={<BookingRequest/>} />
           <Route path="/bookings/calendar" element={<BookingCalender/>} />
 
