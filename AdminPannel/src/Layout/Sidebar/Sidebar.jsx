@@ -5,11 +5,8 @@ import {
   Calendar,
   Car,
   Users,
-  UserCheck,
   CreditCard,
   Star,
-  Ticket,
-  MapPin,
   BarChart3,
   Settings,
   ChevronDown,
@@ -17,8 +14,7 @@ import {
   ChevronRight,
   Crown,
   LogOut,
-  X,
-  ListFilter
+  X
 } from "lucide-react";
 import './Sidebar.css';
 
@@ -27,8 +23,15 @@ const MOBILE_BREAKPOINT = 768;
 // All paths formatted cleanly to match App.jsx exactly
 const menuConfig = [
   { type: 'link', icon: <LayoutDashboard size={20} />, text: 'Dashboard', path: '/dashboard' },
-  { type: 'link', icon: <Car size={20} />, text: 'Vehicle Management', path: '/vehicle-management' },
-  { type: 'link', icon: <ListFilter size={20} />, text: 'Feature Listing', path: '/feature-listing' },
+  {
+    type: 'dropdown',
+    icon: <Car size={20} />,
+    text: 'Vehicle Management',
+    children: [
+      { text: 'Feature Listing', path: '/feature-listing' },
+      { text: 'Locations', path: '/locations' },
+    ]
+  },
   {
     type: 'dropdown',
     icon: <Calendar size={20} />,
@@ -41,15 +44,10 @@ const menuConfig = [
     ]
   },
   { type: 'link', icon: <Users size={20} />, text: 'Customers', path: '/customers' },
-  { type: 'link', icon: <UserCheck size={20} />, text: 'Drivers', path: '/drivers' },
   { type: 'link', icon: <CreditCard size={20} />, text: 'Payments', path: '/payments' },
   { type: 'link', icon: <Star size={20} />, text: 'Reviews', path: '/reviews' },
-  { type: 'link', icon: <Ticket size={20} />, text: 'Coupons', path: '/coupons' },
-  { type: 'link', icon: <MapPin size={20} />, text: 'Locations', path: '/locations' },
   { type: 'link', icon: <BarChart3 size={20} />, text: 'Reports', path: '/reports' },
   { type: 'link', icon: <Settings size={20} />, text: 'Settings', path: '/settings' },
-  { type: 'link', icon: <Car size={20} />, text: 'Vehiclelist', path: '/vechilelist' },
-   { type: 'link', icon: <Car size={20} />, text: 'Addvehicle', path: '/addvehicle' },
 ];
 
 const Sidebar = ({

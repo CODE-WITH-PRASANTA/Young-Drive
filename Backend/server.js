@@ -4,6 +4,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
+const locationRoutes = require('./routes/locationRoutes');
 
 // Required Middlewares
 app.use(cors());
@@ -16,6 +17,7 @@ const vehicleRoutes = require("./routes/vehicleRoutes");
 // Route Endpoints
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/vehicles", vehicleRoutes);
+app.use('/api/locations', locationRoutes);
 
 const PORT = process.env.PORT || 5000;
 
