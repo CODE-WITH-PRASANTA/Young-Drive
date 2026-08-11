@@ -12,6 +12,8 @@ import Payments from "./Components/Payments/Payments";
 import Reviews from "./Components/Reviews/Reviews";
 import Locations from "./Components/Locations/Locations";
 import MyProfile from "./Components/MyProfile/MyProfile";
+import BookingRequest from "./Components/BookingRequest/BookingRequest";
+import BookingCalender from "./Components/BookingCalender/BookingCalender";
 
 function App() {
   return (
@@ -44,6 +46,9 @@ function App() {
              <Route path="/locations" element={<Locations/>} />
              <Route path="/settings" element={<MyProfile/>} />
         
+          <Route path="/bookings/requests" element={<BookingRequest/>} />
+          <Route path="/bookings/calendar" element={<BookingCalender/>} />
+
 
 
 
