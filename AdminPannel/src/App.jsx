@@ -6,8 +6,6 @@ import VehicleManagement from "./Components/Profile/VehicleManagement/VehicleMan
 import FeatureListing from "./Components/Profile/FeatureListing/FeatureListing";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import AllBookings from "./Components/AllBookings/AllBookings";
-import VehicleList from "./Components/VehicleList/VehicleList";
-import AddNewVehicle from "./Components/AddNewVehicle/AddNewVehicle";
 import Payments from "./Components/Payments/Payments";
 import Reviews from "./Components/Reviews/Reviews";
 import Locations from "./Components/Locations/Locations";
@@ -39,8 +37,6 @@ function App() {
          
           <Route path="bookings/all" element={<AllBookings />}/>
           
-          <Route path="vechilelist" element={<VehicleList />} />
-          <Route path="addvehicle" element={<AddNewVehicle/>} />
            <Route path="/payments" element={<Payments/>} />
             <Route path="/reviews" element={<Reviews/>} />
              <Route path="/locations" element={<Locations/>} />
