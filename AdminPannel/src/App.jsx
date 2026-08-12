@@ -2,8 +2,8 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import MainLayout from "./Layout/MainLayout/MainLayout";
-import VehicleManagement from "./Components/Profile/VehicleManagement/VehicleManagement";
-import FeatureListing from "./Components/Profile/FeatureListing/FeatureListing";
+import VehicleManagement from "./Components/VehicleManagement/VehicleManagement";
+import FeatureListing from "./Components/FeatureListing/FeatureListing";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import AllBookings from "./Components/AllBookings/AllBookings";
 import VehicleList from "./Components/VehicleList/VehicleList";

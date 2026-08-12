@@ -174,23 +174,20 @@ export function VehicleManagement() {
   const [formData, setFormData] = useState(emptyForm);
   const [isEditing, setIsEditing] = useState(false);
   
-  // Table Filters & Search
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('All');
   const [filterStatus, setFilterStatus] = useState('All');
   
-  // Selection & Bulk Actions
   const [selectedIds, setSelectedIds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [mobileTab, setMobileTab] = useState('form'); 
 
-  // Handle Form Inputs
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle Feature Checkbox Toggle
   const handleFeatureToggle = (feature) => {
     setFormData((prev) => {
       const exists = prev.features.includes(feature);
@@ -201,7 +198,6 @@ export function VehicleManagement() {
     });
   };
 
-  // Fully Functional Real Image Upload handler
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
@@ -220,7 +216,6 @@ export function VehicleManagement() {
     }));
   };
 
-  // Rich Text Editor Toolbar Actions
   const handleFormatText = (wrapperTag) => {
     const textarea = document.getElementById('fullDescTextarea');
     if (!textarea) return;
@@ -256,13 +251,11 @@ export function VehicleManagement() {
     setFormData((prev) => ({ ...prev, fullDesc: updatedText }));
   };
 
-  // Reset Form
   const handleResetForm = () => {
     setFormData(emptyForm);
     setIsEditing(false);
   };
 
-  // Fully Functional Filter Reset Handler
   const handleResetFilters = () => {
     setSearchQuery('');
     setFilterType('All');
@@ -270,7 +263,6 @@ export function VehicleManagement() {
     setCurrentPage(1);
   };
 
-  // Save / Update Vehicle
   const handleSaveVehicle = (e) => {
     e.preventDefault();
     if (!formData.name || !formData.brand || !formData.price) {
@@ -295,16 +287,15 @@ export function VehicleManagement() {
       alert('New vehicle added successfully!');
     }
     handleResetForm();
+    setMobileTab('list');
   };
 
-  // Edit Vehicle
   const handleEdit = (vehicle) => {
     setFormData(vehicle);
     setIsEditing(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setMobileTab('form');
   };
 
-  // Delete Single Vehicle
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this vehicle?')) {
       setVehicles((prev) => prev.filter((item) => item.id !== id));
@@ -312,7 +303,6 @@ export function VehicleManagement() {
     }
   };
 
-  // Bulk Actions
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       setSelectedIds(currentVehicles.map((v) => v.id));
@@ -335,7 +325,6 @@ export function VehicleManagement() {
     }
   };
 
-  // Filter Logic
   const filteredVehicles = vehicles.filter((v) => {
     const matchesSearch = v.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           v.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -345,7 +334,6 @@ export function VehicleManagement() {
     return matchesSearch && matchesType && matchesStatus;
   });
 
-  // Pagination Logic
   const totalPages = Math.ceil(filteredVehicles.length / itemsPerPage) || 1;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -353,7 +341,6 @@ export function VehicleManagement() {
 
   return (
     <div className="VehicleManagement-container">
-      {/* Top Header */}
       <div className="VehicleManagement-header">
         <div>
           <h1>Vehicle Management Dashboard</h1>
@@ -361,215 +348,215 @@ export function VehicleManagement() {
             Dashboard &gt; Vehicles &gt; <span>{isEditing ? 'Edit Vehicle' : 'Manage Inventory'}</span>
           </p>
         </div>
+        <div className="VehicleManagement-mobile-toggle-tabs">
+          <button 
+            type="button" 
+            className={mobileTab === 'form' ? 'active' : ''} 
+            onClick={() => setMobileTab('form')}
+          >
+            {isEditing ? 'Edit Vehicle' : '+ Add Vehicle'} (60%)
+          </button>
+          <button 
+            type="button" 
+            className={mobileTab === 'list' ? 'active' : ''} 
+            onClick={() => setMobileTab('list')}
+          >
+            All Vehicles ({vehicles.length}) (40%)
+          </button>
+        </div>
       </div>
 
-      {/* Main Grid Content - 50% / 50% Split */}
       <div className="VehicleManagement-grid">
         
-        {/* Left Column: Form Section */}
-        <div className="VehicleManagement-card VehicleManagement-form-section">
+        {/* Left Column: Form Section (60%) */}
+        <div className={`VehicleManagement-card VehicleManagement-form-section ${mobileTab === 'form' ? 'mobile-active' : ''}`}>
           <div className="VehicleManagement-card-header">
             <h3><FaCar className="VehicleManagement-icon-accent" /> {isEditing ? `Edit Vehicle (#${formData.id})` : 'Add New Vehicle'}</h3>
           </div>
 
-          <form onSubmit={handleSaveVehicle} className="VehicleManagement-form">
-            
-            {/* Real File Upload Dropzone */}
-            <div className="VehicleManagement-field-group">
-              <label className="VehicleManagement-label">Vehicle Images <span className="required">*</span></label>
-              <label className="VehicleManagement-dropzone">
-                <FaCloudUploadAlt className="VehicleManagement-drop-icon" />
-                <p>Click to upload local images or drag &amp; drop</p>
-                <small>Supports JPG, PNG, WEBP (Max 5MB)</small>
-                <input 
-                  type="file" 
-                  multiple 
-                  accept="image/*" 
-                  onChange={handleImageUpload} 
-                  style={{ display: 'none' }} 
-                />
-              </label>
+          <div className="VehicleManagement-form-scroll-container">
+            <form onSubmit={handleSaveVehicle} className="VehicleManagement-form">
+              <div className="VehicleManagement-field-group">
+                <label className="VehicleManagement-label">Vehicle Images <span className="required">*</span></label>
+                <label className="VehicleManagement-dropzone">
+                  <FaCloudUploadAlt className="VehicleManagement-drop-icon" />
+                  <p>Click to upload local images or drag &amp; drop</p>
+                  <small>Supports JPG, PNG, WEBP (Max 5MB)</small>
+                  <input type="file" multiple accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+                </label>
 
-              {/* Uploaded Thumbnails */}
-              <div className="VehicleManagement-image-thumbnails">
-                {formData.images.map((img, idx) => (
-                  <div key={idx} className="VehicleManagement-thumb-box">
-                    <img src={img} alt={`Thumbnail ${idx}`} />
-                    <button type="button" className="VehicleManagement-thumb-remove" onClick={() => handleRemoveImage(idx)} title="Remove image">
-                      <FaTimes />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Inputs Grid */}
-            <div className="VehicleManagement-form-grid">
-              <div className="VehicleManagement-field">
-                <label>Vehicle Name <span className="required">*</span></label>
-                <input type="text" name="name" placeholder="e.g. Audi A3 1.6 TDI S line" value={formData.name} onChange={handleInputChange} required />
-              </div>
-
-              <div className="VehicleManagement-field">
-                <label>Brand <span className="required">*</span></label>
-                <input type="text" name="brand" placeholder="e.g. Audi" value={formData.brand} onChange={handleInputChange} required />
-              </div>
-
-              <div className="VehicleManagement-field">
-                <label>Model <span className="required">*</span></label>
-                <input type="text" name="model" placeholder="e.g. A3" value={formData.model} onChange={handleInputChange} />
-              </div>
-
-              <div className="VehicleManagement-field">
-                <label>Year <span className="required">*</span></label>
-                <select name="year" value={formData.year} onChange={handleInputChange}>
-                  <option value="">Select year</option>
-                  <option value="2024">2024</option>
-                  <option value="2023">2023</option>
-                  <option value="2022">2022</option>
-                  <option value="2021">2021</option>
-                </select>
-              </div>
-
-              <div className="VehicleManagement-field">
-                <label>Fuel Type <span className="required">*</span></label>
-                <select name="fuelType" value={formData.fuelType} onChange={handleInputChange}>
-                  <option value="">Select fuel type</option>
-                  <option value="Diesel">Diesel</option>
-                  <option value="Petrol">Petrol</option>
-                  <option value="Hybrid">Hybrid</option>
-                  <option value="Electric">Electric</option>
-                </select>
-              </div>
-
-              <div className="VehicleManagement-field">
-                <label>Transmission <span className="required">*</span></label>
-                <select name="transmission" value={formData.transmission} onChange={handleInputChange}>
-                  <option value="">Select transmission</option>
-                  <option value="Automatic">Automatic</option>
-                  <option value="Manual">Manual</option>
-                </select>
-              </div>
-
-              <div className="VehicleManagement-field">
-                <label>Seating Capacity <span className="required">*</span></label>
-                <input type="text" name="seats" placeholder="e.g. 5" value={formData.seats} onChange={handleInputChange} />
-              </div>
-
-              <div className="VehicleManagement-field">
-                <label>Doors <span className="required">*</span></label>
-                <input type="text" name="doors" placeholder="e.g. 4" value={formData.doors} onChange={handleInputChange} />
-              </div>
-
-              <div className="VehicleManagement-field">
-                <label>Luggage Capacity <span className="required">*</span></label>
-                <input type="text" name="luggage" placeholder="e.g. 2 Bags" value={formData.luggage} onChange={handleInputChange} />
-              </div>
-
-              <div className="VehicleManagement-field">
-                <label>Mileage <span className="required">*</span></label>
-                <input type="text" name="mileage" placeholder="e.g. 25.30 miles/ltr" value={formData.mileage} onChange={handleInputChange} />
-              </div>
-
-              <div className="VehicleManagement-field">
-                <label>Car Type <span className="required">*</span></label>
-                <select name="carType" value={formData.carType} onChange={handleInputChange}>
-                  <option value="">Select car type</option>
-                  <option value="Sedan">Sedan</option>
-                  <option value="SUV">SUV</option>
-                  <option value="Hatchback">Hatchback</option>
-                  <option value="MPV">MPV</option>
-                  <option value="Crossover">Crossover</option>
-                </select>
-              </div>
-
-              <div className="VehicleManagement-field">
-                <label>Color <span className="required">*</span></label>
-                <input type="text" name="color" placeholder="e.g. Grey" value={formData.color} onChange={handleInputChange} />
-              </div>
-            </div>
-
-            {/* Checkbox Features */}
-            <div className="VehicleManagement-field-group">
-              <label className="VehicleManagement-label">Features <span className="required">*</span></label>
-              <div className="VehicleManagement-checkbox-grid">
-                {availableFeatures.map((feature) => (
-                  <label key={feature} className="VehicleManagement-checkbox-item">
-                    <input
-                      type="checkbox"
-                      checked={formData.features.includes(feature)}
-                      onChange={() => handleFeatureToggle(feature)}
-                    />
-                    <span>{feature}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Price & Status Group */}
-            <div className="VehicleManagement-form-grid">
-              <div className="VehicleManagement-field">
-                <label>Daily Price <span className="required">*</span></label>
-                <input type="number" name="price" placeholder="₹ 498.25" value={formData.price} onChange={handleInputChange} required />
-              </div>
-              <div className="VehicleManagement-field">
-                <label>Offer Price</label>
-                <input type="number" name="offerPrice" placeholder="₹ 498.25" value={formData.offerPrice} onChange={handleInputChange} />
-              </div>
-              <div className="VehicleManagement-field">
-                <label>Status <span className="required">*</span></label>
-                <select name="status" value={formData.status} onChange={handleInputChange}>
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Descriptions */}
-            <div className="VehicleManagement-field">
-              <label>Short Description <span className="required">*</span></label>
-              <input type="text" name="shortDesc" placeholder="e.g. Premium compact sedan with advanced features..." value={formData.shortDesc} onChange={handleInputChange} />
-            </div>
-
-            <div className="VehicleManagement-field">
-              <label>Full Description <span className="required">*</span></label>
-              <div className="VehicleManagement-editor-wrapper">
-                <div className="VehicleManagement-editor-toolbar">
-                  <button type="button" onClick={() => handleFormatText('bold')} title="Bold"><FaBold /></button>
-                  <button type="button" onClick={() => handleFormatText('italic')} title="Italic"><FaItalic /></button>
-                  <button type="button" onClick={() => handleFormatText('ul')} title="Bullet List"><FaListUl /></button>
-                  <button type="button" onClick={() => handleFormatText('ol')} title="Numbered List"><FaListOl /></button>
-                  <button type="button" onClick={() => handleFormatText('link')} title="Insert Link"><FaLink /></button>
-                  <button type="button" onClick={() => handleFormatText('image')} title="Insert Image"><FaImage /></button>
+                <div className="VehicleManagement-image-thumbnails">
+                  {formData.images.map((img, idx) => (
+                    <div key={idx} className="VehicleManagement-thumb-box">
+                      <img src={img} alt={`Thumbnail ${idx}`} />
+                      <button type="button" className="VehicleManagement-thumb-remove" onClick={() => handleRemoveImage(idx)} title="Remove image">
+                        <FaTimes />
+                      </button>
+                    </div>
+                  ))}
                 </div>
-                <textarea
-                  id="fullDescTextarea"
-                  name="fullDesc"
-                  rows="4"
-                  placeholder="Write detailed description about the vehicle..."
-                  value={formData.fullDesc}
-                  onChange={handleInputChange}
-                ></textarea>
               </div>
-            </div>
 
-            {/* Form Action Buttons */}
-            <div className="VehicleManagement-form-actions">
-              <button type="submit" className="VehicleManagement-btn-save">
-                <FaSave /> {isEditing ? 'Update Vehicle' : 'Save Vehicle'}
-              </button>
-              <button type="button" className="VehicleManagement-btn-reset" onClick={handleResetForm}>
-                <FaUndo /> Reset
-              </button>
-            </div>
+              <div className="VehicleManagement-form-grid">
+                <div className="VehicleManagement-field">
+                  <label>Vehicle Name <span className="required">*</span></label>
+                  <input type="text" name="name" placeholder="e.g. Audi A3 1.6 TDI S line" value={formData.name} onChange={handleInputChange} required />
+                </div>
 
-          </form>
+                <div className="VehicleManagement-field">
+                  <label>Brand <span className="required">*</span></label>
+                  <input type="text" name="brand" placeholder="e.g. Audi" value={formData.brand} onChange={handleInputChange} required />
+                </div>
+
+                <div className="VehicleManagement-field">
+                  <label>Model <span className="required">*</span></label>
+                  <input type="text" name="model" placeholder="e.g. A3" value={formData.model} onChange={handleInputChange} />
+                </div>
+
+                <div className="VehicleManagement-field">
+                  <label>Year <span className="required">*</span></label>
+                  <select name="year" value={formData.year} onChange={handleInputChange}>
+                    <option value="">Select year</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                  </select>
+                </div>
+
+                <div className="VehicleManagement-field">
+                  <label>Fuel Type <span className="required">*</span></label>
+                  <select name="fuelType" value={formData.fuelType} onChange={handleInputChange}>
+                    <option value="">Select fuel type</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Petrol">Petrol</option>
+                    <option value="Hybrid">Hybrid</option>
+                    <option value="Electric">Electric</option>
+                  </select>
+                </div>
+
+                <div className="VehicleManagement-field">
+                  <label>Transmission <span className="required">*</span></label>
+                  <select name="transmission" value={formData.transmission} onChange={handleInputChange}>
+                    <option value="">Select transmission</option>
+                    <option value="Automatic">Automatic</option>
+                    <option value="Manual">Manual</option>
+                  </select>
+                </div>
+
+                <div className="VehicleManagement-field">
+                  <label>Seating Capacity <span className="required">*</span></label>
+                  <input type="text" name="seats" placeholder="e.g. 5" value={formData.seats} onChange={handleInputChange} />
+                </div>
+
+                <div className="VehicleManagement-field">
+                  <label>Doors <span className="required">*</span></label>
+                  <input type="text" name="doors" placeholder="e.g. 4" value={formData.doors} onChange={handleInputChange} />
+                </div>
+
+                <div className="VehicleManagement-field">
+                  <label>Luggage Capacity <span className="required">*</span></label>
+                  <input type="text" name="luggage" placeholder="e.g. 2 Bags" value={formData.luggage} onChange={handleInputChange} />
+                </div>
+
+                <div className="VehicleManagement-field">
+                  <label>Mileage <span className="required">*</span></label>
+                  <input type="text" name="mileage" placeholder="e.g. 25.30 miles/ltr" value={formData.mileage} onChange={handleInputChange} />
+                </div>
+
+                <div className="VehicleManagement-field">
+                  <label>Car Type <span className="required">*</span></label>
+                  <select name="carType" value={formData.carType} onChange={handleInputChange}>
+                    <option value="">Select car type</option>
+                    <option value="Sedan">Sedan</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Hatchback">Hatchback</option>
+                    <option value="MPV">MPV</option>
+                    <option value="Crossover">Crossover</option>
+                  </select>
+                </div>
+
+                <div className="VehicleManagement-field">
+                  <label>Color <span className="required">*</span></label>
+                  <input type="text" name="color" placeholder="e.g. Grey" value={formData.color} onChange={handleInputChange} />
+                </div>
+              </div>
+
+              <div className="VehicleManagement-field-group">
+                <label className="VehicleManagement-label">Features <span className="required">*</span></label>
+                <div className="VehicleManagement-checkbox-grid">
+                  {availableFeatures.map((feature) => (
+                    <label key={feature} className="VehicleManagement-checkbox-item">
+                      <input
+                        type="checkbox"
+                        checked={formData.features.includes(feature)}
+                        onChange={() => handleFeatureToggle(feature)}
+                      />
+                      <span>{feature}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="VehicleManagement-form-grid">
+                <div className="VehicleManagement-field">
+                  <label>Daily Price <span className="required">*</span></label>
+                  <input type="number" name="price" placeholder="₹ 498.25" value={formData.price} onChange={handleInputChange} required />
+                </div>
+                <div className="VehicleManagement-field">
+                  <label>Offer Price</label>
+                  <input type="number" name="offerPrice" placeholder="₹ 498.25" value={formData.offerPrice} onChange={handleInputChange} />
+                </div>
+                <div className="VehicleManagement-field">
+                  <label>Status <span className="required">*</span></label>
+                  <select name="status" value={formData.status} onChange={handleInputChange}>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="VehicleManagement-field">
+                <label>Short Description <span className="required">*</span></label>
+                <input type="text" name="shortDesc" placeholder="e.g. Premium compact sedan..." value={formData.shortDesc} onChange={handleInputChange} />
+              </div>
+
+              <div className="VehicleManagement-field">
+                <label>Full Description <span className="required">*</span></label>
+                <div className="VehicleManagement-editor-wrapper">
+                  <div className="VehicleManagement-editor-toolbar">
+                    <button type="button" onClick={() => handleFormatText('bold')} title="Bold"><FaBold /></button>
+                    <button type="button" onClick={() => handleFormatText('italic')} title="Italic"><FaItalic /></button>
+                    <button type="button" onClick={() => handleFormatText('ul')} title="Bullet List"><FaListUl /></button>
+                    <button type="button" onClick={() => handleFormatText('ol')} title="Numbered List"><FaListOl /></button>
+                    <button type="button" onClick={() => handleFormatText('link')} title="Insert Link"><FaLink /></button>
+                    <button type="button" onClick={() => handleFormatText('image')} title="Insert Image"><FaImage /></button>
+                  </div>
+                  <textarea
+                    id="fullDescTextarea"
+                    name="fullDesc"
+                    rows="4"
+                    placeholder="Write detailed description..."
+                    value={formData.fullDesc}
+                    onChange={handleInputChange}
+                  ></textarea>
+                </div>
+              </div>
+
+              <div className="VehicleManagement-form-actions">
+                <button type="submit" className="VehicleManagement-btn-save">
+                  <FaSave /> {isEditing ? 'Update Vehicle' : 'Save Vehicle'}
+                </button>
+                <button type="button" className="VehicleManagement-btn-reset" onClick={handleResetForm}>
+                  <FaUndo /> Reset
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
 
-        {/* Right Column: Table List Section */}
-        <div className="VehicleManagement-card VehicleManagement-table-section">
-          
-          {/* Table Header Controls */}
+        {/* Right Column: Table List Section (40%) with Horizontal Scroll */}
+        <div className={`VehicleManagement-card VehicleManagement-table-section ${mobileTab === 'list' ? 'mobile-active' : ''}`}>
           <div className="VehicleManagement-table-controls">
             <div className="VehicleManagement-card-header">
               <h3><FaCar className="VehicleManagement-icon-accent" /> All Vehicles ({filteredVehicles.length})</h3>
@@ -580,14 +567,14 @@ export function VehicleManagement() {
                 <FaSearch className="VehicleManagement-search-icon" />
                 <input
                   type="text"
-                  placeholder="Search vehicles..."
+                  placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
                 />
               </div>
 
               <select value={filterType} onChange={(e) => { setFilterType(e.target.value); setCurrentPage(1); }}>
-                <option value="All">All Types</option>
+                <option value="All">Types</option>
                 <option value="Sedan">Sedan</option>
                 <option value="SUV">SUV</option>
                 <option value="Hatchback">Hatchback</option>
@@ -596,42 +583,41 @@ export function VehicleManagement() {
               </select>
 
               <select value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }}>
-                <option value="All">All Status</option>
+                <option value="All">Status</option>
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
 
-              {/* Fully functional Filter Reset Button */}
-              <button type="button" className="VehicleManagement-btn-filter" onClick={handleResetFilters}>
-                <FaFilter /> Reset Filters
+              <button type="button" className="VehicleManagement-btn-filter" onClick={handleResetFilters} title="Reset Filters">
+                <FaFilter />
               </button>
             </div>
           </div>
 
-          {/* Table Container */}
+          {/* Horizontal scroll container for the right-side table */}
           <div className="VehicleManagement-table-wrapper">
             <table className="VehicleManagement-table">
               <thead>
                 <tr>
-                  <th style={{ width: '35px' }}>
+                  <th style={{ width: '30px' }}>
                     <input
                       type="checkbox"
                       onChange={handleSelectAll}
                       checked={currentVehicles.length > 0 && currentVehicles.every((v) => selectedIds.includes(v.id))}
                     />
                   </th>
-                  <th style={{ width: '30px' }}>#</th>
-                  <th>Vehicle</th>
-                  <th>Price</th>
-                  <th>Status</th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
+                  <th style={{ width: '25px' }}>#</th>
+                  <th style={{ minWidth: '220px' }}>Vehicle Details</th>
+                  <th style={{ minWidth: '85px' }}>Price</th>
+                  <th style={{ minWidth: '75px' }}>Status</th>
+                  <th style={{ textAlign: 'right', minWidth: '70px' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {currentVehicles.length === 0 ? (
                   <tr>
                     <td colSpan="6" className="VehicleManagement-empty-cell">
-                      No vehicles found matching your criteria.
+                      No vehicles found.
                     </td>
                   </tr>
                 ) : (
@@ -663,7 +649,7 @@ export function VehicleManagement() {
                       </td>
                       <td className="VehicleManagement-price-cell">
                         <strong>₹{Number(car.price).toFixed(2)}</strong>
-                        <span>/ day</span>
+                        <span>/d</span>
                       </td>
                       <td>
                         <span className={`VehicleManagement-badge ${car.status.toLowerCase()}`}>
@@ -687,53 +673,51 @@ export function VehicleManagement() {
             </table>
           </div>
 
-          {/* Table Footer / Pagination */}
           <div className="VehicleManagement-table-footer">
             <div className="VehicleManagement-bulk-actions">
               {selectedIds.length > 0 && (
                 <button type="button" className="VehicleManagement-btn-bulk-delete" onClick={handleBulkDelete}>
-                  Delete Selected ({selectedIds.length})
+                  Delete ({selectedIds.length})
                 </button>
               )}
             </div>
 
-            <div className="VehicleManagement-pagination-container">
-              <span className="VehicleManagement-pagination-info">
-                {filteredVehicles.length ? `${indexOfFirstItem + 1}-${Math.min(indexOfLastItem, filteredVehicles.length)} of ${filteredVehicles.length}` : '0 results'}
-              </span>
-
-              <div className="VehicleManagement-pagination">
-                <button
-                  type="button"
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            <div className="VehicleManagement-pagination-right-group">
+              <div className="VehicleManagement-items-per-page">
+                <select 
+                  value={itemsPerPage} 
+                  onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
                 >
-                  <FaChevronLeft />
-                </button>
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={15}>15</option>
+                </select>
+              </div>
 
-                {Array.from({ length: totalPages }, (_, i) => (
+              <div className="VehicleManagement-pagination-container">
+                <span className="VehicleManagement-pagination-info">
+                  {filteredVehicles.length ? `${indexOfFirstItem + 1}-${Math.min(indexOfLastItem, filteredVehicles.length)}/${filteredVehicles.length}` : '0'}
+                </span>
+
+                <div className="VehicleManagement-pagination">
                   <button
                     type="button"
-                    key={i + 1}
-                    className={currentPage === i + 1 ? 'active' : ''}
-                    onClick={() => setCurrentPage(i + 1)}
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                   >
-                    {i + 1}
+                    <FaChevronLeft />
                   </button>
-                ))}
-
-                <button
-                  type="button"
-                  disabled={currentPage === totalPages || totalPages === 0}
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                >
-                  <FaChevronRight />
-                </button>
+                  <button
+                    type="button"
+                    disabled={currentPage === totalPages || totalPages === 0}
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  >
+                    <FaChevronRight />
+                  </button>
+                </div>
               </div>
             </div>
-
           </div>
-
         </div>
 
       </div>
