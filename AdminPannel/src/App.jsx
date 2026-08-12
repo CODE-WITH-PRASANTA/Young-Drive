@@ -1,13 +1,18 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 
 import MainLayout from "./Layout/MainLayout/MainLayout";
 import VehicleManagement from "./Components/VehicleManagement/VehicleManagement";
 import FeatureListing from "./Components/FeatureListing/FeatureListing";
 import Dashboard from "./Pages/Dashboard/Dashboard";
+
 import AllBookings from "./Components/AllBookings/AllBookings";
-import VehicleList from "./Components/VehicleList/VehicleList";
-import AddNewVehicle from "./Components/AddNewVehicle/AddNewVehicle";
 import Payments from "./Components/Payments/Payments";
 import Reviews from "./Components/Reviews/Reviews";
 import Locations from "./Components/Locations/Locations";
@@ -15,47 +20,147 @@ import MyProfile from "./Components/MyProfile/MyProfile";
 import BookingRequest from "./Components/BookingRequest/BookingRequest";
 import BookingCalender from "./Components/BookingCalender/BookingCalender";
 
+import Login from "./Components/Login/Login";
+import ProtectedRoute from "./Components/protectedRoute/protectedRoute";
+
+/* =========================================
+    APP
+========================================= */
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Parent layout wraps all pages */}
-        <Route path="/" element={<MainLayout />}>
-          {/* Default view when landing on '/' */}
-          <Route index element={<Dashboard />} />
 
-          {/* Clean, relative nested paths (NO leading slashes) */}
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="vehicle-management" element={<VehicleManagement />} />
-          <Route path="feature-listing" element={<FeatureListing />} />
-          
+        {/* =================================
+            PUBLIC LOGIN PAGE
+        ================================== */}
 
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
+        {/* =================================
+            PROTECTED ADMIN ROUTES
+        ================================== */}
 
-          {/* Bookings Submenu Routes */}
-          
-          {/* Direct Route Aliases mapped to your sidebar menu */}
-          <Route path="vehicles" element={<VehicleManagement />} />
-         
-          <Route path="bookings/all" element={<AllBookings />}/>
-          
-          <Route path="vechilelist" element={<VehicleList />} />
-          <Route path="addvehicle" element={<AddNewVehicle/>} />
-           <Route path="/payments" element={<Payments/>} />
-            <Route path="/reviews" element={<Reviews/>} />
-             <Route path="/locations" element={<Locations/>} />
-             <Route path="/settings" element={<MyProfile/>} />
-        
-          <Route path="/bookings/requests" element={<BookingRequest/>} />
-          <Route path="/bookings/calendar" element={<BookingCalender/>} />
+        <Route element={<ProtectedRoute />}>
+          <Route
+            path="/"
+            element={<MainLayout />}
+          >
 
+            {/* DASHBOARD */}
 
+            <Route
+              index
+              element={<Dashboard />}
+            />
 
+            <Route
+              path="dashboard"
+              element={<Dashboard />}
+            />
 
+            {/* =================================
+                VEHICLE MANAGEMENT
+            ================================== */}
+
+            <Route
+              path="vehicle-management"
+              element={
+                <VehicleManagement />
+              }
+            />
+
+            <Route
+              path="vehicles"
+              element={
+                <VehicleManagement />
+              }
+            />
+
+            <Route
+              path="feature-listing"
+              element={
+                <FeatureListing />
+              }
+            />
+
+            {/* =================================
+                BOOKINGS
+            ================================== */}
+
+            <Route
+              path="bookings/all"
+              element={<AllBookings />}
+            />
+
+            <Route
+              path="bookings/requests"
+              element={
+                <BookingRequest />
+              }
+            />
+
+            <Route
+              path="bookings/calendar"
+              element={
+                <BookingCalender />
+              }
+            />
+
+            {/* =================================
+                GENERAL
+            ================================== */}
+
+            <Route
+              path="payments"
+              element={<Payments />}
+            />
+
+            <Route
+              path="reviews"
+              element={<Reviews />}
+            />
+
+            <Route
+              path="locations"
+              element={<Locations />}
+            />
+
+            <Route
+              path="settings"
+              element={<MyProfile />}
+            />
+
+          </Route>
         </Route>
 
-        {/* Catch-all redirect */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        {/* =================================
+            CATCH ALL
+        ================================== */}
+
+        <Route
+          path="*"
+          element={
+            localStorage.getItem(
+              "adminAuth"
+            ) === "true" ? (
+              <Navigate
+                to="/dashboard"
+                replace
+              />
+            ) : (
+              <Navigate
+                to="/login"
+                replace
+              />
+            )
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   );

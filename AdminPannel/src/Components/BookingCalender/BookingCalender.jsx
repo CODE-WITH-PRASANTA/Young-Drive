@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { 
   ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, 
-  MapPin, Clock, User, Mail, Phone, CreditCard, X, 
-  CheckCircle2, Gauge, Fuel, Settings, Users, Filter, MoreVertical
+  MapPin, Clock, User, Mail, Phone, X, 
+  Filter, MoreVertical, ShieldCheck, Car, Settings, Fuel, Users
 } from 'lucide-react';
 import './BookingCalender.css';
 
@@ -21,6 +21,13 @@ const INITIAL_BOOKINGS = [
   { id: 11, car: 'Mercedes GLC', type: 'pickup-only', time: '11:00 AM - May 21', date: 18, price: 130, location: 'Manhattan Central', dropLocation: 'Newark Airport', status: 'Confirmed' },
   { id: 12, car: 'Hyundai Tucson', type: 'pickup-drop', time: '9:00 AM - May 22', date: 19, price: 70, location: 'Brooklyn Center', dropLocation: 'LaGuardia Airport', status: 'Confirmed' },
   { id: 13, car: 'Jeep Compass', type: 'partially', time: '9:00 AM - May 31', date: 28, price: 85, location: 'Queens Hub', dropLocation: 'Manhattan', status: 'Confirmed' }
+];
+
+const VEHICLE_LIST = [
+  { id: 'camry', name: 'Toyota Camry', type: 'Sedan', category: 'Sedan • Black', image: 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=120&auto=format&fit=crop&q=60', transmission: 'Automatic', fuel: 'Diesel', seats: '7 Seats' },
+  { id: 'bmwx5', name: 'BMW X5', type: 'SUV', category: 'SUV • White', image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=120&auto=format&fit=crop&q=60', transmission: 'Automatic', fuel: 'Petrol', seats: '5 Seats' },
+  { id: 'audiq7', name: 'Audi Q7', type: 'SUV', category: 'SUV • Blue', image: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=120&auto=format&fit=crop&q=60', transmission: 'Automatic', fuel: 'Diesel', seats: '7 Seats' },
+  { id: 'civic', name: 'Honda Civic', type: 'Sedan', category: 'Sedan • Red', image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=120&auto=format&fit=crop&q=60', transmission: 'Manual', fuel: 'Petrol', seats: '5 Seats' }
 ];
 
 const UPCOMING_TABLE_DATA = [
@@ -45,7 +52,7 @@ const UPCOMING_TABLE_DATA = [
 
 const BookingCalender = () => {
   // Calendar State
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 4, 13)); // May 13, 2025
+  const [currentDate, setCurrentDate] = useState(new Date(2025, 4, 13));
   const [selectedMiniDate, setSelectedMiniDate] = useState(13);
 
   // Filters State
@@ -60,26 +67,24 @@ const BookingCalender = () => {
 
   // Modal Popup State
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalData, setModalData] = useState(null);
 
-  // Modal Form Inputs
-  const [pickupLoc, setPickupLoc] = useState('Manchester, England');
-  const [dropLoc, setDropLoc] = useState('Manchester, England');
-  const [pickupDate, setPickupDate] = useState('2025-05-20');
-  const [pickupTime, setPickupTime] = useState('10:00');
-  const [dropDate, setDropDate] = useState('2025-05-23');
-  const [dropTime, setDropTime] = useState('10:00');
-  
-  const [driverName, setDriverName] = useState('');
-  const [driverEmail, setDriverEmail] = useState('');
-  const [driverPhone, setDriverPhone] = useState('');
-  const [driverAge, setDriverAge] = useState('25');
-  const [licenseNo, setLicenseNo] = useState('');
+  // New Booking Modal Form Inputs State
+  const [selectedVehicle, setSelectedVehicle] = useState(VEHICLE_LIST[0]);
+  const [bookingDate, setBookingDate] = useState('2025-05-18');
+  const [bookingTime, setBookingTime] = useState('10:00 AM');
+  const [pickupDate, setPickupDate] = useState('2025-05-18');
+  const [pickupTime, setPickupTime] = useState('10:00 AM');
+  const [dropoffDate, setDropoffDate] = useState('2025-05-20');
+  const [dropoffTime, setDropoffTime] = useState('10:00 AM');
 
-  // Additional Options Checkboxes
-  const [optChildSeat, setOptChildSeat] = useState(false);
-  const [optGps, setOptGps] = useState(false);
-  const [optExtraDriver, setOptExtraDriver] = useState(false);
+  const [pickupLocation, setPickupLocation] = useState('Manchester, England');
+  const [dropoffLocation, setDropoffLocation] = useState('Manchester, England');
+
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phoneCode, setPhoneCode] = useState('+1');
+  const [phone, setPhone] = useState('');
+  const [additionalMessage, setAdditionalMessage] = useState('');
 
   // Filter Bookings
   const filteredBookings = useMemo(() => {
@@ -102,50 +107,36 @@ const BookingCalender = () => {
 
   // Open Modal Handler
   const handleOpenModal = (bookingObj = null) => {
-    const defaultCar = bookingObj ? {
-      name: bookingObj.car,
-      pricePerDay: bookingObj.price || 80,
-      image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500&auto=format&fit=crop&q=80',
-      location: bookingObj.location || 'Manchester, England',
-      mileage: '25,100 miles',
-      fuel: 'Diesel',
-      transmission: 'Automatic',
-      seats: '7 seats'
-    } : {
-      name: 'Volkswagen Golf GTD',
-      pricePerDay: 80,
-      image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500&auto=format&fit=crop&q=80',
-      location: 'Manchester, England',
-      mileage: '25,100 miles',
-      fuel: 'Diesel',
-      transmission: 'Automatic',
-      seats: '7 seats'
-    };
-
-    setModalData(defaultCar);
+    if (bookingObj) {
+      const matched = VEHICLE_LIST.find(v => v.name.toLowerCase().includes(bookingObj.car.toLowerCase())) || VEHICLE_LIST[0];
+      setSelectedVehicle(matched);
+      setPickupLocation(bookingObj.location || 'Manchester, England');
+      setDropoffLocation(bookingObj.dropLocation || 'Manchester, England');
+    }
     setIsModalOpen(true);
   };
 
-  // Price Calculation Logic
-  const daysCount = 3; // Fixed 3 days duration for demo
-  const basePrice = (modalData?.pricePerDay || 80) * daysCount;
-  const optionsPrice = (optChildSeat ? 5 * daysCount : 0) + (optGps ? 7 * daysCount : 0) + (optExtraDriver ? 10 * daysCount : 0);
-  const totalPrice = basePrice + optionsPrice;
+  const handleVehicleChange = (e) => {
+    const found = VEHICLE_LIST.find(v => v.id === e.target.value);
+    if (found) setSelectedVehicle(found);
+  };
+
+  const handleCreateBookingSubmit = (e) => {
+    e.preventDefault();
+    alert(`New booking created successfully for ${selectedVehicle.name}!`);
+    setIsModalOpen(false);
+  };
 
   // Calendar Grid Days Generation (May 2025)
   const daysInMonth = 31;
-  const startDayOffset = 4; // May 1, 2025 is Thursday (0:Sun, 1:Mon, 2:Tue, 3:Wed, 4:Thu)
   
   const calendarCells = [];
-  // Previous month padding
   for (let i = 27; i <= 30; i++) {
     calendarCells.push({ day: i, isCurrentMonth: false });
   }
-  // Current month days
   for (let i = 1; i <= daysInMonth; i++) {
     calendarCells.push({ day: i, isCurrentMonth: true });
   }
-  // Next month padding
   for (let i = 1; i <= 7; i++) {
     calendarCells.push({ day: i, isCurrentMonth: false });
   }
@@ -370,13 +361,11 @@ const BookingCalender = () => {
               <div className="mini-day-name">Fr</div>
               <div className="mini-day-name">Sa</div>
 
-              {/* Prev month */}
               <div className="mini-date muted">27</div>
               <div className="mini-date muted">28</div>
               <div className="mini-date muted">29</div>
               <div className="mini-date muted">30</div>
 
-              {/* May dates */}
               {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
                 <div 
                   key={d} 
@@ -468,226 +457,259 @@ const BookingCalender = () => {
 
       </div>
 
-      {/* Booking Details Modal Dialog */}
+      {/* NEW BOOKING POPUP MODAL */}
       {isModalOpen && (
         <div className="bc-modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="bc-modal-container" onClick={(e) => e.stopPropagation()}>
-            <button className="bc-modal-close-btn" onClick={() => setIsModalOpen(false)}>
-              <X size={20} />
+          <div className="new-booking-modal-card" onClick={(e) => e.stopPropagation()}>
+            
+            {/* Close Cross Button */}
+            <button className="new-booking-close-btn" onClick={() => setIsModalOpen(false)}>
+              <X size={18} />
             </button>
 
-            {/* Modal Left Side: Car Info */}
-            <div className="bc-modal-left">
-              <div className="car-image-container">
-                <img src={modalData.image} alt={modalData.name} />
+            {/* Modal Header */}
+            <div className="new-booking-header">
+              <div className="calendar-icon-badge">
+                <CalendarIcon size={18} className="green-icon" />
               </div>
-
-              <div className="car-details-card">
-                <h3>{modalData.name}</h3>
-                <p className="car-loc"><MapPin size={14} /> {modalData.location}</p>
-
-                <div className="car-specs-grid">
-                  <div><Gauge size={14} /> {modalData.mileage}</div>
-                  <div><Fuel size={14} /> {modalData.fuel}</div>
-                  <div><Settings size={14} /> {modalData.transmission}</div>
-                  <div><Users size={14} /> {modalData.seats}</div>
-                </div>
-
-                <div className="car-pricing-banner">
-                  <div className="price-tag">
-                    <span className="amount">${modalData.pricePerDay}</span>
-                    <span className="unit">/day</span>
-                  </div>
-                  <div className="subtotal">
-                    <span>Total ({daysCount} days)</span>
-                    <strong>${basePrice}</strong>
-                  </div>
-                </div>
-
-                <div className="car-perks-list">
-                  <div><CheckCircle2 size={16} className="text-green" /> Free Cancellation</div>
-                  <div><CheckCircle2 size={16} className="text-green" /> No Hidden Charges</div>
-                </div>
+              <div>
+                <h2>New Booking</h2>
+                <p>Fill in the details to create a new vehicle booking</p>
               </div>
             </div>
 
-            {/* Modal Right Side: Booking Form */}
-            <div className="bc-modal-right">
-              <h2>Booking Details</h2>
-
-              <div className="modal-form-section">
-                <h4>1. Pick-up & Drop-off</h4>
-                <div className="form-row-2">
-                  <div className="form-group">
-                    <label>Pick-up Location</label>
-                    <div className="input-with-icon">
-                      <MapPin size={16} />
-                      <select value={pickupLoc} onChange={(e) => setPickupLoc(e.target.value)}>
-                        <option value="Manchester, England">Manchester, England</option>
-                        <option value="London, England">London, England</option>
-                      </select>
+            {/* Scrollable Form Body Container */}
+            <div className="new-booking-body">
+              <form onSubmit={handleCreateBookingSubmit}>
+                <div className="new-booking-grid">
+                  
+                  {/* LEFT COLUMN */}
+                  <div className="nb-col">
+                    
+                    {/* Vehicle Information */}
+                    <div className="nb-section-title">Vehicle Information</div>
+                    
+                    <div className="nb-form-group">
+                      <label>Select Vehicle</label>
+                      <div className="custom-vehicle-select-box">
+                        <select value={selectedVehicle.id} onChange={handleVehicleChange}>
+                          {VEHICLE_LIST.map(v => (
+                            <option key={v.id} value={v.id}>{v.name}</option>
+                          ))}
+                        </select>
+                        <div className="selected-vehicle-preview">
+                          <img src={selectedVehicle.image} alt={selectedVehicle.name} />
+                          <div>
+                            <strong>{selectedVehicle.name}</strong>
+                            <span>{selectedVehicle.category}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
+
+                    <div className="nb-form-group">
+                      <label>Vehicle Type</label>
+                      <div className="nb-display-input">
+                        <Car size={15} className="green-icon" />
+                        <span>{selectedVehicle.type}</span>
+                      </div>
+                    </div>
+
+                    <div className="nb-dual-row">
+                      <div className="nb-form-group">
+                        <label>Transmission</label>
+                        <div className="nb-display-input">
+                          <Settings size={15} className="muted-icon" />
+                          <span>{selectedVehicle.transmission}</span>
+                        </div>
+                      </div>
+                      <div className="nb-form-group">
+                        <label>Fuel Type</label>
+                        <div className="nb-display-input">
+                          <Fuel size={15} className="muted-icon" />
+                          <span>{selectedVehicle.fuel}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="nb-form-group">
+                      <label>Seating Capacity</label>
+                      <div className="nb-display-input">
+                        <Users size={15} className="muted-icon" />
+                        <span>{selectedVehicle.seats}</span>
+                      </div>
+                    </div>
+
+                    {/* Booking Information */}
+                    <div className="nb-section-title" style={{ marginTop: '12px' }}>Booking Information</div>
+
+                    <div className="nb-dual-row">
+                      <div className="nb-form-group">
+                        <label>Booking Date</label>
+                        <input type="date" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} />
+                      </div>
+                      <div className="nb-form-group">
+                        <label>Booking Time</label>
+                        <select value={bookingTime} onChange={(e) => setBookingTime(e.target.value)}>
+                          <option value="10:00 AM">10:00 AM</option>
+                          <option value="11:00 AM">11:00 AM</option>
+                          <option value="02:00 PM">02:00 PM</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="nb-dual-row">
+                      <div className="nb-form-group">
+                        <label>Pick-up Date</label>
+                        <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} />
+                      </div>
+                      <div className="nb-form-group">
+                        <label>Pick-up Time</label>
+                        <select value={pickupTime} onChange={(e) => setPickupTime(e.target.value)}>
+                          <option value="10:00 AM">10:00 AM</option>
+                          <option value="11:00 AM">11:00 AM</option>
+                          <option value="02:00 PM">02:00 PM</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="nb-dual-row">
+                      <div className="nb-form-group">
+                        <label>Drop-off Date</label>
+                        <input type="date" value={dropoffDate} onChange={(e) => setDropoffDate(e.target.value)} />
+                      </div>
+                      <div className="nb-form-group">
+                        <label>Drop-off Time</label>
+                        <select value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)}>
+                          <option value="10:00 AM">10:00 AM</option>
+                          <option value="11:00 AM">11:00 AM</option>
+                          <option value="02:00 PM">02:00 PM</option>
+                        </select>
+                      </div>
+                    </div>
+
                   </div>
 
-                  <div className="form-group">
-                    <label>Drop-off Location</label>
-                    <div className="input-with-icon">
-                      <MapPin size={16} />
-                      <select value={dropLoc} onChange={(e) => setDropLoc(e.target.value)}>
-                        <option value="Manchester, England">Manchester, England</option>
-                        <option value="London, England">London, England</option>
-                      </select>
+                  {/* RIGHT COLUMN */}
+                  <div className="nb-col">
+                    
+                    {/* Location Details */}
+                    <div className="nb-section-title">Location Details</div>
+
+                    <div className="nb-form-group">
+                      <label>Pick-up Location</label>
+                      <div className="input-with-icon-left select-wrapper">
+                        <MapPin size={15} className="input-icon" />
+                        <select value={pickupLocation} onChange={(e) => setPickupLocation(e.target.value)}>
+                          <option value="Manchester, England">Manchester, England</option>
+                          <option value="New York Downtown">New York Downtown</option>
+                          <option value="Manhattan">Manhattan</option>
+                        </select>
+                      </div>
                     </div>
+
+                    <div className="nb-form-group">
+                      <label>Drop-off Location</label>
+                      <div className="input-with-icon-left select-wrapper">
+                        <MapPin size={15} className="input-icon" />
+                        <select value={dropoffLocation} onChange={(e) => setDropoffLocation(e.target.value)}>
+                          <option value="Manchester, England">Manchester, England</option>
+                          <option value="JFK Airport">JFK Airport</option>
+                          <option value="LaGuardia Airport">LaGuardia Airport</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Customer Information */}
+                    <div className="nb-section-title" style={{ marginTop: '12px' }}>Customer Information</div>
+
+                    <div className="nb-dual-row">
+                      <div className="nb-form-group">
+                        <label>Full Name</label>
+                        <div className="input-with-icon-left">
+                          <User size={15} className="input-icon" />
+                          <input 
+                            type="text" 
+                            placeholder="Enter full name" 
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="nb-form-group">
+                        <label>Email Address</label>
+                        <div className="input-with-icon-left">
+                          <Mail size={15} className="input-icon" />
+                          <input 
+                            type="email" 
+                            placeholder="Enter email address" 
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="nb-form-group">
+                      <label>Phone Number</label>
+                      <div className="phone-picker-wrapper">
+                        <div className="country-code-select">
+                          <span className="flag">🇺🇸</span>
+                          <select value={phoneCode} onChange={(e) => setPhoneCode(e.target.value)}>
+                            <option value="+1">+1</option>
+                            <option value="+44">+44</option>
+                            <option value="+91">+91</option>
+                          </select>
+                        </div>
+                        <input 
+                          type="tel" 
+                          placeholder="Enter phone number" 
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="nb-form-group">
+                      <label>Additional Message (Optional)</label>
+                      <div className="textarea-wrapper">
+                        <textarea 
+                          rows="2" 
+                          placeholder="Enter any special requests or notes..."
+                          value={additionalMessage}
+                          onChange={(e) => setAdditionalMessage(e.target.value)}
+                        ></textarea>
+                      </div>
+                    </div>
+
+                    {/* Secure Booking Banner */}
+                    <div className="nb-secure-banner">
+                      <ShieldCheck size={18} className="shield-green" />
+                      <div>
+                        <strong>Secure Booking</strong>
+                        <p>We use secure encryption to protect your data.</p>
+                      </div>
+                    </div>
+
                   </div>
+
                 </div>
 
-                <div className="form-row-2">
-                  <div className="form-group">
-                    <label>Pick-up Date & Time</label>
-                    <div className="dual-inputs">
-                      <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} />
-                      <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} />
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Drop-off Date & Time</label>
-                    <div className="dual-inputs">
-                      <input type="date" value={dropDate} onChange={(e) => setDropDate(e.target.value)} />
-                      <input type="time" value={dropTime} onChange={(e) => setDropTime(e.target.value)} />
-                    </div>
-                  </div>
+                {/* Action Buttons */}
+                <div className="nb-footer-actions">
+                  <button type="button" className="btn-nb-cancel" onClick={() => setIsModalOpen(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn-nb-submit">
+                    <CalendarIcon size={15} />
+                    <span>Create Booking</span>
+                  </button>
                 </div>
-              </div>
-
-              <div className="modal-form-section">
-                <h4>2. Driver Details</h4>
-                <div className="form-row-2">
-                  <div className="form-group">
-                    <label>Full Name</label>
-                    <div className="input-with-icon">
-                      <User size={16} />
-                      <input 
-                        type="text" 
-                        placeholder="Enter full name" 
-                        value={driverName}
-                        onChange={(e) => setDriverName(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Email Address</label>
-                    <div className="input-with-icon">
-                      <Mail size={16} />
-                      <input 
-                        type="email" 
-                        placeholder="Enter email" 
-                        value={driverEmail}
-                        onChange={(e) => setDriverEmail(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="form-row-3">
-                  <div className="form-group">
-                    <label>Phone Number</label>
-                    <div className="input-with-icon">
-                      <Phone size={16} />
-                      <input 
-                        type="text" 
-                        placeholder="Enter phone number" 
-                        value={driverPhone}
-                        onChange={(e) => setDriverPhone(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Driver Age</label>
-                    <select value={driverAge} onChange={(e) => setDriverAge(e.target.value)}>
-                      <option value="21">21 - 24</option>
-                      <option value="25">25+</option>
-                    </select>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Driving License No.</label>
-                    <div className="input-with-icon">
-                      <CreditCard size={16} />
-                      <input 
-                        type="text" 
-                        placeholder="Enter license number" 
-                        value={licenseNo}
-                        onChange={(e) => setLicenseNo(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="modal-form-section">
-                <h4>3. Additional Options</h4>
-                <div className="options-checkbox-grid">
-                  <label className={`checkbox-card ${optChildSeat ? 'checked' : ''}`}>
-                    <input 
-                      type="checkbox" 
-                      checked={optChildSeat} 
-                      onChange={(e) => setOptChildSeat(e.target.checked)} 
-                    />
-                    <span>Child Seat</span>
-                    <strong className="text-green">$5 /day</strong>
-                  </label>
-
-                  <label className={`checkbox-card ${optGps ? 'checked' : ''}`}>
-                    <input 
-                      type="checkbox" 
-                      checked={optGps} 
-                      onChange={(e) => setOptGps(e.target.checked)} 
-                    />
-                    <span>GPS Navigation</span>
-                    <strong className="text-green">$7 /day</strong>
-                  </label>
-
-                  <label className={`checkbox-card ${optExtraDriver ? 'checked' : ''}`}>
-                    <input 
-                      type="checkbox" 
-                      checked={optExtraDriver} 
-                      onChange={(e) => setOptExtraDriver(e.target.checked)} 
-                    />
-                    <span>Additional Driver</span>
-                    <strong className="text-green">$10 /day</strong>
-                  </label>
-                </div>
-              </div>
-
-              <div className="modal-form-section">
-                <h4>4. Payment Summary</h4>
-                <div className="summary-pricing-card">
-                  <div className="summary-details">
-                    <div>
-                      <span>${modalData.pricePerDay} x {daysCount} days</span>
-                      <strong>${basePrice}</strong>
-                    </div>
-                    <div>
-                      <span>Additional Options</span>
-                      <strong>${optionsPrice}</strong>
-                    </div>
-                  </div>
-
-                  <div className="total-highlight-box">
-                    <span>Total Amount</span>
-                    <strong className="total-price">${totalPrice}</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="modal-footer-actions">
-                <button className="btn-cancel" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                <button className="btn-confirm-green" onClick={() => setIsModalOpen(false)}>Confirm Booking</button>
-              </div>
-
+              </form>
             </div>
 
           </div>

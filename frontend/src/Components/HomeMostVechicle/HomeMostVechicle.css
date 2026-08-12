@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-/* --- MAIN SECTION BACKGROUND (Pure White Full-Width) --- */
+/* --- MAIN SECTION BACKGROUND --- */
 .most-vehicles-section {
   width: 100%;
   background-color: #ffffff;
@@ -37,7 +37,7 @@
   font-weight: 500;
 }
 
-/* --- NAVIGATION ARROWS (With Smooth Green Hover Effect) --- */
+/* --- NAVIGATION ARROWS --- */
 .nav-buttons {
   display: flex;
   gap: 10px;
@@ -55,12 +55,11 @@
   justify-content: center;
   font-size: 16px;
   cursor: pointer;
-  /* Smooth transition for background, color, and scale */
   transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
 }
 
 .nav-btn:hover {
-  background-color: #5be161; /* Signature Green */
+  background-color: #5be161;
   color: #000000;
   transform: translateY(-2px);
 }
@@ -73,15 +72,13 @@
   overflow-x: auto;
   scroll-behavior: smooth;
   padding-bottom: 12px;
-}
 
-/* Hide scrollbar */
-.vehicles-grid::-webkit-scrollbar {
-  display: none;
-}
-.vehicles-grid {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.vehicles-grid::-webkit-scrollbar {
+  display: none;
 }
 
 /* --- VEHICLE CARD --- */
@@ -100,7 +97,6 @@
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.07);
 }
 
-/* --- CARD IMAGE & RATING BADGE --- */
 .card-image-wrapper {
   position: relative;
   width: 100%;
@@ -145,7 +141,6 @@
   color: #888888;
 }
 
-/* --- CARD CONTENT --- */
 .card-content {
   padding: 20px;
   display: flex;
@@ -183,7 +178,6 @@
   margin: 16px 0;
 }
 
-/* --- SPECS GRID --- */
 .specs-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -205,7 +199,6 @@
   opacity: 0.8;
 }
 
-/* --- CARD FOOTER & BOOK BUTTON --- */
 .card-footer {
   display: flex;
   justify-content: space-between;
@@ -232,7 +225,6 @@
   color: #111111;
 }
 
-/* --- BOOK NOW BUTTON (Smooth Green Hover Effect) --- */
 .book-btn {
   background-color: #f3f5f8;
   color: #111111;
@@ -242,17 +234,15 @@
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  /* Smooth transition for green color change */
   transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
 }
 
 .book-btn:hover {
-  background-color: #5be161; /* Signature Green */
+  background-color: #5be161;
   color: #000000;
   transform: translateY(-1px);
 }
 
-/* --- LOAD MORE BUTTON --- */
 .load-more-container {
   display: flex;
   justify-content: center;
@@ -284,10 +274,448 @@
   font-size: 14px;
 }
 
+/* ==========================================================================
+   POPUP MODAL STYLES (MATCHING UI IMAGE)
+   ========================================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: modalFadeIn 0.25s ease-out forwards;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-card {
+  background: #ffffff;
+  width: 960px;
+  max-width: 100%;
+  max-height: 90vh;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  padding: 32px;
+  gap: 36px;
+  position: relative;
+  overflow-y: auto;
+  animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background-color: #f3f4f6;
+  color: #374151;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.modal-close-btn:hover {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+/* --- MODAL LEFT SIDE --- */
+.modal-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-img-container {
+  position: relative;
+  width: 100%;
+  height: 230px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  background-color: #f3f4f6;
+}
+
+.modal-car-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-carousel-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.dot.active {
+  background-color: #059669;
+  width: 18px;
+  border-radius: 10px;
+}
+
+.modal-car-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 6px;
+}
+
+.modal-car-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.icon-svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.modal-specs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.modal-spec-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.modal-price-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+
+.from-text {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.price-bold {
+  font-size: 24px;
+  font-weight: 800;
+  color: #059669;
+}
+
+.per-day {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.modal-cancellation-box {
+  background-color: #ecfdf5;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: auto;
+}
+
+.modal-cancellation-box .info-icon {
+  background: #d1fae5;
+  color: #059669;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.modal-cancellation-box strong {
+  display: block;
+  font-size: 13px;
+  color: #065f46;
+  margin-bottom: 2px;
+}
+
+.modal-cancellation-box p {
+  font-size: 12px;
+  color: #047857;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* --- MODAL RIGHT SIDE (FORM) --- */
+.modal-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.form-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+.input-with-icon input,
+.input-with-icon select,
+.booking-form textarea {
+  width: 100%;
+  padding: 10px 12px 10px 38px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #111827;
+  background-color: #ffffff;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-with-icon select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%206B7280'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+.input-with-icon input:focus,
+.input-with-icon select:focus,
+.booking-form textarea:focus {
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+}
+
+.phone-input-wrapper {
+  display: flex;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.phone-input-wrapper:focus-within {
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+}
+
+.country-select {
+  display: flex;
+  align-items: center;
+  padding: 0 8px 0 12px;
+  background-color: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+}
+
+.flag-icon {
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+.country-select select {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  outline: none;
+  cursor: pointer;
+}
+
+.phone-input-wrapper input {
+  border: none;
+  padding: 10px 12px;
+  width: 100%;
+  font-size: 13px;
+  outline: none;
+}
+
+.booking-form textarea {
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.secure-booking-banner {
+  background-color: #ecfdf5;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.shield-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.secure-booking-banner strong {
+  display: block;
+  font-size: 12px;
+  color: #065f46;
+}
+
+.secure-booking-banner p {
+  font-size: 11px;
+  color: #047857;
+  margin: 0;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.cancel-btn {
+  background-color: #ffffff;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background-color: #f9fafb;
+}
+
+.confirm-btn {
+  background-color: #008744;
+  color: #ffffff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.confirm-btn:hover {
+  background-color: #007038;
+  transform: translateY(-1px);
+}
+
 /* --- RESPONSIVE MEDIA QUERIES --- */
 @media (max-width: 1024px) {
   .vehicles-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 850px) {
+  .modal-card {
+    grid-template-columns: 1fr;
+    max-height: 85vh;
+  }
+
+  .modal-cancellation-box {
+    margin-bottom: 20px;
   }
 }
 
@@ -301,6 +729,10 @@
   }
 
   .vehicles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
     grid-template-columns: 1fr;
   }
 }
