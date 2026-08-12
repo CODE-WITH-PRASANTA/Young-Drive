@@ -1,53 +1,149 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const bookingSchema = new mongoose.Schema(
-  {
-    id: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true
-    },
-    date: {
-      type: String,
-      required: true,
-      default: () => new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-    },
-    customer: {
-      name: { type: String, required: true },
-      email: { type: String, required: true },
-      phone: { type: String, required: true },
-      avatar: { type: String, default: 'https://i.pravatar.cc/150?img=33' }
-    },
-    vehicle: {
-      name: { type: String, required: true },
-      color: { type: String, default: 'White' },
-      plate: { type: String, default: 'MH12 XX 9999' },
-      img: { type: String, default: 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=300' }
-    },
-    pickup: { type: String, required: true },
-    returnDate: { type: String, required: true },
-    duration: { type: String, default: '1 Day' },
-    pickupLoc: { type: String, default: 'Main Branch' },
-    returnLoc: { type: String, default: 'Main Branch' },
-    driver: { type: String },
-    amount: { type: String, required: true },
-    paymentStatus: {
-      type: String,
-      enum: ['Paid', 'Unpaid', 'Pending'],
-      default: 'Paid'
-    },
-    status: {
-      type: String,
-      enum: ['Pending', 'Confirmed', 'Ongoing', 'Completed', 'Cancelled'],
-      default: 'Confirmed'
-    },
-    cancellationReason: { type: String },
-    cancellationComment: { type: String }
-  },
-  {
-    timestamps: true
-  }
-);
+const bookingSchema =
+  new mongoose.Schema(
+    {
+      bookingId: {
+        type: String,
+        unique: true,
+        sparse: true,
+      },
 
-module.exports = mongoose.model('Booking', bookingSchema);
+      customerName: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      email: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      phone: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      vehicle: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Vehicle",
+        required: true,
+      },
+
+      vehicleName: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      bookingDate: {
+        type: Date,
+        required: true,
+      },
+
+      bookingTime: {
+        type: String,
+        default: "10:00 AM",
+      },
+
+      pickupDate: {
+        type: Date,
+        required: true,
+      },
+
+      pickupTime: {
+        type: String,
+        default: "10:00 AM",
+      },
+
+      returnDate: {
+        type: Date,
+        required: true,
+      },
+
+      dropoffDate: {
+        type: Date,
+        required: true,
+      },
+
+      dropoffTime: {
+        type: String,
+        default: "10:00 AM",
+      },
+
+      pickupLocation: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      dropoffLocation: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      amount: {
+        type: Number,
+        default: 0,
+      },
+
+      status: {
+        type: String,
+        enum: [
+          "Pending",
+          "Confirmed",
+          "Ongoing",
+          "Completed",
+          "Cancelled",
+        ],
+        default: "Pending",
+      },
+
+      paymentStatus: {
+        type: String,
+        enum: [
+          "Paid",
+          "Unpaid",
+          "Pending",
+          "Refunded",
+        ],
+        default: "Unpaid",
+      },
+
+      paymentMethod: {
+        type: String,
+        default: "",
+      },
+
+      additionalMessage: {
+        type: String,
+        default: "",
+        trim: true,
+      },
+
+      cancellationReason: {
+        type: String,
+        default: "",
+      },
+
+      cancellationComment: {
+        type: String,
+        default: "",
+      },
+    },
+
+    {
+      timestamps: true,
+    }
+  );
+
+
+module.exports =
+  mongoose.model(
+    "Booking",
+    bookingSchema
+  );
