@@ -457,7 +457,7 @@ const BookingCalender = () => {
 
       </div>
 
-      {/* NEW BOOKING POPUP MODAL (MATCHING IMAGE DESIGN) */}
+      {/* NEW BOOKING POPUP MODAL */}
       {isModalOpen && (
         <div className="bc-modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="new-booking-modal-card" onClick={(e) => e.stopPropagation()}>
@@ -470,7 +470,7 @@ const BookingCalender = () => {
             {/* Modal Header */}
             <div className="new-booking-header">
               <div className="calendar-icon-badge">
-                <CalendarIcon size={20} className="green-icon" />
+                <CalendarIcon size={18} className="green-icon" />
               </div>
               <div>
                 <h2>New Booking</h2>
@@ -478,243 +478,239 @@ const BookingCalender = () => {
               </div>
             </div>
 
-            {/* Modal Grid Form Body */}
-            <form onSubmit={handleCreateBookingSubmit}>
-              <div className="new-booking-grid">
-                
-                {/* LEFT COLUMN */}
-                <div className="nb-col">
+            {/* Scrollable Form Body Container */}
+            <div className="new-booking-body">
+              <form onSubmit={handleCreateBookingSubmit}>
+                <div className="new-booking-grid">
                   
-                  {/* Vehicle Information */}
-                  <div className="nb-section-title">Vehicle Information</div>
-                  
-                  <div className="nb-form-group">
-                    <label>Select Vehicle</label>
-                    <div className="custom-vehicle-select-box">
-                      <select value={selectedVehicle.id} onChange={handleVehicleChange}>
-                        {VEHICLE_LIST.map(v => (
-                          <option key={v.id} value={v.id}>{v.name}</option>
-                        ))}
-                      </select>
-                      <div className="selected-vehicle-preview">
-                        <img src={selectedVehicle.image} alt={selectedVehicle.name} />
-                        <div>
-                          <strong>{selectedVehicle.name}</strong>
-                          <span>{selectedVehicle.category}</span>
+                  {/* LEFT COLUMN */}
+                  <div className="nb-col">
+                    
+                    {/* Vehicle Information */}
+                    <div className="nb-section-title">Vehicle Information</div>
+                    
+                    <div className="nb-form-group">
+                      <label>Select Vehicle</label>
+                      <div className="custom-vehicle-select-box">
+                        <select value={selectedVehicle.id} onChange={handleVehicleChange}>
+                          {VEHICLE_LIST.map(v => (
+                            <option key={v.id} value={v.id}>{v.name}</option>
+                          ))}
+                        </select>
+                        <div className="selected-vehicle-preview">
+                          <img src={selectedVehicle.image} alt={selectedVehicle.name} />
+                          <div>
+                            <strong>{selectedVehicle.name}</strong>
+                            <span>{selectedVehicle.category}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="nb-form-group">
-                    <label>Vehicle Type</label>
-                    <div className="nb-display-input">
-                      <Car size={16} className="green-icon" />
-                      <span>{selectedVehicle.type}</span>
-                    </div>
-                  </div>
-
-                  <div className="nb-dual-row">
                     <div className="nb-form-group">
-                      <label>Transmission</label>
+                      <label>Vehicle Type</label>
                       <div className="nb-display-input">
-                        <Settings size={16} className="muted-icon" />
-                        <span>{selectedVehicle.transmission}</span>
+                        <Car size={15} className="green-icon" />
+                        <span>{selectedVehicle.type}</span>
                       </div>
                     </div>
-                    <div className="nb-form-group">
-                      <label>Fuel Type</label>
-                      <div className="nb-display-input">
-                        <Fuel size={16} className="muted-icon" />
-                        <span>{selectedVehicle.fuel}</span>
+
+                    <div className="nb-dual-row">
+                      <div className="nb-form-group">
+                        <label>Transmission</label>
+                        <div className="nb-display-input">
+                          <Settings size={15} className="muted-icon" />
+                          <span>{selectedVehicle.transmission}</span>
+                        </div>
+                      </div>
+                      <div className="nb-form-group">
+                        <label>Fuel Type</label>
+                        <div className="nb-display-input">
+                          <Fuel size={15} className="muted-icon" />
+                          <span>{selectedVehicle.fuel}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="nb-form-group">
-                    <label>Seating Capacity</label>
-                    <div className="nb-display-input">
-                      <Users size={16} className="muted-icon" />
-                      <span>{selectedVehicle.seats}</span>
-                    </div>
-                  </div>
-
-                  {/* Booking Information */}
-                  <div className="nb-section-title" style={{ marginTop: '20px' }}>Booking Information</div>
-
-                  <div className="nb-dual-row">
                     <div className="nb-form-group">
-                      <label>Booking Date</label>
-                      <div className="input-with-icon-right">
+                      <label>Seating Capacity</label>
+                      <div className="nb-display-input">
+                        <Users size={15} className="muted-icon" />
+                        <span>{selectedVehicle.seats}</span>
+                      </div>
+                    </div>
+
+                    {/* Booking Information */}
+                    <div className="nb-section-title" style={{ marginTop: '12px' }}>Booking Information</div>
+
+                    <div className="nb-dual-row">
+                      <div className="nb-form-group">
+                        <label>Booking Date</label>
                         <input type="date" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} />
                       </div>
-                    </div>
-                    <div className="nb-form-group">
-                      <label>Booking Time</label>
-                      <select value={bookingTime} onChange={(e) => setBookingTime(e.target.value)}>
-                        <option value="10:00 AM">10:00 AM</option>
-                        <option value="11:00 AM">11:00 AM</option>
-                        <option value="02:00 PM">02:00 PM</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="nb-dual-row">
-                    <div className="nb-form-group">
-                      <label>Pick-up Date</label>
-                      <div className="input-with-icon-right">
-                        <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} />
-                      </div>
-                    </div>
-                    <div className="nb-form-group">
-                      <label>Pick-up Time</label>
-                      <select value={pickupTime} onChange={(e) => setPickupTime(e.target.value)}>
-                        <option value="10:00 AM">10:00 AM</option>
-                        <option value="11:00 AM">11:00 AM</option>
-                        <option value="02:00 PM">02:00 PM</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="nb-dual-row">
-                    <div className="nb-form-group">
-                      <label>Drop-off Date</label>
-                      <div className="input-with-icon-right">
-                        <input type="date" value={dropoffDate} onChange={(e) => setDropoffDate(e.target.value)} />
-                      </div>
-                    </div>
-                    <div className="nb-form-group">
-                      <label>Drop-off Time</label>
-                      <select value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)}>
-                        <option value="10:00 AM">10:00 AM</option>
-                        <option value="11:00 AM">11:00 AM</option>
-                        <option value="02:00 PM">02:00 PM</option>
-                      </select>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* RIGHT COLUMN */}
-                <div className="nb-col">
-                  
-                  {/* Location Details */}
-                  <div className="nb-section-title">Location Details</div>
-
-                  <div className="nb-form-group">
-                    <label>Pick-up Location</label>
-                    <div className="input-with-icon-left select-wrapper">
-                      <MapPin size={16} className="input-icon" />
-                      <select value={pickupLocation} onChange={(e) => setPickupLocation(e.target.value)}>
-                        <option value="Manchester, England">Manchester, England</option>
-                        <option value="New York Downtown">New York Downtown</option>
-                        <option value="Manhattan">Manhattan</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="nb-form-group">
-                    <label>Drop-off Location</label>
-                    <div className="input-with-icon-left select-wrapper">
-                      <MapPin size={16} className="input-icon" />
-                      <select value={dropoffLocation} onChange={(e) => setDropoffLocation(e.target.value)}>
-                        <option value="Manchester, England">Manchester, England</option>
-                        <option value="JFK Airport">JFK Airport</option>
-                        <option value="LaGuardia Airport">LaGuardia Airport</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Customer Information */}
-                  <div className="nb-section-title" style={{ marginTop: '20px' }}>Customer Information</div>
-
-                  <div className="nb-dual-row">
-                    <div className="nb-form-group">
-                      <label>Full Name</label>
-                      <div className="input-with-icon-left">
-                        <User size={16} className="input-icon" />
-                        <input 
-                          type="text" 
-                          placeholder="Enter full name" 
-                          value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="nb-form-group">
-                      <label>Email Address</label>
-                      <div className="input-with-icon-left">
-                        <Mail size={16} className="input-icon" />
-                        <input 
-                          type="email" 
-                          placeholder="Enter email address" 
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="nb-form-group">
-                    <label>Phone Number</label>
-                    <div className="phone-picker-wrapper">
-                      <div className="country-code-select">
-                        <span className="flag">🇺🇸</span>
-                        <select value={phoneCode} onChange={(e) => setPhoneCode(e.target.value)}>
-                          <option value="+1">+1</option>
-                          <option value="+44">+44</option>
-                          <option value="+91">+91</option>
+                      <div className="nb-form-group">
+                        <label>Booking Time</label>
+                        <select value={bookingTime} onChange={(e) => setBookingTime(e.target.value)}>
+                          <option value="10:00 AM">10:00 AM</option>
+                          <option value="11:00 AM">11:00 AM</option>
+                          <option value="02:00 PM">02:00 PM</option>
                         </select>
                       </div>
-                      <input 
-                        type="tel" 
-                        placeholder="Enter phone number" 
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        required
-                      />
                     </div>
+
+                    <div className="nb-dual-row">
+                      <div className="nb-form-group">
+                        <label>Pick-up Date</label>
+                        <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} />
+                      </div>
+                      <div className="nb-form-group">
+                        <label>Pick-up Time</label>
+                        <select value={pickupTime} onChange={(e) => setPickupTime(e.target.value)}>
+                          <option value="10:00 AM">10:00 AM</option>
+                          <option value="11:00 AM">11:00 AM</option>
+                          <option value="02:00 PM">02:00 PM</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="nb-dual-row">
+                      <div className="nb-form-group">
+                        <label>Drop-off Date</label>
+                        <input type="date" value={dropoffDate} onChange={(e) => setDropoffDate(e.target.value)} />
+                      </div>
+                      <div className="nb-form-group">
+                        <label>Drop-off Time</label>
+                        <select value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)}>
+                          <option value="10:00 AM">10:00 AM</option>
+                          <option value="11:00 AM">11:00 AM</option>
+                          <option value="02:00 PM">02:00 PM</option>
+                        </select>
+                      </div>
+                    </div>
+
                   </div>
 
-                  <div className="nb-form-group">
-                    <label>Additional Message (Optional)</label>
-                    <div className="textarea-wrapper">
-                      <textarea 
-                        rows="3" 
-                        placeholder="Enter any special requests or notes..."
-                        value={additionalMessage}
-                        onChange={(e) => setAdditionalMessage(e.target.value)}
-                      ></textarea>
-                    </div>
-                  </div>
+                  {/* RIGHT COLUMN */}
+                  <div className="nb-col">
+                    
+                    {/* Location Details */}
+                    <div className="nb-section-title">Location Details</div>
 
-                  {/* Secure Booking Banner */}
-                  <div className="nb-secure-banner">
-                    <ShieldCheck size={20} className="shield-green" />
-                    <div>
-                      <strong>Secure Booking</strong>
-                      <p>Your information is safe with us. We use secure encryption to protect your data.</p>
+                    <div className="nb-form-group">
+                      <label>Pick-up Location</label>
+                      <div className="input-with-icon-left select-wrapper">
+                        <MapPin size={15} className="input-icon" />
+                        <select value={pickupLocation} onChange={(e) => setPickupLocation(e.target.value)}>
+                          <option value="Manchester, England">Manchester, England</option>
+                          <option value="New York Downtown">New York Downtown</option>
+                          <option value="Manhattan">Manhattan</option>
+                        </select>
+                      </div>
                     </div>
+
+                    <div className="nb-form-group">
+                      <label>Drop-off Location</label>
+                      <div className="input-with-icon-left select-wrapper">
+                        <MapPin size={15} className="input-icon" />
+                        <select value={dropoffLocation} onChange={(e) => setDropoffLocation(e.target.value)}>
+                          <option value="Manchester, England">Manchester, England</option>
+                          <option value="JFK Airport">JFK Airport</option>
+                          <option value="LaGuardia Airport">LaGuardia Airport</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Customer Information */}
+                    <div className="nb-section-title" style={{ marginTop: '12px' }}>Customer Information</div>
+
+                    <div className="nb-dual-row">
+                      <div className="nb-form-group">
+                        <label>Full Name</label>
+                        <div className="input-with-icon-left">
+                          <User size={15} className="input-icon" />
+                          <input 
+                            type="text" 
+                            placeholder="Enter full name" 
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="nb-form-group">
+                        <label>Email Address</label>
+                        <div className="input-with-icon-left">
+                          <Mail size={15} className="input-icon" />
+                          <input 
+                            type="email" 
+                            placeholder="Enter email address" 
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="nb-form-group">
+                      <label>Phone Number</label>
+                      <div className="phone-picker-wrapper">
+                        <div className="country-code-select">
+                          <span className="flag">🇺🇸</span>
+                          <select value={phoneCode} onChange={(e) => setPhoneCode(e.target.value)}>
+                            <option value="+1">+1</option>
+                            <option value="+44">+44</option>
+                            <option value="+91">+91</option>
+                          </select>
+                        </div>
+                        <input 
+                          type="tel" 
+                          placeholder="Enter phone number" 
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="nb-form-group">
+                      <label>Additional Message (Optional)</label>
+                      <div className="textarea-wrapper">
+                        <textarea 
+                          rows="2" 
+                          placeholder="Enter any special requests or notes..."
+                          value={additionalMessage}
+                          onChange={(e) => setAdditionalMessage(e.target.value)}
+                        ></textarea>
+                      </div>
+                    </div>
+
+                    {/* Secure Booking Banner */}
+                    <div className="nb-secure-banner">
+                      <ShieldCheck size={18} className="shield-green" />
+                      <div>
+                        <strong>Secure Booking</strong>
+                        <p>We use secure encryption to protect your data.</p>
+                      </div>
+                    </div>
+
                   </div>
 
                 </div>
 
-              </div>
-
-              {/* Action Buttons */}
-              <div className="nb-footer-actions">
-                <button type="button" className="btn-nb-cancel" onClick={() => setIsModalOpen(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn-nb-submit">
-                  <CalendarIcon size={16} />
-                  <span>Create Booking</span>
-                </button>
-              </div>
-            </form>
+                {/* Action Buttons */}
+                <div className="nb-footer-actions">
+                  <button type="button" className="btn-nb-cancel" onClick={() => setIsModalOpen(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn-nb-submit">
+                    <CalendarIcon size={15} />
+                    <span>Create Booking</span>
+                  </button>
+                </div>
+              </form>
+            </div>
 
           </div>
         </div>
