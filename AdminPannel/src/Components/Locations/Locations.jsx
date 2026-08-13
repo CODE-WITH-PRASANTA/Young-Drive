@@ -1,47 +1,67 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   FiMapPin, 
   FiCheckCircle, 
   FiAlertCircle, 
   FiGrid, 
   FiSearch, 
-  FiFilter, 
   FiEdit2, 
   FiTrash2, 
   FiChevronLeft, 
   FiChevronRight, 
   FiChevronUp, 
-  FiPlus, 
   FiSave, 
   FiX, 
   FiInfo 
 } from 'react-icons/fi';
 import './Locations.css';
 
-const initialLocations = [
-  { id: 1, name: 'New York Downtown', address: '123 Manhattan Ave', city: 'New York', state: 'New York', country: 'United States', postalCode: '10001', type: 'Pickup & Drop', status: 'Active', mapLink: 'https://maps.google.com/...' },
-  { id: 2, name: 'Los Angeles Airport', address: 'LAX Airport Terminal', city: 'Los Angeles', state: 'California', country: 'United States', postalCode: '90045', type: 'Pickup Only', status: 'Active', mapLink: 'https://maps.google.com/...' },
-  { id: 3, name: 'Chicago Downtown', address: '500 Michigan Ave', city: 'Chicago', state: 'Illinois', country: 'United States', postalCode: '60611', type: 'Drop Only', status: 'Active', mapLink: 'https://maps.google.com/...' },
-  { id: 4, name: 'Miami Beach', address: '789 Ocean Drive', city: 'Miami', state: 'Florida', country: 'United States', postalCode: '33139', type: 'Pickup & Drop', status: 'Active', mapLink: 'https://maps.google.com/...' },
-  { id: 5, name: 'Houston Central', address: '321 Main St', city: 'Houston', state: 'Texas', country: 'United States', postalCode: '77002', type: 'Pickup & Drop', status: 'Active', mapLink: 'https://maps.google.com/...' },
-  { id: 6, name: 'San Francisco Airport', address: 'SFO International', city: 'San Francisco', state: 'California', country: 'United States', postalCode: '94128', type: 'Pickup Only', status: 'Inactive', mapLink: 'https://maps.google.com/...' },
-];
+const API_URL = 'http://localhost:5000/api/locations';
 
 const Locations = () => {
-  const [locationsData, setLocationsData] = useState(initialLocations);
+  const [locationsData, setLocationsData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All Status');
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isFormVisible, setIsFormVisible] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  
-  // Form State
-  const [formData, setFormData] = useState({
-    name: '', address: '', city: '', state: '', country: 'United States', postalCode: '', type: 'Pickup & Drop', status: 'Active', mapLink: ''
-  });
+
+  const initialFormState = {
+    name: '',
+    address: '',
+    city: '',
+    state: '',
+    country: 'United States',
+    postalCode: '',
+    type: 'Pickup & Drop',
+    status: 'Active',
+    mapLink: ''
+  };
+
+  const [formData, setFormData] = useState(initialFormState);
   const [editingId, setEditingId] = useState(null);
 
-  const itemsPerPage = 5;
+  // 1. Fetch All Locations from Backend
+  const fetchLocations = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(API_URL);
+      const result = await res.json();
+      if (result.success) {
+        setLocationsData(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLocations();
+  }, []);
 
   // Filter & Search Logic
   const filteredLocations = useMemo(() => {
@@ -62,34 +82,81 @@ const Locations = () => {
   const currentTableData = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return filteredLocations.slice(start, start + itemsPerPage);
-  }, [filteredLocations, currentPage]);
+  }, [filteredLocations, currentPage, itemsPerPage]);
 
-  const handleDelete = (id) => {
-    setLocationsData(prev => prev.filter(item => item.id !== id));
+  // Reset Form
+  const resetForm = () => {
+    setFormData(initialFormState);
+    setEditingId(null);
   };
 
+  // 2. Delete Location
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this location?')) {
+      try {
+        const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+        const result = await res.json();
+        if (result.success) {
+          setLocationsData(prev => prev.filter(item => item._id !== id));
+          if (editingId === id) resetForm();
+        }
+      } catch (error) {
+        console.error('Error deleting location:', error);
+      }
+    }
+  };
+
+  // 3. Edit Handler (Populate Form)
   const handleEdit = (loc) => {
-    setFormData(loc);
-    setEditingId(loc.id);
+    setFormData({
+      name: loc.name || '',
+      address: loc.address || '',
+      city: loc.city || '',
+      state: loc.state || '',
+      country: loc.country || 'United States',
+      postalCode: loc.postalCode || '',
+      type: loc.type || 'Pickup & Drop',
+      status: loc.status || 'Active',
+      mapLink: loc.mapLink || ''
+    });
+    setEditingId(loc._id);
     setIsFormVisible(true);
   };
 
-  const handleFormSubmit = (e) => {
+  // 4. Submit Form (Save / Update)
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (editingId) {
-      setLocationsData(prev => prev.map(item => item.id === editingId ? { ...formData, id: editingId } : item));
-      setEditingId(null);
-    } else {
-      const newItem = { ...formData, id: Date.now() };
-      setLocationsData(prev => [newItem, ...prev]);
+    try {
+      const method = editingId ? 'PUT' : 'POST';
+      const url = editingId ? `${API_URL}/${editingId}` : API_URL;
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        if (editingId) {
+          setLocationsData(prev =>
+            prev.map(item => item._id === editingId ? result.data : item)
+          );
+        } else {
+          setLocationsData(prev => [result.data, ...prev]);
+        }
+        resetForm();
+        setShowAddModal(false);
+      }
+    } catch (error) {
+      console.error('Error saving location:', error);
     }
-    setFormData({ name: '', address: '', city: '', state: '', country: 'United States', postalCode: '', type: 'Pickup & Drop', status: 'Active', mapLink: '' });
-    setShowAddModal(false);
   };
 
   return (
     <div className="locations-container">
-      {/* Top Header & Breadcrumb */}
+      {/* Header */}
       <div className="locations-header-wrapper">
         <div className="locations-title-group">
           <h1 className="locations-title">Locations</h1>
@@ -97,13 +164,10 @@ const Locations = () => {
         </div>
         <div className="locations-header-right">
           <span className="locations-breadcrumb">Master Data &gt; Locations</span>
-          <button className="locations-add-main-btn" onClick={() => setShowAddModal(true)}>
-            <FiPlus /> Add New Location
-          </button>
         </div>
       </div>
 
-      {/* Top Statistic Cards */}
+      {/* Dynamic Statistics Cards */}
       <div className="locations-stats-grid">
         <div className="locations-stat-card">
           <div>
@@ -139,10 +203,10 @@ const Locations = () => {
         </div>
       </div>
 
-      {/* Main Content Layout (Table Left, Form Right) */}
+      {/* Main Content Area */}
       <div className={`locations-main-layout ${!isFormVisible ? 'form-collapsed' : ''}`}>
         
-        {/* Left Side Table Section */}
+        {/* Table Section */}
         <div className="locations-left-content">
           <div className="locations-controls-bar">
             <div className="locations-search-box">
@@ -159,7 +223,7 @@ const Locations = () => {
             <div className="locations-filter-dropdown-wrapper">
               <select 
                 value={statusFilter} 
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
                 className="locations-status-select"
               >
                 <option value="All Status">All Status</option>
@@ -183,9 +247,11 @@ const Locations = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentTableData.length > 0 ? (
+                {loading ? (
+                  <tr><td colSpan="7" className="locations-no-data">Loading locations...</td></tr>
+                ) : currentTableData.length > 0 ? (
                   currentTableData.map((loc) => (
-                    <tr key={loc.id}>
+                    <tr key={loc._id}>
                       <td><input type="checkbox" /></td>
                       <td>
                         <div className="locations-name-cell">
@@ -199,12 +265,12 @@ const Locations = () => {
                       <td>{loc.city}</td>
                       <td>{loc.state}</td>
                       <td>
-                        <span className={`locations-type-badge ${loc.type.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`}>
+                        <span className={`locations-type-badge ${loc.type ? loc.type.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-') : ''}`}>
                           {loc.type}
                         </span>
                       </td>
                       <td>
-                        <span className={`locations-status-badge ${loc.status.toLowerCase()}`}>
+                        <span className={`locations-status-badge ${loc.status ? loc.status.toLowerCase() : ''}`}>
                           {loc.status}
                         </span>
                       </td>
@@ -213,7 +279,7 @@ const Locations = () => {
                           <button className="locations-action-edit" onClick={() => handleEdit(loc)} title="Edit">
                             <FiEdit2 />
                           </button>
-                          <button className="locations-action-delete" onClick={() => handleDelete(loc.id)} title="Delete">
+                          <button className="locations-action-delete" onClick={() => handleDelete(loc._id)} title="Delete">
                             <FiTrash2 />
                           </button>
                         </div>
@@ -227,7 +293,7 @@ const Locations = () => {
             </table>
           </div>
 
-          {/* Pagination Footer */}
+          {/* Pagination */}
           <div className="locations-pagination-footer">
             <div className="locations-pagination-info">
               Showing {filteredLocations.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredLocations.length)} of {filteredLocations.length} entries
@@ -256,15 +322,23 @@ const Locations = () => {
               >
                 <FiChevronRight />
               </button>
-              <select className="locations-per-page-select" defaultValue="10 / page">
-                <option>10 / page</option>
-                <option>20 / page</option>
+              <select 
+                className="locations-per-page-select" 
+                value={`${itemsPerPage} / page`}
+                onChange={(e) => {
+                  setItemsPerPage(Number(e.target.value.split(' ')[0]));
+                  setCurrentPage(1);
+                }}
+              >
+                <option value="5 / page">5 / page</option>
+                <option value="10 / page">10 / page</option>
+                <option value="20 / page">20 / page</option>
               </select>
             </div>
           </div>
         </div>
 
-        {/* Right Side Form Panel */}
+        {/* Right Form Panel */}
         {isFormVisible && (
           <div className="locations-right-form-panel">
             <div className="locations-form-header">
@@ -361,7 +435,6 @@ const Locations = () => {
                   <option value="Pickup Only">Pickup Only</option>
                   <option value="Drop Only">Drop Only</option>
                 </select>
-                <small className="locations-help-text">Pickup & Drop, Pickup Only, or Drop Only</small>
               </div>
 
               <div className="locations-form-group">
@@ -386,7 +459,7 @@ const Locations = () => {
               </div>
 
               <div className="locations-form-buttons">
-                <button type="button" className="locations-btn-cancel" onClick={() => { setEditingId(null); setFormData({ name: '', address: '', city: '', state: '', country: 'United States', postalCode: '', type: 'Pickup & Drop', status: 'Active', mapLink: '' }); }}>
+                <button type="button" className="locations-btn-cancel" onClick={resetForm}>
                   Cancel
                 </button>
                 <button type="submit" className="locations-btn-save">
@@ -398,7 +471,7 @@ const Locations = () => {
         )}
       </div>
 
-      {/* Bottom Management Tips Banner */}
+      {/* Tips */}
       <div className="locations-tips-banner">
         <div className="locations-tips-header">
           <FiInfo className="locations-tips-icon" />
@@ -411,7 +484,7 @@ const Locations = () => {
         </ul>
       </div>
 
-      {/* Modal Add New Location Popup */}
+      {/* Modal Popup */}
       {showAddModal && (
         <div className="locations-modal-overlay" onClick={() => setShowAddModal(false)}>
           <div className="locations-modal-content" onClick={(e) => e.stopPropagation()}>

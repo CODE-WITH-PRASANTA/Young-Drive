@@ -83,10 +83,10 @@ exports.updateBookingStatus = async (req, res) => {
     if (cancellationReason) updateFields.cancellationReason = cancellationReason;
     if (cancellationComment) updateFields.cancellationComment = cancellationComment;
 
-    const booking = await Booking.findOneAndUpdate(
+        const booking = await Booking.findOneAndUpdate(
       { id: id },
       { $set: updateFields },
-      { new: true, runValidators: true }
+      { returnDocument: "after", runValidators: true }
     );
 
     if (!booking) {

@@ -1,19 +1,20 @@
 /* =========================================================
-   DRIVE-X — PREMIUM RESPONSIVE DARK SIDEBAR
+   DRIVE-X — PREMIUM RESPONSIVE LIGHT (WHITE & RED) SIDEBAR
    ========================================================= */
 
 :root {
-  --sb-bg: #0a0f1a;
-  --sb-bg-glass: rgba(11, 17, 30, 0.92);
-  --sb-card-bg: #121a29;
-  --sb-border: #1a2436;
-  --sb-text-muted: #8492a6;
-  --sb-text-main: #d0d7de;
+  --sb-bg: #ffffff;
+  --sb-bg-glass: rgba(255, 255, 255, 0.95);
+  --sb-card-bg: #f8fafc;
+  --sb-border: #e2e8f0;
+  --sb-text-muted: #64748b;
+  --sb-text-main: #1e293b;
   --sb-red-primary: #ef4444;
-  --sb-red-secondary: #ff6b6b;
-  --sb-red-glow: rgba(239, 68, 68, 0.45);
-  --sb-red-gradient: linear-gradient(135deg, #ff5b5b 0%, #e11d1d 55%, #b5121b 100%);
-  --sb-hover-bg: rgba(255, 255, 255, 0.045);
+  --sb-red-secondary: #dc2626;
+  --sb-red-glow: rgba(239, 68, 68, 0.25);
+  --sb-red-gradient: linear-gradient(135deg, #ff4d4d 0%, #ef4444 55%, #dc2626 100%);
+  --sb-hover-bg: #f1f5f9;
+  --sb-hover-text: #ef4444;
   --sb-width-full: 264px;
   --sb-width-collapsed: 80px;
   --sb-width-tablet: 240px;
@@ -31,7 +32,7 @@
   width: var(--sb-width-full);
   height: 100dvh;
   background:
-    radial-gradient(120% 60% at 0% 0%, rgba(239, 68, 68, 0.10) 0%, transparent 55%),
+    radial-gradient(120% 60% at 0% 0%, rgba(239, 68, 68, 0.05) 0%, transparent 55%),
     var(--sb-bg);
   border-right: 1px solid var(--sb-border);
   display: flex;
@@ -53,7 +54,7 @@
 /* Scoped scrollbar (Firefox) */
 .Sidebar-nav {
   scrollbar-width: thin;
-  scrollbar-color: #263449 transparent;
+  scrollbar-color: #cbd5e1 transparent;
 }
 
 /* ---------------------------------------------------------
@@ -67,7 +68,7 @@
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--sb-border);
   position: relative;
 }
 
@@ -85,6 +86,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #ffffff;
   box-shadow: 0 6px 16px var(--sb-red-glow);
 }
 
@@ -98,7 +100,7 @@
 .brand-name {
   font-size: 20px;
   font-weight: 800;
-  color: #ffffff;
+  color: #0f172a;
   letter-spacing: -0.5px;
 }
 
@@ -121,7 +123,7 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--sb-card-bg);
+  background: #ffffff;
   border: 1px solid var(--sb-border);
   color: var(--sb-text-muted);
   display: flex;
@@ -130,10 +132,11 @@
   cursor: pointer;
   transition: all 0.2s ease;
   z-index: 5;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
 
 .Sidebar-collapse-btn:hover {
-  color: #fff;
+  color: var(--sb-red-primary);
   border-color: var(--sb-red-primary);
   box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
 }
@@ -155,11 +158,11 @@
   width: 5px;
 }
 .Sidebar-nav::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #cbd5e1;
   border-radius: 4px;
 }
 .Sidebar-nav::-webkit-scrollbar-thumb:hover {
-  background: #2a3a52;
+  background: #94a3b8;
 }
 
 .Sidebar-link {
@@ -167,7 +170,7 @@
   display: flex;
   align-items: center;
   padding: 11px 13px;
-  color: var(--sb-text-muted);
+  color: var(--sb-text-main);
   text-decoration: none;
   border-radius: var(--sb-radius);
   background: transparent;
@@ -183,7 +186,7 @@
 
 .Sidebar-link:hover {
   background: var(--sb-hover-bg);
-  color: #ffffff;
+  color: var(--sb-red-primary);
 }
 
 .Sidebar-link:focus-visible,
@@ -197,6 +200,7 @@
   outline-offset: 2px;
 }
 
+/* Clicked / Active Option -> Red Background */
 .Sidebar-link.parent-active,
 .Sidebar-link.active {
   background: var(--sb-red-gradient);
@@ -214,7 +218,7 @@
   width: 4px;
   height: 60%;
   border-radius: 4px;
-  background: var(--sb-red-secondary);
+  background: var(--sb-red-primary);
 }
 
 .Sidebar.collapsed .Sidebar-link.active::before {
@@ -236,7 +240,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--sb-red-secondary);
+  background: var(--sb-red-primary);
   border: 2px solid var(--sb-bg);
 }
 
@@ -269,7 +273,7 @@
   flex-shrink: 0;
 }
 
-/* Dropdown / submenu */
+/* Submenu / Active Sublink */
 .Sidebar-dropdown-wrapper {
   display: flex;
   flex-direction: column;
@@ -315,28 +319,28 @@
 }
 
 .Sidebar-sublink:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.03);
+  color: var(--sb-red-primary);
+  background: var(--sb-hover-bg);
 }
 
 .Sidebar-sublink.active {
-  color: #ffffff;
-  background: rgba(239, 68, 68, 0.12);
+  color: var(--sb-red-primary);
+  background: rgba(239, 68, 68, 0.08);
   font-weight: 600;
-  border: 1px solid rgba(239, 68, 68, 0.28);
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-/* Flyout popover (collapsed rail, desktop only) */
+/* Flyout popover (collapsed state) */
 .Sidebar-flyout {
   position: absolute;
   left: calc(100% + 10px);
   top: 0;
   min-width: 200px;
-  background: var(--sb-card-bg);
+  background: #ffffff;
   border: 1px solid var(--sb-border);
   border-radius: var(--sb-radius);
   padding: 10px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
   z-index: 50;
   animation: sb-fade-in 0.15s ease;
 }
@@ -369,7 +373,7 @@
 
 .Sidebar-flyout-link:hover {
   background: var(--sb-hover-bg);
-  color: #fff;
+  color: var(--sb-red-primary);
 }
 
 .Sidebar-flyout-link.active {
@@ -386,7 +390,7 @@
   overflow: hidden;
   margin: 10px 14px 4px;
   padding: 18px 16px;
-  background: linear-gradient(160deg, var(--sb-card-bg) 0%, #0f1725 100%);
+  background: linear-gradient(160deg, #f8fafc 0%, #f1f5f9 100%);
   border: 1px solid var(--sb-border);
   border-radius: 18px;
   text-align: center;
@@ -408,7 +412,7 @@
   left: -60%;
   width: 60%;
   height: 220%;
-  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  background: linear-gradient(120deg, transparent, rgba(239, 68, 68, 0.05), transparent);
   transform: rotate(20deg);
   transition: left 0.6s ease;
   pointer-events: none;
@@ -425,13 +429,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffd76a;
-  background: rgba(255, 215, 106, 0.12);
-  box-shadow: 0 0 0 6px rgba(255, 215, 106, 0.06);
+  color: #d97706;
+  background: rgba(217, 119, 6, 0.1);
+  box-shadow: 0 0 0 6px rgba(217, 119, 6, 0.05);
 }
 
 .Sidebar-upgrade-card h4 {
-  color: #ffffff;
+  color: #0f172a;
   font-size: 14px;
   font-weight: 700;
   margin: 0;
@@ -475,7 +479,7 @@
   height: 74px;
   min-height: 74px;
   padding: 0 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: 1px solid var(--sb-border);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -503,7 +507,7 @@
   border-radius: 50%;
   object-fit: cover;
   display: block;
-  border: 2px solid rgba(255, 255, 255, 0.08);
+  border: 2px solid var(--sb-border);
 }
 
 .Sidebar-status-dot {
@@ -513,7 +517,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #2ecc71;
+  background: #22c55e;
   border: 2px solid var(--sb-bg);
 }
 
@@ -525,7 +529,7 @@
 }
 
 .user-name {
-  color: #ffffff;
+  color: #0f172a;
   font-size: 13.5px;
   font-weight: 600;
   white-space: nowrap;
@@ -553,9 +557,9 @@
 }
 
 .logout-btn:hover {
-  color: #ffffff;
-  background: rgba(239, 68, 68, 0.14);
-  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--sb-red-primary);
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
 }
 
 /* ---------------------------------------------------------
@@ -573,9 +577,6 @@
    RESPONSIVE BREAKPOINTS
    =========================================================== */
 
-/* --- Large desktop / default already covers >1200px --- */
-
-/* --- Small laptops / tablets landscape: auto-tighten rail --- */
 @media (max-width: 1200px) {
   .Sidebar {
     width: var(--sb-width-tablet);
@@ -585,7 +586,6 @@
   }
 }
 
-/* --- Tablets (portrait) --- */
 @media (max-width: 1024px) and (min-width: 769px) {
   .Sidebar-upgrade-card {
     padding: 14px 12px;
@@ -595,7 +595,6 @@
   }
 }
 
-/* --- Mobile: off-canvas drawer --- */
 @media (max-width: 768px) {
   .Sidebar {
     width: min(84vw, 300px);
@@ -604,14 +603,13 @@
     box-shadow: none;
   }
 
-  /* On mobile the "collapsed" concept doesn't apply — always full width drawer */
   .Sidebar.collapsed {
     width: min(84vw, 300px);
   }
 
   .Sidebar.mobile-open {
     left: 0;
-    box-shadow: 12px 0 40px rgba(0, 0, 0, 0.55);
+    box-shadow: 12px 0 40px rgba(0, 0, 0, 0.15);
   }
 
   .Sidebar-collapse-btn {
@@ -622,7 +620,7 @@
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.65);
+    background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
     z-index: 190;
@@ -644,7 +642,7 @@
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
+    background: #f1f5f9;
     border: 1px solid var(--sb-border);
     color: var(--sb-text-muted);
     cursor: pointer;
@@ -652,16 +650,14 @@
   }
 
   .Sidebar-close-btn:hover {
-    color: #fff;
+    color: var(--sb-red-primary);
     border-color: var(--sb-red-primary);
   }
 
-  /* Flyouts don't make sense on touch screens */
   .Sidebar-flyout {
     display: none;
   }
 
-  /* Roomier touch targets */
   .Sidebar-link {
     padding: 13px 14px;
     font-size: 14.5px;
@@ -672,7 +668,6 @@
   }
 }
 
-/* --- Very small phones --- */
 @media (max-width: 380px) {
   .Sidebar {
     width: 88vw;
@@ -686,14 +681,12 @@
   }
 }
 
-/* --- Short viewports: keep footer/upgrade reachable --- */
 @media (max-height: 620px) {
   .Sidebar-upgrade-card {
     display: none;
   }
 }
 
-/* --- Reduced motion --- */
 @media (prefers-reduced-motion: reduce) {
   .Sidebar,
   .Sidebar-link,

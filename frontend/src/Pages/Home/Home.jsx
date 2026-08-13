@@ -7,6 +7,7 @@ import HomeCalculate from '../../Components/HomeCalculate/HomeCalculate'
 import HomeFeatureList from '../../Components/HomeFeatureList/HomeFeatureList'
 import HomeTrusted from '../../Components/HomeTrusted/HomeTrusted'
 import HomePriceChart from '../../Components/HomePriceChart/HomePriceChart'
+import Testimonial from '../../Components/Testimonial/Testimonial'
 
 const Home = () => {
   return (
@@ -19,6 +20,7 @@ const Home = () => {
       <HomePriceChart/>
       <HomeFeatureList/>
       <HomeTrusted/>
+      <Testimonial/>
       
       
     </div>

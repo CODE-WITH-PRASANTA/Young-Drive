@@ -1,0 +1,550 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: #fdfdfd;
+}
+
+/* ==========================
+   PAGE
+========================== */
+
+.login-page {
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #f8fafc;
+}
+
+/* ==========================
+   LOGIN CARD
+========================== */
+
+.login-card {
+  width: 100%;
+  max-width: 1000px;
+  min-height: 560px;
+
+  display: flex;
+  overflow: hidden;
+
+  border-radius: 30px;
+  background: #ffffff;
+
+  box-shadow: 0 20px 60px rgba(220, 38, 38, 0.12);
+}
+
+/* ==========================
+   LEFT SIDE
+========================== */
+
+.login-left {
+  flex: 1;
+  padding: 35px;
+  position: relative;
+  overflow: hidden;
+  color: #ffffff;
+
+  background: linear-gradient(
+    135deg,
+    #ef4444 0%,
+    #dc2626 55%,
+    #991b1b 100%
+  );
+}
+
+.left-top {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+  z-index: 2;
+}
+
+.login-logo {
+  width: 60px;
+}
+
+.company-info h3 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.company-info span {
+  font-size: 12px;
+  opacity: 0.9;
+  letter-spacing: 0.5px;
+}
+
+.left-content {
+  margin-top: 30px;
+  position: relative;
+  z-index: 2;
+}
+
+.left-content h1 {
+  font-size: 42px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.line {
+  width: 70px;
+  height: 4px;
+  border-radius: 50px;
+  background: #ffffff;
+  margin: 18px 0;
+}
+
+.left-content p {
+  font-size: 16px;
+  line-height: 1.7;
+  max-width: 420px;
+}
+
+.secure-card {
+  width: 300px;
+  margin-top: 25px;
+  padding: 18px;
+
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(15px);
+}
+
+.secure-card svg {
+  font-size: 34px;
+}
+
+.secure-card h4 {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.secure-card span {
+  font-size: 13px;
+}
+
+/* Decorative Waves */
+
+.wave {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.wave.one {
+  width: 350px;
+  height: 350px;
+  right: -180px;
+  bottom: -180px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.wave.two {
+  width: 280px;
+  height: 280px;
+  right: -140px;
+  bottom: -140px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.wave.three {
+  width: 200px;
+  height: 200px;
+  right: -90px;
+  bottom: -90px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Dots */
+
+.dot-pattern {
+  position: absolute;
+  width: 80px;
+  height: 70px;
+
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.7) 2px,
+    transparent 2px
+  );
+
+  background-size: 18px 18px;
+}
+
+.top-dots {
+  top: 30px;
+  right: 35px;
+}
+
+.bottom-dots {
+  bottom: 20px;
+  left: 30px;
+}
+
+/* ==========================
+   RIGHT SIDE
+========================== */
+
+.login-right {
+  flex: 1;
+  padding: 35px 40px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  background: #ffffff;
+}
+
+.top-icon {
+  width: 65px;
+  height: 65px;
+
+  margin: 0 auto 18px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+
+  color: #ffffff;
+  font-size: 26px;
+
+  background: linear-gradient(
+    135deg,
+    #ef4444,
+    #dc2626
+  );
+
+  box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+}
+
+.login-right h2 {
+  text-align: center;
+  font-size: 34px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.subtitle {
+  text-align: center;
+  color: #64748b;
+  font-size: 15px;
+
+  margin-top: 6px;
+  margin-bottom: 25px;
+}
+
+/* ==========================
+   FORM
+========================== */
+
+.input-box {
+  height: 52px;
+  margin-bottom: 15px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 18px;
+
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+
+  background: #ffffff;
+  transition: 0.3s;
+}
+
+.input-box:focus-within {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
+}
+
+.input-icon {
+  color: #dc2626;
+}
+
+.input-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+
+  padding-left: 12px;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000;
+  caret-color: #000000;
+}
+
+.eye {
+  cursor: pointer;
+  color: #64748b;
+}
+
+.eye:hover {
+  color: #dc2626;
+}
+
+/* ==========================
+   OPTIONS
+========================== */
+
+.options-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 20px;
+}
+
+.options-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 14px;
+  color: #475569;
+}
+
+.options-row a {
+  text-decoration: none;
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.options-row a:hover {
+  text-decoration: underline;
+}
+
+/* ==========================
+   BUTTON
+========================== */
+
+.login-btn {
+  width: 100%;
+  height: 52px;
+
+  border: none;
+  border-radius: 14px;
+
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  background: linear-gradient(
+    90deg,
+    #ef4444,
+    #dc2626
+  );
+
+  transition: 0.3s;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(220, 38, 38, 0.35);
+}
+
+/* ==========================
+   MESSAGE
+========================== */
+
+.login-message {
+  width: 100%;
+  padding: 12px 18px;
+  margin-bottom: 15px;
+
+  border-radius: 12px;
+
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.login-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.login-message.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* ==========================
+   COPYRIGHT
+========================== */
+
+.copyright {
+  text-align: center;
+  margin-top: 25px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* ==========================
+   SUCCESS SCREEN
+========================== */
+
+.login-success-screen {
+  text-align: center;
+}
+
+.success-icon {
+  width: 100px;
+  height: 100px;
+
+  margin: 0 auto 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+
+  color: #ffffff;
+  font-size: 55px;
+
+  background: linear-gradient(
+    135deg,
+    #22c55e,
+    #16a34a
+  );
+}
+
+/* ==========================
+   TABLET
+========================== */
+
+@media (max-width: 991px) {
+  .login-card {
+    flex-direction: column;
+    max-width: 700px;
+    min-height: auto;
+  }
+
+  .login-left,
+  .login-right {
+    padding: 30px;
+  }
+
+  .left-content h1 {
+    font-size: 36px;
+  }
+}
+
+/* ==========================
+   MOBILE
+========================== */
+
+@media (max-width: 576px) {
+  .login-page {
+    padding: 12px;
+    align-items: flex-start;
+  }
+
+  .login-card {
+    flex-direction: column;
+    border-radius: 20px;
+    min-height: auto;
+  }
+
+  .login-left,
+  .login-right {
+    padding: 22px;
+  }
+
+  .login-logo {
+    width: 50px;
+  }
+
+  .left-content h1 {
+    font-size: 32px;
+  }
+
+  .left-content p {
+    font-size: 14px;
+  }
+
+  .secure-card {
+    width: 100%;
+  }
+
+  .login-right h2 {
+    font-size: 28px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .options-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .top-dots,
+  .bottom-dots {
+    display: none;
+  }
+
+  .wave.one {
+    width: 220px;
+    height: 220px;
+  }
+
+  .wave.two {
+    width: 170px;
+    height: 170px;
+  }
+
+  .wave.three {
+    width: 120px;
+    height: 120px;
+  }
+}
+.credentials-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f1f5f9;
+  border: 1px dashed #cbd5e1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 18px;
+}
+
+.credentials-hint svg {
+  color: #ef4444;
+}
