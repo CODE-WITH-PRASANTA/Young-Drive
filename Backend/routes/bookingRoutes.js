@@ -1,17 +1,57 @@
-const express = require('express');
+const express = require("express");
+
 const router = express.Router();
+
 const {
-  getAllBookings,
   createBooking,
+  getBookings,
+  getBookingById,
+  updateBooking,
+  updateBookingStatus,
+  deleteBooking,
+} = require("../controllers/bookingController");
+
+
+/* CREATE */
+router.post(
+  "/",
+  createBooking
+);
+
+
+/* GET ALL */
+router.get(
+  "/",
+  getBookings
+);
+
+
+/* GET ONE */
+router.get(
+  "/:id",
+  getBookingById
+);
+
+
+/* UPDATE */
+router.put(
+  "/:id",
+  updateBooking
+);
+
+
+/* UPDATE STATUS */
+router.patch(
+  "/:id/status",
   updateBookingStatus
-} = require('../controllers/bookingController');
+);
 
-// Booking endpoints
-router.route('/')
-  .get(getAllBookings)
-  .post(createBooking);
 
-router.route('/:id/status')
-  .patch(updateBookingStatus);
+/* DELETE */
+router.delete(
+  "/:id",
+  deleteBooking
+);
+
 
 module.exports = router;
