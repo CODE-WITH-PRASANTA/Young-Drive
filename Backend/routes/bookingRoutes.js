@@ -41,7 +41,7 @@ router.put(
 
 
 /* UPDATE STATUS */
-router.patch(
+router.put(
   "/:id/status",
   updateBookingStatus
 );

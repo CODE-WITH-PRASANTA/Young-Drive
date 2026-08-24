@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import './AllBookings.css';
-import API from '../../api/axios';
+import React, { useState, useEffect } from "react";
+import "./AllBookings.css";
+import API from "../../api/axios";
 
 import {
   FaCalendarAlt,
@@ -17,33 +17,28 @@ import {
   FaCalendarCheck,
   FaExclamationCircle,
   FaChevronLeft,
-  FaChevronRight
-} from 'react-icons/fa';
+  FaChevronRight,
+} from "react-icons/fa";
 
 const AllBookings = () => {
-
   /* =====================================================
      DATABASE STATE
   ===================================================== */
 
   const [bookings, setBookings] = useState([]);
+  const [listings, setListings] = useState([]);
 
-  const [activeTab, setActiveTab] = useState('All');
-
-  const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [selectedBooking, setSelectedBooking] = useState(null);
-
   const [activeMenuId, setActiveMenuId] = useState(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [activeDetailsTab, setActiveDetailsTab] = useState('Details');
+  const [activeDetailsTab, setActiveDetailsTab] = useState("Details");
 
   const [loading, setLoading] = useState(false);
-
   const [saving, setSaving] = useState(false);
-
 
   /* =====================================================
      CANCELLATION SIDEBAR CONTROLS
@@ -52,11 +47,10 @@ const AllBookings = () => {
   const [showCancelBox, setShowCancelBox] = useState(false);
 
   const [cancellationReason, setCancellationReason] =
-    useState('Select reason');
+    useState("Select reason");
 
   const [cancellationComment, setCancellationComment] =
-    useState('');
-
+    useState("");
 
   /* =====================================================
      PAGINATION
@@ -66,304 +60,507 @@ const AllBookings = () => {
 
   const itemsPerPage = 5;
 
-
   /* =====================================================
      NEW BOOKING FORM
   ===================================================== */
 
   const [newBooking, setNewBooking] = useState({
-    customerName: '',
-    email: '',
-    phone: '',
-    vehicle: 'Audi A3 1.6 TDI S line',
-    pickupDate: '',
-    returnDate: '',
-    amount: ''
+    customerName: "",
+    email: "",
+    phone: "",
+    vehicle: "",
+    pickupDate: "",
+    returnDate: "",
+    amount: "",
   });
 
+  /* =====================================================
+     DATE HELPERS
+  ===================================================== */
+
+  const formatDate = (dateValue) => {
+    if (!dateValue) {
+      return "N/A";
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return String(dateValue);
+    }
+
+    return date.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const formatDateTime = (dateValue) => {
+    if (!dateValue) {
+      return "N/A";
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return String(dateValue);
+    }
+
+    return date.toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getDateInputValue = (dateValue) => {
+    if (!dateValue) {
+      return "";
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const calculateDuration = (pickup, dropoff) => {
+    if (!pickup || !dropoff) {
+      return "";
+    }
+
+    const start = new Date(pickup);
+    const end = new Date(dropoff);
+
+    if (
+      Number.isNaN(start.getTime()) ||
+      Number.isNaN(end.getTime())
+    ) {
+      return "";
+    }
+
+    const difference = end.getTime() - start.getTime();
+
+    if (difference < 0) {
+      return "";
+    }
+
+    const days = Math.ceil(
+      difference / (1000 * 60 * 60 * 24)
+    );
+
+    if (days === 1) {
+      return "1 day";
+    }
+
+    return `${days} days`;
+  };
+
+  /* =====================================================
+     INDIAN MONEY FORMAT
+  ===================================================== */
+
+  const formatIndianMoney = (amount) => {
+    const value = Number(amount) || 0;
+
+    return `₹${value.toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  };
+
+  /* =====================================================
+     VEHICLE HELPERS
+  ===================================================== */
+
+  const getVehicleName = (vehicle) => {
+    if (!vehicle) {
+      return "Vehicle";
+    }
+
+    const brand =
+      vehicle.vehicleBrand ||
+      vehicle.brand ||
+      vehicle.make ||
+      "";
+
+    const model =
+      vehicle.vehicleModel ||
+      vehicle.model ||
+      "";
+
+    const brandModel = [brand, model]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    if (brandModel) {
+      return brandModel;
+    }
+
+    return (
+      vehicle.name ||
+      vehicle.title ||
+      vehicle.vehicleName ||
+      "Vehicle"
+    );
+  };
+
+  const getVehicleImage = (vehicle) => {
+    if (!vehicle) {
+      return "";
+    }
+
+    if (
+      vehicle.image &&
+      typeof vehicle.image === "string"
+    ) {
+      return vehicle.image;
+    }
+
+    if (
+      vehicle.imageUrl &&
+      typeof vehicle.imageUrl === "string"
+    ) {
+      return vehicle.imageUrl;
+    }
+
+    if (
+      Array.isArray(vehicle.images) &&
+      vehicle.images.length > 0
+    ) {
+      return vehicle.images[0];
+    }
+
+    return "";
+  };
+
+  const getVehicleId = (vehicle) => {
+    if (!vehicle) {
+      return "";
+    }
+
+    return (
+      vehicle._id ||
+      vehicle.id ||
+      vehicle.vehicleId ||
+      ""
+    );
+  };
+
+  /* =====================================================
+     BOOKING ID HELPERS
+  ===================================================== */
+
+  const getBookingId = (booking) => {
+    return (
+      booking?.bookingId ||
+      booking?.id ||
+      booking?._id ||
+      ""
+    );
+  };
+
+  const getMongoBookingId = (booking) => {
+    return (
+      booking?._id ||
+      booking?.mongoId ||
+      ""
+    );
+  };
+
+  /* =====================================================
+     FETCH LISTINGS / VEHICLES
+  ===================================================== */
+
+  const fetchListings = async () => {
+    try {
+      const response = await API.get("/listings");
+
+      console.log(
+        "Listings response:",
+        response.data
+      );
+
+      let listingData = [];
+
+      if (
+        response.data &&
+        Array.isArray(response.data.data)
+      ) {
+        listingData = response.data.data;
+      } else if (
+        response.data &&
+        Array.isArray(response.data.listings)
+      ) {
+        listingData = response.data.listings;
+      } else if (
+        response.data &&
+        Array.isArray(response.data.results)
+      ) {
+        listingData = response.data.results;
+      } else if (
+        Array.isArray(response.data)
+      ) {
+        listingData = response.data;
+      }
+
+      setListings(listingData);
+
+      if (
+        listingData.length > 0 &&
+        !newBooking.vehicle
+      ) {
+        const firstListing =
+          listingData[0];
+
+        setNewBooking((prev) => ({
+          ...prev,
+          vehicle:
+            getVehicleId(firstListing),
+        }));
+      }
+    } catch (error) {
+      console.error(
+        "Failed to fetch listings:",
+        error
+      );
+
+      console.error(
+        "Listings server response:",
+        error?.response?.data
+      );
+    }
+  };
 
   /* =====================================================
      FETCH BOOKINGS FROM BACKEND
   ===================================================== */
 
   const fetchBookings = async () => {
-
     try {
-
       setLoading(true);
 
       const params = {};
 
-      if (activeTab !== 'All') {
+      if (activeTab !== "All") {
         params.status = activeTab;
       }
 
       if (searchTerm.trim()) {
-        params.search = searchTerm.trim();
+        params.search =
+          searchTerm.trim();
       }
 
-
       console.log(
-        'Fetching bookings:',
+        "Fetching bookings:",
         params
       );
 
-
       const response = await API.get(
-        '/bookings',
+        "/bookings",
         {
-          params
+          params,
         }
       );
 
-
       console.log(
-        'Bookings response:',
+        "Bookings response:",
         response.data
       );
 
-
-      /*
-        Supports:
-
-        {
-          success: true,
-          data: []
-        }
-
-        OR
-
-        {
-          data: []
-        }
-
-        OR
-
-        []
-      */
-
       let bookingData = [];
-
 
       if (
         response.data &&
         Array.isArray(response.data.data)
       ) {
-
         bookingData =
           response.data.data;
-
       } else if (
         response.data &&
         Array.isArray(response.data.bookings)
       ) {
-
         bookingData =
           response.data.bookings;
-
       } else if (
         Array.isArray(response.data)
       ) {
-
         bookingData =
           response.data;
-
       }
 
-
-      setBookings(
-        bookingData
-      );
-
-
-      /*
-        If selected booking was
-        updated/deleted, update
-        sidebar automatically.
-      */
+      setBookings(bookingData);
 
       if (selectedBooking) {
+        const selectedId =
+          getMongoBookingId(
+            selectedBooking
+          ) ||
+          getBookingId(
+            selectedBooking
+          );
 
         const updatedBooking =
           bookingData.find(
-            (booking) =>
-              String(
-                booking.id ||
-                booking._id
-              ) ===
-              String(
-                selectedBooking.id ||
-                selectedBooking._id
-              )
+            (booking) => {
+              const mongoId =
+                getMongoBookingId(
+                  booking
+                );
+
+              const displayId =
+                getBookingId(
+                  booking
+                );
+
+              return (
+                String(mongoId) ===
+                  String(selectedId) ||
+                String(displayId) ===
+                  String(selectedId)
+              );
+            }
           );
 
-
         if (updatedBooking) {
-
           setSelectedBooking(
             updatedBooking
           );
-
         } else {
-
-          setSelectedBooking(
-            null
-          );
-
+          setSelectedBooking(null);
         }
-
       }
-
     } catch (error) {
-
       console.error(
-        'Failed to fetch bookings:',
+        "Failed to fetch bookings:",
         error
       );
 
-
       console.error(
-        'Server response:',
+        "Server response:",
         error?.response?.data
       );
 
-
       setBookings([]);
-
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
-
   /* =====================================================
-     FETCH WHEN FILTER / SEARCH CHANGES
+     INITIAL LOAD
   ===================================================== */
 
   useEffect(() => {
+    fetchListings();
+  }, []);
 
+  /* =====================================================
+     FETCH BOOKINGS WHEN FILTER / SEARCH CHANGES
+  ===================================================== */
+
+  useEffect(() => {
     fetchBookings();
-
   }, [
     activeTab,
-    searchTerm
+    searchTerm,
   ]);
-
 
   /* =====================================================
      TOTAL REVENUE
   ===================================================== */
 
-  const calculateTotalRevenue = (
-    bookingList
-  ) => {
+  const calculateTotalRevenue = (bookingList) => {
+    const total = bookingList.reduce(
+      (sum, item) => {
+        const numericVal =
+          parseFloat(
+            String(item.amount ?? 0).replace(
+              /[^0-9.-]+/g,
+              ""
+            )
+          ) || 0;
 
-    const total =
-      bookingList.reduce(
-        (sum, item) => {
+        return sum + numericVal;
+      },
+      0
+    );
 
-          if (
-            item.amount === undefined ||
-            item.amount === null
-          ) {
-            return sum;
-          }
-
-
-          const numericVal =
-            parseFloat(
-              String(item.amount)
-                .replace(
-                  /[^0-9.-]+/g,
-                  ''
-                )
-            ) || 0;
-
-
-          return (
-            sum +
-            numericVal
-          );
-
-        },
-        0
-      );
-
-
-    return `$${total.toLocaleString(
-      'en-US',
-      {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }
-    )}`;
-
+    return formatIndianMoney(total);
   };
-
 
   /* =====================================================
      CLIENT-SIDE FILTER
   ===================================================== */
 
   const filteredBookings =
-    bookings.filter((b) => {
-
+    bookings.filter((booking) => {
       const bookingStatus =
-        b.status || 'Pending';
-
+        booking.status ||
+        "Pending";
 
       const matchesTab =
-        activeTab === 'All' ||
-        bookingStatus
-          .toLowerCase() ===
+        activeTab === "All" ||
+        bookingStatus.toLowerCase() ===
           activeTab.toLowerCase();
-
 
       const search =
         searchTerm
           .toLowerCase()
           .trim();
 
-
       if (!search) {
         return matchesTab;
       }
 
-
       const bookingId =
         String(
-          b.id ||
-          b._id ||
-          ''
+          booking.bookingId ||
+            booking.id ||
+            booking._id ||
+            ""
         ).toLowerCase();
-
 
       const customerName =
         String(
-          b.customer?.name ||
-          b.customerName ||
-          ''
+          booking.customer?.name ||
+            booking.customerName ||
+            ""
         ).toLowerCase();
-
 
       const customerEmail =
         String(
-          b.customer?.email ||
-          b.email ||
-          ''
+          booking.customer?.email ||
+            booking.email ||
+            ""
         ).toLowerCase();
-
 
       const customerPhone =
         String(
-          b.customer?.phone ||
-          b.phone ||
-          ''
+          booking.customer?.phone ||
+            booking.phone ||
+            ""
         ).toLowerCase();
 
+      const vehicleName =
+        String(
+          booking.vehicleName ||
+            getVehicleName(
+              booking.vehicle
+            ) ||
+            ""
+        ).toLowerCase();
 
       return (
         matchesTab &&
@@ -371,12 +568,11 @@ const AllBookings = () => {
           bookingId.includes(search) ||
           customerName.includes(search) ||
           customerEmail.includes(search) ||
-          customerPhone.includes(search)
+          customerPhone.includes(search) ||
+          vehicleName.includes(search)
         )
       );
-
     });
-
 
   /* =====================================================
      PAGINATION
@@ -385,37 +581,30 @@ const AllBookings = () => {
   const totalPages =
     Math.ceil(
       filteredBookings.length /
-      itemsPerPage
+        itemsPerPage
     ) || 1;
-
 
   const startIndex =
     (currentPage - 1) *
     itemsPerPage;
 
-
   const currentDisplayedBookings =
     filteredBookings.slice(
       startIndex,
-      startIndex + itemsPerPage
+      startIndex +
+        itemsPerPage
     );
-
 
   const handlePageChange = (
     page
   ) => {
-
     if (
       page >= 1 &&
       page <= totalPages
     ) {
-
       setCurrentPage(page);
-
     }
-
   };
-
 
   /* =====================================================
      TAB CHANGE
@@ -424,15 +613,10 @@ const AllBookings = () => {
   const handleTabChange = (
     tab
   ) => {
-
     setActiveTab(tab);
-
     setCurrentPage(1);
-
     setActiveMenuId(null);
-
   };
-
 
   /* =====================================================
      SEARCH
@@ -441,162 +625,147 @@ const AllBookings = () => {
   const handleSearchChange = (
     e
   ) => {
-
     setSearchTerm(
       e.target.value
     );
 
     setCurrentPage(1);
-
   };
-
 
   /* =====================================================
      EXPORT CSV
   ===================================================== */
 
   const handleExportCSV = () => {
-
     if (
       filteredBookings.length === 0
     ) {
-
       alert(
-        'No booking records available to export.'
+        "No booking records available to export."
       );
 
       return;
-
     }
-
 
     const headers =
       [
-        'Booking ID',
-        'Date',
-        'Customer Name',
-        'Email',
-        'Phone',
-        'Vehicle',
-        'Pickup',
-        'Return',
-        'Amount',
-        'Status'
-      ].join(',') + '\n';
-
+        "Booking ID",
+        "Date",
+        "Customer Name",
+        "Email",
+        "Phone",
+        "Vehicle",
+        "Pickup",
+        "Return",
+        "Amount",
+        "Payment Status",
+        "Status",
+      ].join(",") +
+      "\n";
 
     const rows =
       filteredBookings.map(
-        (b) => {
-
+        (booking) => {
           const id =
-            b.id ||
-            b._id ||
-            '';
-
+            getBookingId(
+              booking
+            );
 
           const customerName =
-            b.customer?.name ||
-            b.customerName ||
-            '';
-
+            booking.customer
+              ?.name ||
+            booking.customerName ||
+            "";
 
           const email =
-            b.customer?.email ||
-            b.email ||
-            '';
-
+            booking.customer
+              ?.email ||
+            booking.email ||
+            "";
 
           const phone =
-            b.customer?.phone ||
-            b.phone ||
-            '';
-
+            booking.customer
+              ?.phone ||
+            booking.phone ||
+            "";
 
           const vehicle =
-            b.vehicle?.name ||
-            b.vehicleName ||
-            '';
-
+            booking.vehicleName ||
+            getVehicleName(
+              booking.vehicle
+            );
 
           const pickup =
-            b.pickup ||
-            b.pickupDate ||
-            '';
-
+            booking.pickupDate ||
+            "";
 
           const returnDate =
-            b.returnDate ||
-            b.dropoffDate ||
-            '';
-
+            booking.returnDate ||
+            booking.dropoffDate ||
+            "";
 
           const amount =
-            b.amount ||
-            '';
+            booking.amount ??
+            "";
 
+          const paymentStatus =
+            booking.paymentStatus ||
+            "Unpaid";
 
           const status =
-            b.status ||
-            '';
-
+            booking.status ||
+            "Pending";
 
           const date =
-            b.date ||
-            b.createdAt ||
-            '';
-
+            booking.bookingDate ||
+            booking.createdAt ||
+            "";
 
           return [
             id,
-            date,
+            formatDateTime(date),
             customerName,
             email,
             phone,
             vehicle,
-            pickup,
-            returnDate,
-            amount,
-            status
+            formatDate(pickup),
+            formatDate(returnDate),
+            formatIndianMoney(amount),
+            paymentStatus,
+            status,
           ]
             .map(
               (value) =>
-                `"${String(value)
-                  .replace(
-                    /"/g,
-                    '""'
-                  )}"`
+                `"${String(value).replace(
+                  /"/g,
+                  '""'
+                )}"`
             )
-            .join(',');
-
+            .join(",");
         }
       );
-
 
     const blob =
       new Blob(
         [
           headers +
-          rows.join('\n')
+            rows.join("\n"),
         ],
         {
           type:
-            'text/csv;charset=utf-8;'
+            "text/csv;charset=utf-8;",
         }
       );
-
 
     const url =
       window.URL.createObjectURL(
         blob
       );
 
-
     const a =
       document.createElement(
-        'a'
+        "a"
       );
-
 
     a.href = url;
 
@@ -604,7 +773,6 @@ const AllBookings = () => {
       `YoungDrive_Bookings_${new Date()
         .toISOString()
         .slice(0, 10)}.csv`;
-
 
     document.body.appendChild(a);
 
@@ -615,9 +783,7 @@ const AllBookings = () => {
     window.URL.revokeObjectURL(
       url
     );
-
   };
-
 
   /* =====================================================
      TOGGLE ACTION MENU
@@ -627,7 +793,6 @@ const AllBookings = () => {
     id,
     e
   ) => {
-
     e.stopPropagation();
 
     setActiveMenuId(
@@ -635,460 +800,584 @@ const AllBookings = () => {
         ? null
         : id
     );
-
   };
-
 
   /* =====================================================
-     GET BOOKING ID
+     OPEN BOOKING DETAILS
   ===================================================== */
 
-  const getBookingId = (
+  const handleViewBooking = (
     booking
   ) => {
-
-    return (
-      booking?.id ||
-      booking?._id
+    setSelectedBooking(
+      booking
     );
 
-  };
+    setActiveDetailsTab(
+      "Details"
+    );
 
+    setShowCancelBox(false);
+
+    setCancellationReason(
+      "Select reason"
+    );
+
+    setCancellationComment("");
+
+    setActiveMenuId(null);
+  };
 
   /* =====================================================
      UPDATE BOOKING STATUS
   ===================================================== */
 
-  const handleStatusChange = async (
-    id,
-    newStatus,
-    reason = '',
-    comment = ''
-  ) => {
+  const handleStatusChange =
+    async (
+      id,
+      newStatus,
+      reason = "",
+      comment = ""
+    ) => {
+      try {
+        setSaving(true);
 
-    try {
+        setActiveMenuId(null);
 
-      setSaving(true);
+        const payload = {
+          status: newStatus,
+        };
 
-      setActiveMenuId(null);
+        if (reason) {
+          payload.cancellationReason =
+            reason;
+        }
 
+        if (comment) {
+          payload.cancellationComment =
+            comment;
+        }
 
-      const payload = {
-        status: newStatus
-      };
-
-
-      if (reason) {
-
-        payload.cancellationReason =
-          reason;
-
-      }
-
-
-      if (comment) {
-
-        payload.cancellationComment =
-          comment;
-
-      }
-
-
-      console.log(
-        'Updating booking:',
-        id,
-        payload
-      );
-
-
-      /*
-        Backend endpoint:
-
-        PATCH
-        /api/bookings/:id/status
-      */
-
-      const response =
-        await API.patch(
-          `/bookings/${encodeURIComponent(
-            id
-          )}/status`,
+        console.log(
+          "Updating booking status:",
+          id,
           payload
         );
 
-
-      console.log(
-        'Status update response:',
-        response.data
-      );
-
-
-      if (
-        response.data?.success
-      ) {
-
-        /*
-          Update local table immediately.
-        */
-
-        setBookings(
-          (prev) =>
-            prev.map(
-              (booking) => {
-
-                const bookingId =
-                  getBookingId(
-                    booking
-                  );
-
-
-                if (
-                  String(
-                    bookingId
-                  ) ===
-                  String(id)
-                ) {
-
-                  return {
-                    ...booking,
-                    status:
-                      newStatus
-                  };
-
-                }
-
-
-                return booking;
-
-              }
-            )
-        );
-
-
-        /*
-          Update selected sidebar.
-        */
-
-        if (
-          selectedBooking &&
-          String(
-            getBookingId(
-              selectedBooking
-            )
-          ) ===
-          String(id)
-        ) {
-
-          setSelectedBooking(
-            response.data.data ||
-            {
-              ...selectedBooking,
-              status:
-                newStatus
-            }
+        const response =
+          await API.put(
+            `/bookings/${encodeURIComponent(
+              id
+            )}/status`,
+            payload
           );
 
-        }
-
-
-        /*
-          Refresh from database.
-        */
-
-        await fetchBookings();
-
-      } else {
-
-        alert(
-          response.data?.message ||
-          'Failed to update booking status.'
+        console.log(
+          "Status update response:",
+          response.data
         );
 
+        if (
+          response.data?.success
+        ) {
+          const updatedBooking =
+            response.data.data;
+
+          setBookings(
+            (previous) =>
+              previous.map(
+                (booking) => {
+                  const mongoId =
+                    getMongoBookingId(
+                      booking
+                    );
+
+                  return String(
+                    mongoId
+                  ) === String(id)
+                    ? {
+                        ...booking,
+                        ...(updatedBooking ||
+                          {}),
+                        status:
+                          newStatus,
+                      }
+                    : booking;
+                }
+              )
+          );
+
+          if (
+            selectedBooking &&
+            String(
+              getMongoBookingId(
+                selectedBooking
+              )
+            ) ===
+              String(id)
+          ) {
+            setSelectedBooking(
+              updatedBooking ||
+                {
+                  ...selectedBooking,
+                  status:
+                    newStatus,
+                }
+            );
+          }
+
+          await fetchBookings();
+        } else {
+          alert(
+            response.data?.message ||
+              "Failed to update booking status."
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Failed to update booking status:",
+          error
+        );
+
+        console.error(
+          "Server response:",
+          error?.response?.data
+        );
+
+        alert(
+          error?.response?.data
+            ?.message ||
+            "Failed to update booking status."
+        );
+      } finally {
+        setSaving(false);
       }
-
-    } catch (err) {
-
-      console.error(
-        'Failed to update booking status:',
-        err
-      );
-
-
-      console.error(
-        'Server response:',
-        err?.response?.data
-      );
-
-
-      alert(
-        err?.response?.data?.message ||
-        'Failed to update booking status.'
-      );
-
-    } finally {
-
-      setSaving(false);
-
-    }
-
-  };
-
+    };
 
   /* =====================================================
      CANCEL BOOKING
   ===================================================== */
 
-  const handleCancelBookingSubmit = async () => {
+  const handleCancelBookingSubmit =
+    async () => {
+      if (!selectedBooking) {
+        return;
+      }
 
-    if (!selectedBooking) {
-      return;
-    }
+      if (
+        !cancellationReason ||
+        cancellationReason ===
+          "Select reason"
+      ) {
+        alert(
+          "Please select a reason for cancellation."
+        );
 
+        return;
+      }
 
-    if (
-      !cancellationReason ||
-      cancellationReason ===
-        'Select reason'
-    ) {
+      const mongoId =
+        getMongoBookingId(
+          selectedBooking
+        );
 
-      alert(
-        'Please select a reason for cancellation.'
+      if (!mongoId) {
+        alert(
+          "Booking MongoDB ID is missing."
+        );
+
+        return;
+      }
+
+      await handleStatusChange(
+        mongoId,
+        "Cancelled",
+        cancellationReason,
+        cancellationComment
       );
 
-      return;
+      setCancellationReason(
+        "Select reason"
+      );
 
-    }
+      setCancellationComment("");
 
+      setShowCancelBox(false);
 
-    await handleStatusChange(
-      getBookingId(
-        selectedBooking
-      ),
-      'Cancelled',
-      cancellationReason,
-      cancellationComment
-    );
-
-
-    setCancellationReason(
-      'Select reason'
-    );
-
-    setCancellationComment('');
-
-    setShowCancelBox(false);
-
-
-    alert(
-      `Booking ${
-        getBookingId(
+      alert(
+        `Booking ${getBookingId(
           selectedBooking
-        )
-      } has been cancelled.`
-    );
-
-  };
-
+        )} has been cancelled.`
+      );
+    };
 
   /* =====================================================
      CREATE NEW BOOKING
   ===================================================== */
 
-  const handleAddBookingSubmit = async (
-    e
-  ) => {
+  const handleAddBookingSubmit =
+    async (e) => {
+      e.preventDefault();
 
-    e.preventDefault();
+      if (
+        !newBooking.customerName.trim()
+      ) {
+        alert(
+          "Please enter customer name."
+        );
 
+        return;
+      }
 
-    try {
+      if (
+        !newBooking.email.trim()
+      ) {
+        alert(
+          "Please enter customer email."
+        );
 
-      setSaving(true);
+        return;
+      }
 
+      if (
+        !newBooking.phone.trim()
+      ) {
+        alert(
+          "Please enter customer phone."
+        );
 
-      /*
-        Send exactly the fields
-        from your existing form.
-      */
+        return;
+      }
 
-      const payload = {
+      if (!newBooking.vehicle) {
+        alert(
+          "Please select a vehicle."
+        );
 
-        customerName:
-          newBooking.customerName,
+        return;
+      }
 
-        email:
-          newBooking.email,
+      if (!newBooking.pickupDate) {
+        alert(
+          "Please select pickup date."
+        );
 
-        phone:
-          newBooking.phone,
+        return;
+      }
 
-        vehicle:
-          newBooking.vehicle,
+      if (!newBooking.returnDate) {
+        alert(
+          "Please select return date."
+        );
 
-        pickupDate:
-          newBooking.pickupDate,
+        return;
+      }
 
-        returnDate:
-          newBooking.returnDate,
+      if (
+        new Date(
+          newBooking.returnDate
+        ) <
+        new Date(
+          newBooking.pickupDate
+        )
+      ) {
+        alert(
+          "Return date cannot be before pickup date."
+        );
 
-        amount:
-          Number(
-            newBooking.amount
-          ),
+        return;
+      }
 
-        status:
-          'Pending',
+      try {
+        setSaving(true);
 
-        paymentStatus:
-          'Unpaid'
+        const selectedListing =
+          listings.find(
+            (listing) =>
+              String(
+                getVehicleId(
+                  listing
+                )
+              ) ===
+              String(
+                newBooking.vehicle
+              )
+          );
 
-      };
+        if (!selectedListing) {
+          alert(
+            "Selected vehicle/listing not found."
+          );
 
+          return;
+        }
 
-      console.log(
-        'Creating booking:',
-        payload
-      );
+        const vehicleId =
+          getVehicleId(
+            selectedListing
+          );
 
+        if (!vehicleId) {
+          alert(
+            "Selected vehicle ID is missing."
+          );
 
-      /*
-        Backend:
+          return;
+        }
 
-        POST
-        /api/bookings
-      */
+        const pickupLocation =
+          selectedListing.pickupLocation ||
+          selectedListing.location ||
+          selectedListing.address ||
+          "Main Office";
 
-      const response =
-        await API.post(
-          '/bookings',
+        const dropoffLocation =
+          selectedListing.dropoffLocation ||
+          selectedListing.location ||
+          selectedListing.address ||
+          pickupLocation;
+
+        const pickupTime =
+          "10:00 AM";
+
+        const dropoffTime =
+          "06:00 PM";
+
+        const pickupDateTime =
+          new Date(
+            `${newBooking.pickupDate}T10:00:00`
+          );
+
+        const returnDateTime =
+          new Date(
+            `${newBooking.returnDate}T18:00:00`
+          );
+
+        const payload = {
+          customerName:
+            newBooking.customerName.trim(),
+
+          email:
+            newBooking.email
+              .trim()
+              .toLowerCase(),
+
+          phone:
+            newBooking.phone.trim(),
+
+          vehicle:
+            vehicleId,
+
+          vehicleId:
+            vehicleId,
+
+          vehicleName:
+            getVehicleName(
+              selectedListing
+            ),
+
+          vehicleImage:
+            getVehicleImage(
+              selectedListing
+            ),
+
+          bookingDate:
+            new Date(),
+
+          bookingTime:
+            "10:00 AM",
+
+          pickupDate:
+            pickupDateTime,
+
+          pickupTime:
+            pickupTime,
+
+          pickupLocation:
+            pickupLocation,
+
+          returnDate:
+            returnDateTime,
+
+          dropoffDate:
+            returnDateTime,
+
+          dropoffTime:
+            dropoffTime,
+
+          dropoffLocation:
+            dropoffLocation,
+
+          amount:
+            Number(
+              newBooking.amount
+            ) || 0,
+
+          status:
+            "Pending",
+
+          paymentStatus:
+            "Unpaid",
+
+          paymentMethod:
+            "",
+
+          additionalMessage:
+            "",
+        };
+
+        console.log(
+          "===================================="
+        );
+
+        console.log(
+          "FINAL ADMIN BOOKING PAYLOAD:",
           payload
         );
 
-
-      console.log(
-        'Create booking response:',
-        response.data
-      );
-
-
-      if (
-        response.data?.success
-      ) {
-
-        /*
-          Close modal.
-        */
-
-        setIsModalOpen(
-          false
+        console.log(
+          "RETURN DATE:",
+          payload.returnDate
         );
 
+        console.log(
+          "RETURN DATE ISO:",
+          payload.returnDate?.toISOString()
+        );
 
-        /*
-          Reset form.
-        */
+        console.log(
+          "PICKUP DATE:",
+          payload.pickupDate
+        );
 
-        setNewBooking({
+        console.log(
+          "PICKUP DATE ISO:",
+          payload.pickupDate?.toISOString()
+        );
 
-          customerName: '',
+        console.log(
+          "===================================="
+        );
 
-          email: '',
+        const response =
+          await API.post(
+            "/bookings",
+            payload
+          );
 
-          phone: '',
+        console.log(
+          "Create booking response:",
+          response.data
+        );
 
-          vehicle:
-            'Audi A3 1.6 TDI S line',
+        if (
+          response.data?.success
+        ) {
+          alert(
+            "Booking created successfully!"
+          );
 
-          pickupDate: '',
+          setIsModalOpen(false);
 
-          returnDate: '',
+          setNewBooking({
+            customerName: "",
+            email: "",
+            phone: "",
+            vehicle:
+              listings.length > 0
+                ? getVehicleId(
+                    listings[0]
+                  )
+                : "",
+            pickupDate: "",
+            returnDate: "",
+            amount: "",
+          });
 
-          amount: ''
+          await fetchBookings();
 
-        });
+          setCurrentPage(1);
+        } else {
+          alert(
+            response.data?.message ||
+              "Failed to create booking."
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Create booking error:",
+          error
+        );
 
-
-        /*
-          Refresh database data.
-        */
-
-        await fetchBookings();
-
-
-        /*
-          Go to first page.
-        */
-
-        setCurrentPage(1);
-
-      } else {
+        console.error(
+          "Server response:",
+          error?.response?.data
+        );
 
         alert(
-          response.data?.message ||
-          'Failed to create booking.'
+          error?.response?.data
+            ?.message ||
+            "Failed to create booking. Please check your backend connection."
         );
+      } finally {
+        setSaving(false);
+      }
+    };
 
+  /* =====================================================
+     MODAL OPEN
+  ===================================================== */
+
+  const handleOpenNewBooking =
+    async () => {
+      setIsModalOpen(true);
+
+      if (
+        listings.length === 0
+      ) {
+        await fetchListings();
       }
 
-    } catch (error) {
-
-      console.error(
-        'Create booking error:',
-        error
-      );
-
-
-      console.error(
-        'Server response:',
-        error?.response?.data
-      );
-
-
-      alert(
-        error?.response?.data?.message ||
-        'Failed to create booking. Please check your backend connection.'
-      );
-
-    } finally {
-
-      setSaving(false);
-
-    }
-
-  };
-
+      if (
+        !newBooking.vehicle &&
+        listings.length > 0
+      ) {
+        setNewBooking(
+          (previous) => ({
+            ...previous,
+            vehicle:
+              getVehicleId(
+                listings[0]
+              ),
+          })
+        );
+      }
+    };
 
   /* =====================================================
      KEEP CURRENT PAGE VALID
   ===================================================== */
 
   useEffect(() => {
-
     if (
       currentPage >
       totalPages
     ) {
-
       setCurrentPage(
         totalPages
       );
-
     }
-
   }, [
     currentPage,
-    totalPages
+    totalPages,
   ]);
-
 
   /* =====================================================
      MAIN UI
   ===================================================== */
 
   return (
-
     <div className="AllBookings-container">
-
 
       {/* Header */}
 
@@ -1097,27 +1386,21 @@ const AllBookings = () => {
         <div className="AllBookings-title-section">
 
           <h2>
-
             All Bookings
 
             <FaCalendarAlt
               className="AllBookings-title-icon"
             />
-
           </h2>
 
           <p className="AllBookings-breadcrumb">
-
-            Dashboard &gt; Bookings &gt;{' '}
-
+            Dashboard &gt; Bookings &gt;{" "}
             <span>
               All Bookings
             </span>
-
           </p>
 
         </div>
-
 
         <div className="AllBookings-top-actions">
 
@@ -1127,53 +1410,40 @@ const AllBookings = () => {
               handleExportCSV
             }
           >
-
             <FaDownload />
-
             Export CSV
-
           </button>
-
 
           <button
             className="AllBookings-btn-primary"
-            onClick={() =>
-              setIsModalOpen(true)
+            onClick={
+              handleOpenNewBooking
             }
           >
-
             <FaPlus />
-
             New Booking
-
           </button>
 
         </div>
 
       </header>
 
-
       {/* Top Stat Cards Grid */}
 
       <div className="AllBookings-stats-grid">
-
 
         {/* Total */}
 
         <div className="AllBookings-stat-card">
 
           <div className="AllBookings-stat-icon red">
-
             <FaUsers />
-
           </div>
 
           <div className="AllBookings-stat-info">
 
             <span className="AllBookings-stat-label">
-
               Total Bookings
-
             </span>
 
             <h3>
@@ -1181,210 +1451,163 @@ const AllBookings = () => {
             </h3>
 
             <span className="AllBookings-stat-growth positive">
-
               ↑ 18.5% from last week
-
             </span>
 
           </div>
 
         </div>
-
 
         {/* Revenue */}
 
         <div className="AllBookings-stat-card">
 
           <div className="AllBookings-stat-icon blue">
-
             <FaCar />
-
           </div>
 
           <div className="AllBookings-stat-info">
 
             <span className="AllBookings-stat-label">
-
               Total Revenue
-
             </span>
 
             <h3>
-
               {calculateTotalRevenue(
                 bookings
               )}
-
             </h3>
 
             <span className="AllBookings-stat-growth positive">
-
               ↑ 24.7% from last week
-
             </span>
 
           </div>
 
         </div>
-
 
         {/* Confirmed */}
 
         <div className="AllBookings-stat-card">
 
           <div className="AllBookings-stat-icon green">
-
             <FaCheckCircle />
-
           </div>
 
           <div className="AllBookings-stat-info">
 
             <span className="AllBookings-stat-label">
-
               Confirmed
-
             </span>
 
             <h3>
-
               {
                 bookings.filter(
-                  b =>
-                    b.status ===
-                    'Confirmed'
+                  (booking) =>
+                    booking.status ===
+                    "Confirmed"
                 ).length
               }
-
             </h3>
 
             <span className="AllBookings-stat-growth positive">
-
               ↑ 12.3% from last week
-
             </span>
 
           </div>
 
         </div>
-
 
         {/* Ongoing */}
 
         <div className="AllBookings-stat-card">
 
           <div className="AllBookings-stat-icon orange">
-
             <FaClock />
-
           </div>
 
           <div className="AllBookings-stat-info">
 
             <span className="AllBookings-stat-label">
-
               Ongoing
-
             </span>
 
             <h3>
-
               {
                 bookings.filter(
-                  b =>
-                    b.status ===
-                    'Ongoing'
+                  (booking) =>
+                    booking.status ===
+                    "Ongoing"
                 ).length
               }
-
             </h3>
 
             <span className="AllBookings-stat-subtext">
-
               Currently Active
-
             </span>
 
           </div>
 
         </div>
-
 
         {/* Completed */}
 
         <div className="AllBookings-stat-card">
 
           <div className="AllBookings-stat-icon purple">
-
             <FaCalendarCheck />
-
           </div>
 
           <div className="AllBookings-stat-info">
 
             <span className="AllBookings-stat-label">
-
               Completed
-
             </span>
 
             <h3>
-
               {
                 bookings.filter(
-                  b =>
-                    b.status ===
-                    'Completed'
+                  (booking) =>
+                    booking.status ===
+                    "Completed"
                 ).length
               }
-
             </h3>
 
             <span className="AllBookings-stat-growth positive">
-
               ↑ 8.2% from last week
-
             </span>
 
           </div>
 
         </div>
 
-
         {/* Cancelled */}
 
         <div className="AllBookings-stat-card">
 
           <div className="AllBookings-stat-icon light-red">
-
             <FaExclamationCircle />
-
           </div>
 
           <div className="AllBookings-stat-info">
 
             <span className="AllBookings-stat-label">
-
               Cancelled
-
             </span>
 
             <h3>
-
               {
                 bookings.filter(
-                  b =>
-                    b.status ===
-                    'Cancelled'
+                  (booking) =>
+                    booking.status ===
+                    "Cancelled"
                 ).length
               }
-
             </h3>
 
             <span className="AllBookings-stat-growth positive">
-
               ↑ 3.5% from last week
-
             </span>
 
           </div>
@@ -1393,56 +1616,51 @@ const AllBookings = () => {
 
       </div>
 
-
       {/* Main Content Layout */}
 
       <div className="AllBookings-content-body">
-
 
         {/* Left Column */}
 
         <div
           className={`AllBookings-table-wrapper ${
             selectedBooking
-              ? 'with-sidebar'
-              : 'full-width'
+              ? "with-sidebar"
+              : "full-width"
           }`}
         >
-
 
           {/* Status Tabs */}
 
           <div className="AllBookings-status-tabs">
 
             {[
-              'All',
-              'Pending',
-              'Confirmed',
-              'Ongoing',
-              'Completed',
-              'Cancelled'
+              "All",
+              "Pending",
+              "Confirmed",
+              "Ongoing",
+              "Completed",
+              "Cancelled",
             ].map(
               (tab) => {
 
                 const count =
-                  tab === 'All'
+                  tab === "All"
                     ? bookings.length
                     : bookings.filter(
-                        b =>
-                          b.status
+                        (booking) =>
+                          booking.status
                             ?.toLowerCase() ===
                           tab.toLowerCase()
                       ).length;
 
-
                 return (
-
                   <button
                     key={tab}
                     className={`AllBookings-tab-btn ${tab.toLowerCase()} ${
                       activeTab === tab
-                        ? 'active'
-                        : ''
+                        ? "active"
+                        : ""
                     }`}
                     onClick={() =>
                       handleTabChange(
@@ -1450,18 +1668,13 @@ const AllBookings = () => {
                       )
                     }
                   >
-
                     {tab} ({count})
-
                   </button>
-
                 );
-
               }
             )}
 
           </div>
-
 
           {/* Search */}
 
@@ -1483,7 +1696,6 @@ const AllBookings = () => {
             </div>
 
           </div>
-
 
           {/* Data Table */}
 
@@ -1527,7 +1739,6 @@ const AllBookings = () => {
 
               </thead>
 
-
               <tbody>
 
                 {loading ? (
@@ -1538,14 +1749,12 @@ const AllBookings = () => {
                       colSpan="7"
                       style={{
                         textAlign:
-                          'center',
+                          "center",
                         padding:
-                          '2rem'
+                          "2rem",
                       }}
                     >
-
                       Loading bookings...
-
                     </td>
 
                   </tr>
@@ -1561,47 +1770,84 @@ const AllBookings = () => {
                           item
                         );
 
+                      const mongoId =
+                        getMongoBookingId(
+                          item
+                        );
+
+                      const vehicleName =
+                        item.vehicleName ||
+                        getVehicleName(
+                          item.vehicle
+                        );
+
+                      const vehicleColor =
+                        item.vehicle?.color ||
+                        item.vehicleColor ||
+                        "";
+
+                      const vehiclePlate =
+                        item.vehicle?.plate ||
+                        item.vehiclePlate ||
+                        "";
+
+                      const pickupDate =
+                        item.pickupDate ||
+                        item.fullPickupDate;
+
+                      const returnDate =
+                        item.returnDate ||
+                        item.dropoffDate ||
+                        item.fullDropoffDate;
 
                       return (
 
                         <tr
                           key={
+                            mongoId ||
                             bookingId
                           }
                           className={
                             selectedBooking &&
-                            getBookingId(
-                              selectedBooking
-                            ) ===
-                              bookingId
-                              ? 'selected-row'
-                              : ''
+                            (
+                              String(
+                                getMongoBookingId(
+                                  selectedBooking
+                                )
+                              ) ===
+                                String(
+                                  mongoId
+                                ) ||
+                              String(
+                                getBookingId(
+                                  selectedBooking
+                                )
+                              ) ===
+                                String(
+                                  bookingId
+                                )
+                            )
+                              ? "selected-row"
+                              : ""
                           }
                         >
-
 
                           {/* BOOKING */}
 
                           <td className="AllBookings-td-id">
 
                             <span className="AllBookings-id-text">
-
                               {bookingId}
-
                             </span>
 
                             <span className="AllBookings-sub-text">
-
-                              {
-                                item.date ||
-                                item.createdAt ||
-                                ''
-                              }
-
+                              {formatDateTime(
+                                item.bookingDate ||
+                                  item.createdAt
+                              )}
                             </span>
 
                           </td>
-
 
                           {/* CUSTOMER */}
 
@@ -1612,36 +1858,30 @@ const AllBookings = () => {
                               <div>
 
                                 <strong>
-
                                   {
                                     item.customer
                                       ?.name ||
                                     item.customerName ||
-                                    'N/A'
+                                    "N/A"
                                   }
-
                                 </strong>
 
                                 <span className="AllBookings-sub-text">
-
                                   {
                                     item.customer
                                       ?.email ||
                                     item.email ||
-                                    'N/A'
+                                    "N/A"
                                   }
-
                                 </span>
 
                                 <span className="AllBookings-sub-text">
-
                                   {
                                     item.customer
                                       ?.phone ||
                                     item.phone ||
-                                    'N/A'
+                                    "N/A"
                                   }
-
                                 </span>
 
                               </div>
@@ -1649,7 +1889,6 @@ const AllBookings = () => {
                             </div>
 
                           </td>
-
 
                           {/* VEHICLE */}
 
@@ -1660,36 +1899,19 @@ const AllBookings = () => {
                               <div>
 
                                 <strong>
-
-                                  {
-                                    item.vehicle
-                                      ?.name ||
-                                    item.vehicleName ||
-                                    'N/A'
-                                  }
-
+                                  {vehicleName}
                                 </strong>
 
                                 <span className="AllBookings-sub-text">
-
                                   {
-                                    item.vehicle
-                                      ?.color ||
-                                    item.vehicleColor ||
-                                    ''
+                                    vehicleColor
                                   }
-
                                 </span>
 
                                 <span className="AllBookings-plate-badge">
-
                                   {
-                                    item.vehicle
-                                      ?.plate ||
-                                    item.vehiclePlate ||
-                                    ''
+                                    vehiclePlate
                                   }
-
                                 </span>
 
                               </div>
@@ -1698,7 +1920,6 @@ const AllBookings = () => {
 
                           </td>
 
-
                           {/* PICKUP RETURN */}
 
                           <td>
@@ -1706,38 +1927,38 @@ const AllBookings = () => {
                             <div className="AllBookings-dates-cell">
 
                               <span>
+                                {formatDate(
+                                  pickupDate
+                                )}
 
-                                {
-                                  item.pickup ||
-                                  item.pickupDate ||
-                                  'N/A'
-                                }
-
+                                {item.pickupTime
+                                  ? ` ${item.pickupTime}`
+                                  : ""}
                               </span>
 
                               <span>
+                                {formatDate(
+                                  returnDate
+                                )}
 
-                                {
-                                  item.returnDate ||
-                                  item.dropoffDate ||
-                                  'N/A'
-                                }
-
+                                {item.dropoffTime
+                                  ? ` ${item.dropoffTime}`
+                                  : ""}
                               </span>
 
                               <span className="AllBookings-sub-text">
-
                                 {
                                   item.duration ||
-                                  ''
+                                  calculateDuration(
+                                    pickupDate,
+                                    returnDate
+                                  )
                                 }
-
                               </span>
 
                             </div>
 
                           </td>
-
 
                           {/* AMOUNT */}
 
@@ -1746,33 +1967,27 @@ const AllBookings = () => {
                             <div className="AllBookings-amount-cell">
 
                               <strong>
-
-                                {
-                                  item.amount ||
-                                  '$0.00'
-                                }
-
+                                {formatIndianMoney(
+                                  item.amount
+                                )}
                               </strong>
 
                               <span
                                 className={`AllBookings-pay-badge ${
                                   item.paymentStatus
                                     ? item.paymentStatus.toLowerCase()
-                                    : 'unpaid'
+                                    : "unpaid"
                                 }`}
                               >
-
                                 {
                                   item.paymentStatus ||
-                                  'Unpaid'
+                                  "Unpaid"
                                 }
-
                               </span>
 
                             </div>
 
                           </td>
-
 
                           {/* STATUS */}
 
@@ -1782,19 +1997,16 @@ const AllBookings = () => {
                               className={`AllBookings-status-badge ${
                                 item.status
                                   ? item.status.toLowerCase()
-                                  : 'pending'
+                                  : "pending"
                               }`}
                             >
-
                               {
                                 item.status ||
-                                'Pending'
+                                "Pending"
                               }
-
                             </span>
 
                           </td>
-
 
                           {/* ACTIONS */}
 
@@ -1803,16 +2015,13 @@ const AllBookings = () => {
                             <button
                               className="AllBookings-action-btn view"
                               onClick={() =>
-                                setSelectedBooking(
+                                handleViewBooking(
                                   item
                                 )
                               }
                             >
-
                               <FaEye />
-
                             </button>
-
 
                             <div className="AllBookings-dropdown-container">
 
@@ -1825,11 +2034,8 @@ const AllBookings = () => {
                                   )
                                 }
                               >
-
                                 <FaEllipsisV />
-
                               </button>
-
 
                               {activeMenuId ===
                                 bookingId && (
@@ -1837,10 +2043,14 @@ const AllBookings = () => {
                                 <div className="AllBookings-action-menu">
 
                                   <button
+                                    disabled={
+                                      saving ||
+                                      !mongoId
+                                    }
                                     onClick={() =>
                                       handleStatusChange(
-                                        bookingId,
-                                        'Confirmed'
+                                        mongoId,
+                                        "Confirmed"
                                       )
                                     }
                                   >
@@ -1848,10 +2058,14 @@ const AllBookings = () => {
                                   </button>
 
                                   <button
+                                    disabled={
+                                      saving ||
+                                      !mongoId
+                                    }
                                     onClick={() =>
                                       handleStatusChange(
-                                        bookingId,
-                                        'Ongoing'
+                                        mongoId,
+                                        "Ongoing"
                                       )
                                     }
                                   >
@@ -1859,10 +2073,14 @@ const AllBookings = () => {
                                   </button>
 
                                   <button
+                                    disabled={
+                                      saving ||
+                                      !mongoId
+                                    }
                                     onClick={() =>
                                       handleStatusChange(
-                                        bookingId,
-                                        'Completed'
+                                        mongoId,
+                                        "Completed"
                                       )
                                     }
                                   >
@@ -1870,10 +2088,14 @@ const AllBookings = () => {
                                   </button>
 
                                   <button
+                                    disabled={
+                                      saving ||
+                                      !mongoId
+                                    }
                                     onClick={() =>
                                       handleStatusChange(
-                                        bookingId,
-                                        'Pending'
+                                        mongoId,
+                                        "Pending"
                                       )
                                     }
                                   >
@@ -1881,12 +2103,29 @@ const AllBookings = () => {
                                   </button>
 
                                   <button
-                                    onClick={() =>
-                                      handleStatusChange(
-                                        bookingId,
-                                        'Cancelled'
-                                      )
+                                    disabled={
+                                      saving ||
+                                      !mongoId
                                     }
+                                    onClick={() => {
+
+                                      setActiveMenuId(
+                                        null
+                                      );
+
+                                      setSelectedBooking(
+                                        item
+                                      );
+
+                                      setShowCancelBox(
+                                        true
+                                      );
+
+                                      setActiveDetailsTab(
+                                        "Details"
+                                      );
+
+                                    }}
                                   >
                                     Set Cancelled
                                   </button>
@@ -1914,14 +2153,12 @@ const AllBookings = () => {
                       colSpan="7"
                       style={{
                         textAlign:
-                          'center',
+                          "center",
                         padding:
-                          '2rem'
+                          "2rem",
                       }}
                     >
-
                       No bookings found.
-
                     </td>
 
                   </tr>
@@ -1934,14 +2171,13 @@ const AllBookings = () => {
 
           </div>
 
-
           {/* Pagination */}
 
           <div className="AllBookings-pagination-bar">
 
             <span>
 
-              Showing{' '}
+              Showing{" "}
 
               {
                 filteredBookings.length ===
@@ -1950,26 +2186,23 @@ const AllBookings = () => {
                   : startIndex + 1
               }
 
-              {' '}to{' '}
+              {" "}to{" "}
 
-              {
-                Math.min(
-                  startIndex +
-                    itemsPerPage,
-                  filteredBookings.length
-                )
-              }
+              {Math.min(
+                startIndex +
+                  itemsPerPage,
+                filteredBookings.length
+              )}
 
-              {' '}of{' '}
+              {" "}of{" "}
 
               {
                 filteredBookings.length
               }
 
-              {' '}bookings
+              {" "}bookings
 
             </span>
-
 
             <div className="AllBookings-pagination-controls">
 
@@ -1984,28 +2217,26 @@ const AllBookings = () => {
                   currentPage === 1
                 }
               >
-
                 <FaChevronLeft />
-
               </button>
-
 
               {Array.from(
                 {
                   length:
-                    totalPages
+                    totalPages,
                 },
-                (_, i) =>
-                  i + 1
+                (_, index) =>
+                  index + 1
               ).map(
                 (page) => (
 
                   <button
                     key={page}
                     className={`AllBookings-page-btn ${
-                      currentPage === page
-                        ? 'active'
-                        : ''
+                      currentPage ===
+                      page
+                        ? "active"
+                        : ""
                     }`}
                     onClick={() =>
                       handlePageChange(
@@ -2013,14 +2244,11 @@ const AllBookings = () => {
                       )
                     }
                   >
-
                     {page}
-
                   </button>
 
                 )
               )}
-
 
               <button
                 className="AllBookings-page-btn"
@@ -2034,9 +2262,7 @@ const AllBookings = () => {
                   totalPages
                 }
               >
-
                 <FaChevronRight />
-
               </button>
 
             </div>
@@ -2045,15 +2271,11 @@ const AllBookings = () => {
 
         </div>
 
-
-        {/* =================================================
-            SIDEBAR DETAILS
-        ================================================= */}
+        {/* SIDEBAR DETAILS */}
 
         {selectedBooking && (
 
           <div className="AllBookings-details-sidebar">
-
 
             <div className="AllBookings-details-header">
 
@@ -2073,15 +2295,16 @@ const AllBookings = () => {
                     false
                   );
 
+                  setActiveDetailsTab(
+                    "Details"
+                  );
+
                 }}
               >
-
                 <FaTimes />
-
               </button>
 
             </div>
-
 
             {/* Vehicle Summary */}
 
@@ -2092,60 +2315,47 @@ const AllBookings = () => {
                 <div>
 
                   <span className="AllBookings-meta-label">
-
                     Booking ID
-
                   </span>
 
                   <strong>
-
                     {
                       getBookingId(
                         selectedBooking
                       )
                     }
-
                   </strong>
 
                 </div>
 
-
                 <div>
 
                   <span className="AllBookings-meta-label">
-
                     Booking Date
-
                   </span>
 
                   <strong>
-
                     {
-                      selectedBooking.date ||
-                      selectedBooking.createdAt ||
-                      'N/A'
+                      formatDateTime(
+                        selectedBooking.bookingDate ||
+                          selectedBooking.createdAt
+                      )
                     }
-
                   </strong>
 
                 </div>
 
-
                 <div>
 
                   <span className="AllBookings-meta-label">
-
                     Payment Status
-
                   </span>
 
                   <span className="AllBookings-pay-badge paid">
-
                     {
                       selectedBooking.paymentStatus ||
-                      'Unpaid'
+                      "Unpaid"
                     }
-
                   </span>
 
                 </div>
@@ -2154,16 +2364,15 @@ const AllBookings = () => {
 
             </div>
 
-
             {/* Details Tabs */}
 
             <div className="AllBookings-sidebar-tabs">
 
               {[
-                'Details',
-                'Customer',
-                'Payment',
-                'History'
+                "Details",
+                "Customer",
+                "Payment",
+                "History",
               ].map(
                 (tab) => (
 
@@ -2172,8 +2381,8 @@ const AllBookings = () => {
                     className={`AllBookings-sidebar-tab ${
                       activeDetailsTab ===
                       tab
-                        ? 'active'
-                        : ''
+                        ? "active"
+                        : ""
                     }`}
                     onClick={() =>
                       setActiveDetailsTab(
@@ -2181,9 +2390,7 @@ const AllBookings = () => {
                       )
                     }
                   >
-
                     {tab}
-
                   </button>
 
                 )
@@ -2191,16 +2398,14 @@ const AllBookings = () => {
 
             </div>
 
-
             {/* Sidebar Body */}
 
             <div className="AllBookings-sidebar-body">
 
-
               {/* DETAILS TAB */}
 
               {activeDetailsTab ===
-                'Details' && (
+                "Details" && (
 
                 <>
 
@@ -2210,7 +2415,6 @@ const AllBookings = () => {
                       Booking Information
                     </h4>
 
-
                     <div className="AllBookings-info-group">
 
                       <label>
@@ -2218,30 +2422,26 @@ const AllBookings = () => {
                       </label>
 
                       <p>
-
                         {
-                          selectedBooking
-                            .vehicle
-                            ?.name ||
-                          selectedBooking
-                            .vehicleName ||
-                          'N/A'
+                          selectedBooking.vehicleName ||
+                          getVehicleName(
+                            selectedBooking.vehicle
+                          ) ||
+                          "N/A"
                         }
 
-                        {' '}
+                        {" "}
 
                         {
-                          selectedBooking
-                            .vehicle
+                          selectedBooking.vehicle
                             ?.color
                             ? `(${selectedBooking.vehicle.color})`
-                            : ''
+                            : ""
                         }
 
                       </p>
 
                     </div>
-
 
                     <div className="AllBookings-info-group">
 
@@ -2250,17 +2450,19 @@ const AllBookings = () => {
                       </label>
 
                       <p>
+                        {formatDate(
+                          selectedBooking.pickupDate
+                        )}
+
+                        {" "}
 
                         {
-                          selectedBooking.pickup ||
-                          selectedBooking.pickupDate ||
-                          'N/A'
+                          selectedBooking.pickupTime ||
+                          ""
                         }
-
                       </p>
 
                     </div>
-
 
                     <div className="AllBookings-info-group">
 
@@ -2269,17 +2471,20 @@ const AllBookings = () => {
                       </label>
 
                       <p>
+                        {formatDate(
+                          selectedBooking.returnDate ||
+                            selectedBooking.dropoffDate
+                        )}
+
+                        {" "}
 
                         {
-                          selectedBooking.returnDate ||
-                          selectedBooking.dropoffDate ||
-                          'N/A'
+                          selectedBooking.dropoffTime ||
+                          ""
                         }
-
                       </p>
 
                     </div>
-
 
                     <div className="AllBookings-info-group">
 
@@ -2288,16 +2493,18 @@ const AllBookings = () => {
                       </label>
 
                       <p>
-
                         {
                           selectedBooking.duration ||
-                          'N/A'
+                          calculateDuration(
+                            selectedBooking.pickupDate,
+                            selectedBooking.returnDate ||
+                              selectedBooking.dropoffDate
+                          ) ||
+                          "N/A"
                         }
-
                       </p>
 
                     </div>
-
 
                     <div className="AllBookings-info-group">
 
@@ -2306,17 +2513,14 @@ const AllBookings = () => {
                       </label>
 
                       <p>
-
                         {
-                          selectedBooking.pickupLoc ||
                           selectedBooking.pickupLocation ||
-                          'N/A'
+                          selectedBooking.location ||
+                          "N/A"
                         }
-
                       </p>
 
                     </div>
-
 
                     <div className="AllBookings-info-group">
 
@@ -2325,18 +2529,15 @@ const AllBookings = () => {
                       </label>
 
                       <p>
-
                         {
-                          selectedBooking.returnLoc ||
                           selectedBooking.dropoffLocation ||
+                          selectedBooking.dropLocation ||
                           selectedBooking.returnLocation ||
-                          'N/A'
+                          "N/A"
                         }
-
                       </p>
 
                     </div>
-
 
                     <div className="AllBookings-info-group">
 
@@ -2345,18 +2546,15 @@ const AllBookings = () => {
                       </label>
 
                       <p>
-
                         {
                           selectedBooking.driver ||
-                          'N/A'
+                          "N/A"
                         }
-
                       </p>
 
                     </div>
 
                   </div>
-
 
                   {/* Pricing */}
 
@@ -2366,7 +2564,6 @@ const AllBookings = () => {
                       Pricing Details
                     </h4>
 
-
                     <div className="AllBookings-price-row">
 
                       <span>
@@ -2374,16 +2571,12 @@ const AllBookings = () => {
                       </span>
 
                       <span>
-
-                        {
-                          selectedBooking.amount ||
-                          '$0.00'
-                        }
-
+                        {formatIndianMoney(
+                          selectedBooking.amount
+                        )}
                       </span>
 
                     </div>
-
 
                     <div className="AllBookings-price-row total">
 
@@ -2392,12 +2585,9 @@ const AllBookings = () => {
                       </strong>
 
                       <strong className="purple-text">
-
-                        {
-                          selectedBooking.amount ||
-                          '$0.00'
-                        }
-
+                        {formatIndianMoney(
+                          selectedBooking.amount
+                        )}
                       </strong>
 
                     </div>
@@ -2408,18 +2598,16 @@ const AllBookings = () => {
 
               )}
 
-
               {/* CUSTOMER TAB */}
 
               {activeDetailsTab ===
-                'Customer' && (
+                "Customer" && (
 
                 <div className="AllBookings-details-section">
 
                   <h4>
                     Customer Information
                   </h4>
-
 
                   <div className="AllBookings-info-group">
 
@@ -2428,18 +2616,15 @@ const AllBookings = () => {
                     </label>
 
                     <p>
-
                       {
                         selectedBooking.customer
                           ?.name ||
                         selectedBooking.customerName ||
-                        'N/A'
+                        "N/A"
                       }
-
                     </p>
 
                   </div>
-
 
                   <div className="AllBookings-info-group">
 
@@ -2448,18 +2633,15 @@ const AllBookings = () => {
                     </label>
 
                     <p>
-
                       {
                         selectedBooking.customer
                           ?.email ||
                         selectedBooking.email ||
-                        'N/A'
+                        "N/A"
                       }
-
                     </p>
 
                   </div>
-
 
                   <div className="AllBookings-info-group">
 
@@ -2468,18 +2650,15 @@ const AllBookings = () => {
                     </label>
 
                     <p>
-
                       {
                         selectedBooking.customer
                           ?.phone ||
                         selectedBooking.phone ||
-                        'N/A'
+                        "N/A"
                       }
-
                     </p>
 
                   </div>
-
 
                   <div className="AllBookings-info-group">
 
@@ -2488,14 +2667,12 @@ const AllBookings = () => {
                     </label>
 
                     <p>
-
                       {
                         selectedBooking.customer
                           ?.address ||
                         selectedBooking.address ||
-                        'N/A'
+                        "N/A"
                       }
-
                     </p>
 
                   </div>
@@ -2504,18 +2681,16 @@ const AllBookings = () => {
 
               )}
 
-
               {/* PAYMENT TAB */}
 
               {activeDetailsTab ===
-                'Payment' && (
+                "Payment" && (
 
                 <div className="AllBookings-details-section">
 
                   <h4>
                     Payment Information
                   </h4>
-
 
                   <div className="AllBookings-info-group">
 
@@ -2524,16 +2699,12 @@ const AllBookings = () => {
                     </label>
 
                     <p>
-
-                      {
-                        selectedBooking.amount ||
-                        '$0.00'
-                      }
-
+                      {formatIndianMoney(
+                        selectedBooking.amount
+                      )}
                     </p>
 
                   </div>
-
 
                   <div className="AllBookings-info-group">
 
@@ -2542,16 +2713,13 @@ const AllBookings = () => {
                     </label>
 
                     <p>
-
                       {
                         selectedBooking.paymentMethod ||
-                        'N/A'
+                        "N/A"
                       }
-
                     </p>
 
                   </div>
-
 
                   <div className="AllBookings-info-group">
 
@@ -2560,12 +2728,10 @@ const AllBookings = () => {
                     </label>
 
                     <p>
-
                       {
                         selectedBooking.paymentStatus ||
-                        'Unpaid'
+                        "Unpaid"
                       }
-
                     </p>
 
                   </div>
@@ -2574,18 +2740,16 @@ const AllBookings = () => {
 
               )}
 
-
               {/* HISTORY TAB */}
 
               {activeDetailsTab ===
-                'History' && (
+                "History" && (
 
                 <div className="AllBookings-details-section">
 
                   <h4>
                     Booking History
                   </h4>
-
 
                   <div className="AllBookings-info-group">
 
@@ -2594,17 +2758,15 @@ const AllBookings = () => {
                     </label>
 
                     <p>
-
                       {
-                        selectedBooking.createdAt ||
-                        selectedBooking.date ||
-                        'N/A'
+                        formatDateTime(
+                          selectedBooking.createdAt ||
+                            selectedBooking.bookingDate
+                        )
                       }
-
                     </p>
 
                   </div>
-
 
                   <div className="AllBookings-info-group">
 
@@ -2613,16 +2775,43 @@ const AllBookings = () => {
                     </label>
 
                     <p>
-
                       {
                         selectedBooking.status ||
-                        'Pending'
+                        "Pending"
                       }
-
                     </p>
 
                   </div>
 
+                  <div className="AllBookings-info-group">
+
+                    <label>
+                      Cancellation Reason
+                    </label>
+
+                    <p>
+                      {
+                        selectedBooking.cancellationReason ||
+                        "N/A"
+                      }
+                    </p>
+
+                  </div>
+
+                  <div className="AllBookings-info-group">
+
+                    <label>
+                      Cancellation Comment
+                    </label>
+
+                    <p>
+                      {
+                        selectedBooking.cancellationComment ||
+                        "N/A"
+                      }
+                    </p>
+
+                  </div>
 
                   <div className="AllBookings-info-group">
 
@@ -2631,12 +2820,13 @@ const AllBookings = () => {
                     </label>
 
                     <p>
-
                       {
-                        selectedBooking.updatedAt ||
-                        'N/A'
+                        selectedBooking.updatedAt
+                          ? formatDateTime(
+                              selectedBooking.updatedAt
+                            )
+                          : "N/A"
                       }
-
                     </p>
 
                   </div>
@@ -2647,7 +2837,6 @@ const AllBookings = () => {
 
             </div>
 
-
             {/* Quick Actions */}
 
             <div className="AllBookings-sidebar-actions">
@@ -2656,7 +2845,6 @@ const AllBookings = () => {
                 Booking Actions
               </h4>
 
-
               <div className="AllBookings-action-buttons-grid">
 
                 <button
@@ -2664,54 +2852,45 @@ const AllBookings = () => {
                   disabled={saving}
                   onClick={() =>
                     handleStatusChange(
-                      getBookingId(
+                      getMongoBookingId(
                         selectedBooking
                       ),
-                      'Confirmed'
+                      "Confirmed"
                     )
                   }
                 >
-
                   Mark Confirmed
-
                 </button>
-
 
                 <button
                   className="AllBookings-action-btn-sky"
                   disabled={saving}
                   onClick={() =>
                     handleStatusChange(
-                      getBookingId(
+                      getMongoBookingId(
                         selectedBooking
                       ),
-                      'Ongoing'
+                      "Ongoing"
                     )
                   }
                 >
-
                   Mark Ongoing
-
                 </button>
-
 
                 <button
                   className="AllBookings-action-btn-purple"
                   disabled={saving}
                   onClick={() =>
                     handleStatusChange(
-                      getBookingId(
+                      getMongoBookingId(
                         selectedBooking
                       ),
-                      'Completed'
+                      "Completed"
                     )
                   }
                 >
-
                   Mark Completed
-
                 </button>
-
 
                 <button
                   className="AllBookings-action-btn-red"
@@ -2722,17 +2901,14 @@ const AllBookings = () => {
                     )
                   }
                 >
-
                   {
                     showCancelBox
-                      ? 'Hide Cancel Form'
-                      : 'Cancel Booking'
+                      ? "Hide Cancel Form"
+                      : "Cancel Booking"
                   }
-
                 </button>
 
               </div>
-
 
               {/* Cancel Form */}
 
@@ -2742,14 +2918,13 @@ const AllBookings = () => {
                   className="AllBookings-cancel-box"
                   style={{
                     marginTop:
-                      '1rem'
+                      "1rem",
                   }}
                 >
 
                   <h5>
                     Cancel Booking
                   </h5>
-
 
                   <div className="AllBookings-input-group">
 
@@ -2789,7 +2964,6 @@ const AllBookings = () => {
 
                   </div>
 
-
                   <div className="AllBookings-input-group">
 
                     <label>
@@ -2810,42 +2984,37 @@ const AllBookings = () => {
                     />
 
                     <span className="AllBookings-char-count">
-
                       {
                         cancellationComment.length
                       }
                       /200
-
                     </span>
 
                   </div>
-
 
                   <button
                     type="button"
                     className="AllBookings-action-btn-red"
                     style={{
                       width:
-                        '100%',
+                        "100%",
                       marginTop:
-                        '0.5rem',
+                        "0.5rem",
                       padding:
-                        '0.5rem',
+                        "0.5rem",
                       cursor:
-                        'pointer'
+                        "pointer",
                     }}
                     onClick={
                       handleCancelBookingSubmit
                     }
                     disabled={saving}
                   >
-
                     {
                       saving
-                        ? 'Updating...'
-                        : 'Submit Cancellation'
+                        ? "Updating..."
+                        : "Submit Cancellation"
                     }
-
                   </button>
 
                 </div>
@@ -2859,7 +3028,6 @@ const AllBookings = () => {
         )}
 
       </div>
-
 
       {/* =====================================================
           ADD NEW BOOKING MODAL
@@ -2884,14 +3052,12 @@ const AllBookings = () => {
                     false
                   )
                 }
+                disabled={saving}
               >
-
                 <FaTimes />
-
               </button>
 
             </div>
-
 
             <form
               onSubmit={
@@ -2899,7 +3065,6 @@ const AllBookings = () => {
               }
               className="AllBookings-modal-form"
             >
-
 
               {/* Customer Name */}
 
@@ -2916,16 +3081,17 @@ const AllBookings = () => {
                     newBooking.customerName
                   }
                   onChange={(e) =>
-                    setNewBooking({
-                      ...newBooking,
-                      customerName:
-                        e.target.value
-                    })
+                    setNewBooking(
+                      (previous) => ({
+                        ...previous,
+                        customerName:
+                          e.target.value,
+                      })
+                    )
                   }
                 />
 
               </div>
-
 
               {/* Email */}
 
@@ -2942,16 +3108,17 @@ const AllBookings = () => {
                     newBooking.email
                   }
                   onChange={(e) =>
-                    setNewBooking({
-                      ...newBooking,
-                      email:
-                        e.target.value
-                    })
+                    setNewBooking(
+                      (previous) => ({
+                        ...previous,
+                        email:
+                          e.target.value,
+                      })
+                    )
                   }
                 />
 
               </div>
-
 
               {/* Phone */}
 
@@ -2968,16 +3135,17 @@ const AllBookings = () => {
                     newBooking.phone
                   }
                   onChange={(e) =>
-                    setNewBooking({
-                      ...newBooking,
-                      phone:
-                        e.target.value
-                    })
+                    setNewBooking(
+                      (previous) => ({
+                        ...previous,
+                        phone:
+                          e.target.value,
+                      })
+                    )
                   }
                 />
 
               </div>
-
 
               {/* Vehicle */}
 
@@ -2992,34 +3160,57 @@ const AllBookings = () => {
                     newBooking.vehicle
                   }
                   onChange={(e) =>
-                    setNewBooking({
-                      ...newBooking,
-                      vehicle:
-                        e.target.value
-                    })
+                    setNewBooking(
+                      (previous) => ({
+                        ...previous,
+                        vehicle:
+                          e.target.value,
+                      })
+                    )
                   }
                 >
 
-                  <option>
-                    Audi A3 1.6 TDI S line
-                  </option>
+                  {listings.length > 0 ? (
 
-                  <option>
-                    Mercedes-Benz C220d
-                  </option>
+                    listings.map(
+                      (listing) => {
 
-                  <option>
-                    Volkswagen Golf GTD
-                  </option>
+                        const id =
+                          getVehicleId(
+                            listing
+                          );
 
-                  <option>
-                    Volvo S60 D4 R-Design
-                  </option>
+                        return (
+
+                          <option
+                            key={id}
+                            value={id}
+                          >
+                            {
+                              getVehicleName(
+                                listing
+                              )
+                            }
+                          </option>
+
+                        );
+
+                      }
+                    )
+
+                  ) : (
+
+                    <>
+                      <option value="">
+                        Loading vehicles...
+                      </option>
+                    </>
+
+                  )}
 
                 </select>
 
               </div>
-
 
               {/* Dates */}
 
@@ -3038,16 +3229,17 @@ const AllBookings = () => {
                       newBooking.pickupDate
                     }
                     onChange={(e) =>
-                      setNewBooking({
-                        ...newBooking,
-                        pickupDate:
-                          e.target.value
-                      })
+                      setNewBooking(
+                        (previous) => ({
+                          ...previous,
+                          pickupDate:
+                            e.target.value,
+                        })
+                      )
                     }
                   />
 
                 </div>
-
 
                 <div className="AllBookings-form-group">
 
@@ -3062,11 +3254,13 @@ const AllBookings = () => {
                       newBooking.returnDate
                     }
                     onChange={(e) =>
-                      setNewBooking({
-                        ...newBooking,
-                        returnDate:
-                          e.target.value
-                      })
+                      setNewBooking(
+                        (previous) => ({
+                          ...previous,
+                          returnDate:
+                            e.target.value,
+                        })
+                      )
                     }
                   />
 
@@ -3074,13 +3268,12 @@ const AllBookings = () => {
 
               </div>
 
-
               {/* Amount */}
 
               <div className="AllBookings-form-group">
 
                 <label>
-                  Amount ($)
+                  Amount (₹)
                 </label>
 
                 <input
@@ -3091,16 +3284,17 @@ const AllBookings = () => {
                     newBooking.amount
                   }
                   onChange={(e) =>
-                    setNewBooking({
-                      ...newBooking,
-                      amount:
-                        e.target.value
-                    })
+                    setNewBooking(
+                      (previous) => ({
+                        ...previous,
+                        amount:
+                          e.target.value,
+                      })
+                    )
                   }
                 />
 
               </div>
-
 
               {/* Modal Actions */}
 
@@ -3116,24 +3310,22 @@ const AllBookings = () => {
                   }
                   disabled={saving}
                 >
-
                   Cancel
-
                 </button>
-
 
                 <button
                   type="submit"
                   className="AllBookings-btn-primary"
-                  disabled={saving}
+                  disabled={
+                    saving ||
+                    listings.length === 0
+                  }
                 >
-
                   {
                     saving
-                      ? 'Creating...'
-                      : 'Create Booking'
+                      ? "Creating..."
+                      : "Create Booking"
                   }
-
                 </button>
 
               </div>
@@ -3147,10 +3339,7 @@ const AllBookings = () => {
       )}
 
     </div>
-
   );
-
 };
-
 
 export default AllBookings;
