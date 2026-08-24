@@ -1803,7 +1803,7 @@ const BookingCalender = () => {
                             </span>
                           </td>
 
-                          <td>
+                          {/* <td>
                             <button
                               type="button"
                               className="bc-icon-btn"
@@ -1811,7 +1811,7 @@ const BookingCalender = () => {
                             >
                               <MoreVertical size={16} />
                             </button>
-                          </td>
+                          </td> */}
                         </tr>
                       );
                     })
