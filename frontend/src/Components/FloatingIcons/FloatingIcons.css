@@ -1,0 +1,131 @@
+:root {
+  --fi-gold: #f5b700;
+  --fi-gold-dark: #dca300;
+  --fi-whatsapp-dark: #0f1315;
+  --fi-whatsapp-green: #25d366;
+  --fi-black: #111111;
+  --fi-shadow: rgba(0, 0, 0, 0.45);
+}
+
+/* Floating Actions Container (Bottom Right) */
+.FloatingIcons-container {
+  position: fixed;
+  right: 20px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 99999;
+  pointer-events: auto;
+}
+
+/* Base Action Button */
+.FloatingIcons-btn {
+  width: 46px;
+  height: 46px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 4px 14px var(--fi-shadow);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.25s ease, background-color 0.25s ease, opacity 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.FloatingIcons-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.FloatingIcons-btn:active {
+  transform: scale(0.95);
+}
+
+/* Call Button (Gold Circle) */
+.FloatingIcons-call-btn {
+  background-color: var(--fi-gold);
+  color: var(--fi-black);
+  border-radius: 50%;
+}
+
+.FloatingIcons-call-btn:hover {
+  background-color: #ffc414;
+}
+
+/* WhatsApp Button (Dark Circle with Gold Accent) */
+.FloatingIcons-whatsapp-btn {
+  background-color: var(--fi-whatsapp-dark);
+  color: var(--fi-gold);
+  border: 1.5px solid var(--fi-gold);
+  border-radius: 50%;
+}
+
+.FloatingIcons-whatsapp-btn:hover {
+  background-color: var(--fi-gold);
+  color: var(--fi-black);
+}
+
+/* Back to Top Button (Rounded Square Gold) */
+.FloatingIcons-top-btn {
+  background-color: var(--fi-gold);
+  color: var(--fi-black);
+  border-radius: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px) scale(0.85);
+}
+
+.FloatingIcons-top-btn.FloatingIcons-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.FloatingIcons-top-btn.FloatingIcons-visible:hover {
+  transform: translateY(-2px) scale(1.08);
+  background-color: #ffc414;
+}
+
+/* Icon SVGs */
+.FloatingIcons-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.FloatingIcons-icon-arrow {
+  width: 20px;
+  height: 20px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .FloatingIcons-container {
+    right: 14px;
+    bottom: 18px;
+    gap: 10px;
+  }
+
+  .FloatingIcons-btn {
+    width: 42px;
+    height: 42px;
+  }
+
+  .FloatingIcons-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .FloatingIcons-icon-arrow {
+    width: 18px;
+    height: 18px;
+  }
+
+  .FloatingIcons-top-btn {
+    border-radius: 8px;
+  }
+}

@@ -1,0 +1,342 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --ff-gold: #f5b700;
+  --ff-gold-dark: #d99e00;
+  --ff-gold-glow: rgba(245, 183, 0, 0.28);
+  --ff-gold-border: rgba(245, 183, 0, 0.55);
+  --ff-bg-card: #ffffff;
+  --ff-bg-input: #f8f9fa;
+  --ff-input-border: #e2e5e9;
+  --ff-text: #1a1a1a;
+  --ff-text-sub: #555555;
+  --ff-icon-color: #666666;
+}
+
+/* Floating Form Overlay / Centered Container */
+.floating-form-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  pointer-events: auto;
+  font-family: 'Poppins', sans-serif;
+  animation: ffFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.floating-form-overlay.closing {
+  animation: ffFadeOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* White Popup Card */
+.floating-form-card {
+  position: relative;
+  width: 90%;
+  max-width: 340px;
+  background: var(--ff-bg-card);
+  border: 1.5px solid var(--ff-gold-border);
+  border-radius: 18px;
+  padding: 34px 20px 18px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 0 25px var(--ff-gold-glow);
+  box-sizing: border-box;
+  animation: ffScaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.floating-form-card.closing {
+  animation: ffScaleOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Overlapping Yellow Car Badge */
+.floating-form-car-badge {
+  position: absolute;
+  top: -27px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 54px;
+  height: 54px;
+  background-color: var(--ff-gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3.5px solid #ffffff;
+  box-shadow: 0 4px 15px rgba(245, 183, 0, 0.4);
+  z-index: 10;
+}
+
+.badge-car-svg {
+  width: 27px;
+  height: 27px;
+  color: #121212;
+}
+
+/* Close (X) Button */
+.floating-form-close-btn {
+  position: absolute;
+  top: 13px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  color: #71717a;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.floating-form-close-btn:hover {
+  color: var(--ff-gold-dark);
+  transform: scale(1.15);
+}
+
+/* Header Section */
+.floating-form-header {
+  text-align: center;
+  margin-top: 4px;
+  margin-bottom: 14px;
+}
+
+.floating-form-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.floating-form-gold-line {
+  width: 20px;
+  height: 2.5px;
+  background-color: var(--ff-gold);
+  border-radius: 2px;
+}
+
+.floating-form-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ff-text);
+  letter-spacing: 0.8px;
+  margin: 0;
+}
+
+.floating-form-subtitle {
+  font-size: 0.74rem;
+  color: var(--ff-text-sub);
+  line-height: 1.35;
+  margin: 5px 0 0 0;
+}
+
+/* Form Body */
+.floating-form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+/* Field Box */
+.floating-form-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.floating-form-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--ff-icon-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Light Mode Input Elements */
+.floating-form-field input,
+.floating-form-field select,
+.floating-form-field textarea {
+  width: 100%;
+  background-color: var(--ff-bg-input);
+  border: 1px solid var(--ff-input-border);
+  border-radius: 8px;
+  padding: 8.5px 12px 8.5px 36px;
+  font-size: 0.78rem;
+  color: var(--ff-text);
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.floating-form-field input::placeholder,
+.floating-form-field textarea::placeholder {
+  color: #94a3b8;
+  font-size: 0.78rem;
+}
+
+.floating-form-field input:focus,
+.floating-form-field select:focus,
+.floating-form-field textarea:focus {
+  background-color: #ffffff;
+  border-color: var(--ff-gold);
+  box-shadow: 0 0 0 3px rgba(245, 183, 0, 0.2);
+}
+
+/* Select Dropdown */
+.floating-form-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f5b700' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 11px;
+}
+
+.floating-form-field select option {
+  background: #ffffff;
+  color: #1a1a1a;
+}
+
+/* Textarea Layout */
+.floating-form-field.textarea-field {
+  align-items: flex-start;
+}
+
+.floating-form-icon.textarea-icon {
+  top: 9px;
+}
+
+.floating-form-field textarea {
+  resize: none;
+  padding-top: 8px;
+}
+
+/* Submit Button */
+.floating-form-submit-btn {
+  width: 100%;
+  background: var(--ff-gold);
+  color: #111827;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-top: 2px;
+  box-shadow: 0 4px 12px rgba(245, 183, 0, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.floating-form-submit-btn:hover {
+  background-color: #ffc21c;
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 16px rgba(245, 183, 0, 0.45);
+}
+
+.floating-form-submit-btn:active {
+  transform: translateY(0);
+}
+
+.submit-arrow {
+  stroke-width: 3.5;
+}
+
+/* Privacy Note */
+.floating-form-privacy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.privacy-shield-icon {
+  color: var(--ff-gold-dark);
+  flex-shrink: 0;
+}
+
+.floating-form-privacy p {
+  font-size: 0.65rem;
+  color: #64748b;
+  line-height: 1.25;
+  margin: 0;
+  text-align: left;
+}
+
+/* Entrance & Exit Animations */
+@keyframes ffFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ffFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes ffScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes ffScaleOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+}
+
+/* Mobile Screen Optimization */
+@media (max-width: 480px) {
+  .floating-form-card {
+    max-width: 310px;
+    padding: 30px 16px 16px;
+  }
+  
+  .floating-form-title {
+    font-size: 0.98rem;
+  }
+
+  .floating-form-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .floating-form-field input,
+  .floating-form-field select,
+  .floating-form-field textarea {
+    font-size: 0.74rem;
+    padding: 7.5px 10px 7.5px 32px;
+  }
+
+  .floating-form-icon {
+    left: 10px;
+  }
+
+  .floating-form-submit-btn {
+    padding: 9px;
+    font-size: 0.78rem;
+  }
+}
