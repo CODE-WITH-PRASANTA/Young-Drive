@@ -28,8 +28,9 @@ const menuConfig = [
     icon: <Car size={20} />,
     text: 'Vehicle Management',
     children: [
-      { text: 'Feature Listing', path: '/feature-listing' },
-      { text: 'Locations', path: '/locations' },
+      { text: 'Vehicles Post', path: '/feature-listing' },
+      { text: 'Locations Post', path: '/locations' },
+      { text: 'Category Post', path: '/category' },
     ]
   },
   {
@@ -43,7 +44,7 @@ const menuConfig = [
       { text: 'Calendar', path: '/bookings/calendar' },
     ]
   },
-  { type: 'link', icon: <Users size={20} />, text: 'Customers', path: '/customers' },
+  { type: 'link', icon: <Users size={20} />, text: 'Customers Enquiry', path: '/enquiry' },
   { type: 'link', icon: <CreditCard size={20} />, text: 'Payments', path: '/payments' },
   { type: 'link', icon: <Star size={20} />, text: 'Reviews', path: '/reviews' },
   { type: 'link', icon: <BarChart3 size={20} />, text: 'Reports', path: '/reports' },

@@ -110,146 +110,238 @@ const HomeFeatureList = () => {
   /* =====================================================
      FETCH VEHICLES
   ===================================================== */
-
   const fetchVehicles = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
+    setError("");
 
-      setError("");
+    const response = await API.get("/listings");
 
-      const response = await API.get("/listings");
+   
 
-      console.log("Vehicles API Response:", response.data);
+    const vehicleData =
+      response.data?.vehicles ||
+      response.data?.listings ||
+      response.data?.data ||
+      response.data ||
+      [];
 
-      const vehicleData =
-        response.data?.vehicles ||
-        response.data?.listings ||
-        response.data?.data ||
-        response.data ||
-        [];
+    if (!Array.isArray(vehicleData)) {
+      setListings([]);
+      return;
+    }
 
-      if (!Array.isArray(vehicleData)) {
-        setListings([]);
+    
 
-        return;
+    /* =================================================
+       FORMAT BACKEND DATA
+       ================================================= */
+
+    const formattedListings = vehicleData.map((vehicle, index) => {
+      let vehicleImages = [];
+
+      /* =================================================
+         VEHICLE IMAGES
+         ================================================= */
+
+      if (Array.isArray(vehicle.images) && vehicle.images.length > 0) {
+        vehicleImages = vehicle.images
+          .filter(Boolean)
+          .map((image) => getImageUrl(image));
       }
 
       /* =================================================
-         FORMAT BACKEND DATA
-      ================================================= */
+         FALLBACK IMAGE
+         ================================================= */
 
-      const formattedListings = vehicleData.map((vehicle, index) => {
-        /* ---------------------------------------------
-               ALL IMAGES
-            --------------------------------------------- */
+      if (vehicleImages.length === 0) {
+        const fallbackImages = [car1, car2, car3, car4];
 
-        let vehicleImages = [];
+        vehicleImages = [
+          fallbackImages[index % fallbackImages.length],
+        ];
+      }
 
-        if (Array.isArray(vehicle.images) && vehicle.images.length > 0) {
-          vehicleImages = vehicle.images
-            .filter(Boolean)
-            .map((image) => getImageUrl(image));
-        }
+      /* =================================================
+         LISTING TYPE
+         ================================================= */
 
-        /* ---------------------------------------------
-               FALLBACK IMAGE
-            --------------------------------------------- */
+      const isFeatured =
+        vehicle.listingType === "Featured Listings Cars";
 
-        if (vehicleImages.length === 0) {
-          const fallbackImages = [car1, car2, car3, car4];
+      const isMostSearched =
+        vehicle.listingType === "Most Searched Cars";
 
-          vehicleImages = [fallbackImages[index % fallbackImages.length]];
-        }
+      return {
+        id: vehicle._id || vehicle.id || index,
 
-        /* ---------------------------------------------
-               RETURN COMPLETE VEHICLE OBJECT
-            --------------------------------------------- */
+        title:
+          vehicle.name ||
+          vehicle.title ||
+          vehicle.vehicleName ||
+          "Vehicle",
 
-        return {
-          id: vehicle._id || vehicle.id || index,
+        name:
+          vehicle.name ||
+          vehicle.title ||
+          vehicle.vehicleName ||
+          "Vehicle",
 
-          title:
-            vehicle.name || vehicle.title || vehicle.vehicleName || "Vehicle",
+        location:
+          vehicle.location ||
+          vehicle.pickupLocation ||
+          "Location not available",
 
-          name:
-            vehicle.name || vehicle.title || vehicle.vehicleName || "Vehicle",
+        rating:
+          vehicle.rating !== undefined &&
+          vehicle.rating !== null
+            ? vehicle.rating
+            : "0",
 
-          location:
-            vehicle.location ||
-            vehicle.pickupLocation ||
-            "Location not available",
+        reviewsCount:
+          vehicle.reviewsCount !== undefined &&
+          vehicle.reviewsCount !== null
+            ? vehicle.reviewsCount
+            : vehicle.reviews || 0,
 
-          rating:
-            vehicle.rating !== undefined && vehicle.rating !== null
-              ? vehicle.rating
-              : "0",
+        mileage:
+          vehicle.mileage ||
+          vehicle.kilometers ||
+          "N/A",
 
-          reviews:
-            vehicle.reviewsCount !== undefined && vehicle.reviewsCount !== null
-              ? vehicle.reviewsCount
-              : vehicle.reviews || 0,
+        transmission:
+          vehicle.transmission || "N/A",
 
-          reviewsCount:
-            vehicle.reviewsCount !== undefined && vehicle.reviewsCount !== null
-              ? vehicle.reviewsCount
-              : vehicle.reviews || 0,
+        fuelType:
+          vehicle.fuelType ||
+          vehicle.fuel ||
+          "N/A",
 
-          mileage: vehicle.mileage || vehicle.kilometers || "N/A",
+        seats:
+          vehicle.seats || "N/A",
 
-          transmission: vehicle.transmission || "N/A",
+        doors:
+          vehicle.doors || "N/A",
 
-          fuel: vehicle.fuelType || vehicle.fuel || "N/A",
+        driveType:
+          vehicle.driveType || "N/A",
 
-          fuelType: vehicle.fuelType || vehicle.fuel || "N/A",
+        price:
+          vehicle.price !== undefined &&
+          vehicle.price !== null
+            ? vehicle.price
+            : 0,
 
-          seats: vehicle.seats || "N/A",
+        offerPrice:
+          vehicle.offerPrice !== undefined &&
+          vehicle.offerPrice !== null
+            ? vehicle.offerPrice
+            : null,
 
-          doors: vehicle.doors || "N/A",
+        period:
+          vehicle.period || "/ day",
 
-          driveType: vehicle.driveType || "N/A",
+        shortDesc:
+          vehicle.shortDesc || "",
 
-          price:
-            vehicle.price !== undefined && vehicle.price !== null
-              ? vehicle.price
-              : 0,
+        fullDesc:
+          vehicle.fullDesc || "",
 
-          offerPrice:
-            vehicle.offerPrice !== undefined && vehicle.offerPrice !== null
-              ? vehicle.offerPrice
-              : null,
+        status:
+          vehicle.status || "N/A",
 
-          period: vehicle.period || "/ day",
+        order:
+          vehicle.order !== undefined &&
+          vehicle.order !== null
+            ? vehicle.order
+            : null,
 
-          shortDesc: vehicle.shortDesc || "",
+        createdAt:
+          vehicle.createdAt || null,
 
-          fullDesc: vehicle.fullDesc || "",
+        updatedAt:
+          vehicle.updatedAt || null,
 
-          status: vehicle.status || "N/A",
+        /* =================================================
+           CATEGORY
+           ================================================= */
 
-          order:
-            vehicle.order !== undefined && vehicle.order !== null
-              ? vehicle.order
-              : null,
+        category:
+          vehicle.category || null,
 
-          createdAt: vehicle.createdAt || null,
+        categoryName:
+          typeof vehicle.category === "object"
+            ? vehicle.category?.name || ""
+            : vehicle.category || "",
 
-          updatedAt: vehicle.updatedAt || null,
+        /* =================================================
+           LISTING TYPE
+           ================================================= */
 
-          images: vehicleImages,
+        listingType:
+          vehicle.listingType || "",
 
-          image: vehicleImages[0],
-        };
-      });
+        /* =================================================
+           IMAGES
+           ================================================= */
 
-      setListings(formattedListings);
-    } catch (error) {
-      console.error("Error fetching vehicles:", error);
+        images:
+          vehicleImages,
 
-      setError(error?.response?.data?.message || "Failed to load vehicles");
-    } finally {
-      setLoading(false);
-    }
-  };
+        image:
+          vehicleImages[0],
+
+        /* =================================================
+           FEATURED
+           ================================================= */
+
+        featured:
+          isFeatured,
+
+        /* =================================================
+           MOST SEARCHED
+           ================================================= */
+
+        mostSearched:
+          isMostSearched,
+      };
+    });
+
+   
+
+    /* =================================================
+       ONLY FEATURED LISTINGS CARS
+       ================================================= */
+
+    const featuredListings =
+      formattedListings.filter(
+        (vehicle) =>
+          vehicle.listingType ===
+          "Featured Listings Cars"
+      );
+
+   
+
+    /* =================================================
+       SHOW ONLY FEATURED VEHICLES
+       ================================================= */
+
+    setListings(featuredListings);
+
+  } catch (error) {
+    console.error(
+      "Error fetching vehicles:",
+      error
+    );
+
+    setError(
+      error?.response?.data?.message ||
+        "Failed to load vehicles"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   /* =====================================================
      FETCH LOCATIONS
@@ -261,7 +353,7 @@ const HomeFeatureList = () => {
 
       const response = await API.get("/locations");
 
-      console.log("Locations API Response:", response.data);
+      
 
       if (response.data?.success) {
         const locationData = Array.isArray(response.data.data)
@@ -655,19 +747,7 @@ const HomeFeatureList = () => {
       // DEBUG
       // =====================================================
 
-      console.log("====================================");
-
-      console.log("FINAL BOOKING PAYLOAD:", bookingPayload);
-
-      console.log("RETURN DATE:", bookingPayload.returnDate);
-
-      console.log("RETURN DATE ISO:", bookingPayload.returnDate.toISOString());
-
-      console.log("PICKUP DATE:", bookingPayload.pickupDate);
-
-      console.log("PICKUP DATE ISO:", bookingPayload.pickupDate.toISOString());
-
-      console.log("====================================");
+     
 
       // =====================================================
       // API REQUEST
@@ -675,7 +755,7 @@ const HomeFeatureList = () => {
 
       const response = await API.post("/bookings", bookingPayload);
 
-      console.log("Booking API Response:", response.data);
+     
 
       // =====================================================
       // SUCCESS
