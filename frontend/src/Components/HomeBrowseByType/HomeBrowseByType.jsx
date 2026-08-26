@@ -736,25 +736,26 @@ const fetchVehicles = async () => {
       <div className="browse-type-container">
         {/* --- HEADER SECTION --- */}
 
-        <div className="browse-type-header">
-          <div className="header-text-group">
-            <h2 className="section-title">Browse by Type</h2>
+       <div className="browse-type-header">
+        <div className="header-text-group">
+          <h2 className="section-title">
+            Browse By Type | Best Car Rental<br/> Service In Bhubaneswar
+          </h2>
 
-            <p className="section-subtitle">
-              Find the perfect ride for any occasion
-            </p>
-          </div>
-
-          <button
-            className="view-more-btn"
-            onClick={handleViewMore}
-            type="button"
-          >
-            <span>View More</span>
-
-            <span className="btn-arrow">→</span>
-          </button>
+          <p className="section-subtitle">
+            Find The Perfect Ride With EV Car Rental Bhubaneswar & Best Car Rental For Wedding In Bhubaneswar
+          </p>
         </div>
+
+        <button
+          className="view-more-btn"
+          onClick={handleViewMore}
+          type="button"
+        >
+          <span>View More</span>
+          <span className="btn-arrow">→</span>
+        </button>
+      </div>
 
         {/* --- CAR CATEGORIES GRID --- */}
 
@@ -834,27 +835,28 @@ const fetchVehicles = async () => {
 
         {/* --- HOW IT WORKS SECTION --- */}
 
-        <div className="how-it-works-container">
-          <span className="how-tag">HOW IT WORKS</span>
+       <div className="how-it-works-container">
+  <span className="how-tag">
+    How It Works •
+  </span>
 
-          <h2 className="how-title">
-            Presenting Your New Go-To Car
-            <br />
-            Rental Experience
-          </h2>
+  <h2 className="how-title">
+    Book The Best Self Drive <br/>Car Rental In Bhubaneswar Price
+   
+  </h2>
 
-          <div className="steps-grid">
-            {steps.map((step) => (
-              <div className="step-item" key={step.id}>
-                <div className="step-icon-wrapper">{step.icon}</div>
+  <div className="steps-grid">
+    {steps.map((step) => (
+      <div className="step-item" key={step.id}>
+        <div className="step-icon-wrapper">{step.icon}</div>
 
-                <h3 className="step-title">{step.title}</h3>
+        <h3 className="step-title">{step.title}</h3>
 
-                <p className="step-desc">{step.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <p className="step-desc">{step.description}</p>
+      </div>
+    ))}
+  </div>
+</div>
       </div>
     </section>
   );

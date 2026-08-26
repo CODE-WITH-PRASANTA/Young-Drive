@@ -212,7 +212,15 @@ const HomeVehicle = () => {
     },
     "openingHoursSpecification": {
       "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
       "opens": "00:00",
       "closes": "23:59"
     }
@@ -221,14 +229,14 @@ const HomeVehicle = () => {
   return (
     <div className="home-vehicle-wrapper">
       <Helmet>
-        <title>Best Car Rental in Bhubaneswar | Self Drive & Chauffeur Cars - Young Drives</title>
+        <title>Best Car Rental In Bhubaneswar | Self Drive & Chauffeur Cars - Young Drives</title>
         <meta
           name="description"
-          content="Young Drives offers the best car rental in Bhubaneswar. Book self drive car rental, EV car rental, luxury wedding cars, & airport taxi services at the lowest prices."
+          content="Young Drives offers the Best Car Rental In Bhubaneswar. Book Best Self Drive Car Rental In Bhubaneswar, EV Car Rental Bhubaneswar, Best Car Rental For Wedding In Bhubaneswar, and Best Car Rental In Bhubaneswar Airport at the cheapest prices."
         />
         <meta
           name="keywords"
-          content="best car rental in bhubaneswar, best car rental in bhubaneswar airport, best car rental in bhubaneswar with driver, best self drive car rental in bhubaneswar, ev car rental bhubaneswar, cheapest car rental in bhubaneswar"
+          content="Best Car Rental In Bhubaneswar, Best Car Rental In Bhubaneswar Airport, Best Car Rental In Bhubaneswar With Driver, Best Car Rental Service In Bhubaneswar, Best Car Rental Deals In Bhubaneswar, Best Car Rental Company In Bhubaneswar, Best Self Drive Car Rental In Bhubaneswar, Best Car Rental For Wedding In Bhubaneswar, Best Self Drive Car Rental In Bhubaneswar Without Driver, Best Self Drive Car Rental In Bhubaneswar Price, Self Driven Car Rental In Bhubaneswar, Cheapest Car Rental In Bhubaneswar, Car Rental In Bhubaneswar With Driver, Self Drive Rental Cars In Bhubaneswar Price, EV Car Rental Bhubaneswar"
         />
         <link rel="canonical" href="https://youngdrives.com/" />
         <script type="application/ld+json">{JSON.stringify(schemaData)}</script>
@@ -238,23 +246,43 @@ const HomeVehicle = () => {
       <section className="hero-section">
         <div className="hero-overlay">
           <div className="hero-content">
-            <span className="badge-subtitle">Young Drives • Premier Mobility Partner</span>
+            <span className="badge-subtitle">Young Drives • Best Car Rental Company In Bhubaneswar</span>
             <h1 className="hero-title">
-              Best Car Rental in Bhubaneswar for Self Drive & Chauffeur Trips
+              Best Car Rental In Bhubaneswar | Best Self Drive Car Rental In Bhubaneswar Without Driver
             </h1>
 
             <div className="features-row">
               <div className="feature-item">
                 <span className="check-icon">✓</span>
-                Self Drive & Chauffeur Driven
+                Best Self Drive Car Rental In Bhubaneswar
               </div>
               <div className="feature-item">
                 <span className="check-icon">✓</span>
-                Airport Delivery & EV Options
+                Best Car Rental In Bhubaneswar Airport
               </div>
               <div className="feature-item">
                 <span className="check-icon">✓</span>
-                Zero Security Hassle & 24/7 Roadside Support
+                Best Car Rental In Bhubaneswar With Driver
+              </div>
+              <div className="feature-item">
+                <span className="check-icon">✓</span>
+                Best Car Rental Service In Bhubaneswar
+              </div>
+              <div className="feature-item">
+                <span className="check-icon">✓</span>
+                Best Car Rental For Wedding In Bhubaneswar
+              </div>
+              <div className="feature-item">
+                <span className="check-icon">✓</span>
+                EV Car Rental Bhubaneswar
+              </div>
+              <div className="feature-item">
+                <span className="check-icon">✓</span>
+                Cheapest Car Rental In Bhubaneswar
+              </div>
+              <div className="feature-item">
+                <span className="check-icon">✓</span>
+                Best Car Rental Deals In Bhubaneswar
               </div>
             </div>
           </div>
@@ -515,23 +543,23 @@ const HomeVehicle = () => {
       <section className="seo-content-section">
         <div className="seo-grid">
           <div className="seo-card">
-            <h2>Best Self Drive Car Rental in Bhubaneswar Without Driver</h2>
+            <h2>Best Self Drive Car Rental In Bhubaneswar Without Driver</h2>
             <p>
-              Looking for freedom on the road? <strong>Young Drives</strong> delivers the <strong>best self drive car rental in Bhubaneswar price</strong> options with zero hidden costs. Whether you need an economic hatchback for daily commuting or an all-terrain SUV for outstation trips to Puri and Konark, our self-drive fleet gives you complete privacy and control.
+              Looking for top-tier road trips? Young Drives offers the <strong>Best Self Drive Car Rental In Bhubaneswar Price</strong> with complete convenience. Experience the independence of <strong>Self Driven Car Rental In Bhubaneswar</strong> or compare <strong>Self Drive Rental Cars In Bhubaneswar Price</strong> on our flexible packages. We guarantee the <strong>Best Self Drive Car Rental In Bhubaneswar</strong> for daily city drives and outstation travels.
             </p>
           </div>
 
           <div className="seo-card">
-            <h2>Best Car Rental in Bhubaneswar Airport with Driver</h2>
+            <h2>Best Car Rental In Bhubaneswar Airport</h2>
             <p>
-              Arriving at Biju Patnaik International Airport? Avoid taxi surges with our dedicated <strong>best car rental in Bhubaneswar airport</strong> service. Pick from executive sedans or book the <strong>best car rental in Bhubaneswar with driver</strong> for stress-free corporate meetings, family vacations, or guided temple tours.
+              Arriving via flight? Reserve the premier <strong>Best Car Rental In Bhubaneswar Airport</strong> with on-time terminal pickups. Choose comfortable <strong>Car Rental In Bhubaneswar With Driver</strong> or select the trusted <strong>Best Car Rental In Bhubaneswar With Driver</strong> for stress-free corporate meetings, family visits, and city sightseeing.
             </p>
           </div>
 
           <div className="seo-card">
-            <h2>Wedding Rentals, EV Fleet & Budget Solutions</h2>
+            <h2>Best Car Rental For Wedding In Bhubaneswar & EV Options</h2>
             <p>
-              Celebrate your special day with our luxury fleet offering the <strong>best car rental for wedding in Bhubaneswar</strong>. For eco-conscious travelers, our new <strong>EV car rental Bhubaneswar</strong> lineup lets you cruise the Smart City cleanly. Experience the <strong>cheapest car rental in Bhubaneswar</strong> backed by verified reliability.
+              Plan your big day with our luxury fleet offering the <strong>Best Car Rental For Wedding In Bhubaneswar</strong>. For sustainable travel, check out our premium <strong>EV Car Rental Bhubaneswar</strong> catalog. Enjoy the <strong>Cheapest Car Rental In Bhubaneswar</strong> with the absolute <strong>Best Car Rental Deals In Bhubaneswar</strong>, backed by our reputation as the leading <strong>Best Car Rental Company In Bhubaneswar</strong> and <strong>Best Car Rental Service In Bhubaneswar</strong>.
             </p>
           </div>
         </div>
@@ -539,7 +567,7 @@ const HomeVehicle = () => {
         {/* --- LOCAL NAP (NAME, ADDRESS, PHONE) & SCHEMA FOOTPRINT --- */}
         <div className="nap-container">
           <div className="nap-details">
-            <h3>Young Drives - Best Car Rental Company in Bhubaneswar</h3>
+            <h3>Young Drives - Best Car Rental Company In Bhubaneswar</h3>
             <p><strong>📍 Address:</strong> Plot No :-001, CRP square, Vanik road, Back side of Ama Bus Stand, Bhubaneswar, Odisha 75011</p>
             <p><strong>📞 Direct Hotline:</strong> <a href="tel:+919078455208">+91 90784 55208</a></p>
             <p><strong>⏰ Operational Hours:</strong> Open 24 Hours / 7 Days a Week</p>

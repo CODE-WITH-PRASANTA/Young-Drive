@@ -1023,33 +1023,35 @@ const fetchLocations = async () => {
       <div className="most-vehicles-container">
         {/* --- SECTION HEADER --- */}
 
-        <div className="section-header">
-          <div className="header-text">
-            <h2 className="section-title">Most Searched Vehicles</h2>
+      <div className="section-header">
+  <div className="header-text">
+    <h2 className="section-title">
+      Most Searched Best Self Drive Car Rental In Bhubaneswar.
+    </h2>
+    <p className="section-subtitle">
+      Explore Cheapest Car Rental In Bhubaneswar Across The World's Leading Car Brands
+    </p>
+  </div>
 
-            <p className="section-subtitle">The world's leading car brands</p>
-          </div>
+  {/* Navigation Arrows */}
+  <div className="nav-buttons">
+    <button
+      className="nav-btn"
+      onClick={() => handleScroll("left")}
+      aria-label="Previous"
+    >
+      ←
+    </button>
 
-          {/* Navigation Arrows */}
-
-          <div className="nav-buttons">
-            <button
-              className="nav-btn"
-              onClick={() => handleScroll("left")}
-              aria-label="Previous"
-            >
-              ←
-            </button>
-
-            <button
-              className="nav-btn"
-              onClick={() => handleScroll("right")}
-              aria-label="Next"
-            >
-              →
-            </button>
-          </div>
-        </div>
+    <button
+      className="nav-btn"
+      onClick={() => handleScroll("right")}
+      aria-label="Next"
+    >
+      →
+    </button>
+  </div>
+</div>
 
         {/* --- VEHICLES GRID --- */}
 
