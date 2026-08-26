@@ -87,7 +87,7 @@
   font-size: 15px;
   line-height: 1.6;
   color: #71777d;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 /* Feature Checklist */
@@ -96,7 +96,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .home-trusted-features li {
@@ -123,6 +123,7 @@
   font-size: 14px;
   font-weight: 700;
   color: #0d0e11;
+  line-height: 1.4;
 }
 
 /* CTA Button */
@@ -173,12 +174,19 @@
   gap: 16px;
 }
 
-/* Pill / Stadium Card Styling */
+/* Pill / Stadium Card Styling & Smooth Hover Effects */
 .home-trusted-card {
   width: 175px;
   border-radius: 80px;
   overflow: hidden;
   background-color: #e0e0e0;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.home-trusted-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
 }
 
 .home-trusted-card img {
@@ -186,6 +194,11 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.home-trusted-card:hover img {
+  transform: scale(1.08);
 }
 
 /* Heights matching visual layout */

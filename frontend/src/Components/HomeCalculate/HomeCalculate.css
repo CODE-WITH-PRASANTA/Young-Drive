@@ -2,127 +2,233 @@
 
 .calculate-section {
   width: 100%;
-  padding: 24px;
+  padding: 30px 24px;
   box-sizing: border-box;
   background-color: #ffffff;
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Rounded Dark Card Container */
+/* Container */
 .calculate-container {
-  max-width: 100%;
   margin: 0 auto;
-  border-radius: 10px;
+  border-radius: 20px;
   background-color: #0c0f12;
   background-size: cover;
-  background-position: center bottom;
+  background-position: center;
   background-repeat: no-repeat;
-  padding: 64px 56px 40px 56px;
+  padding: 60px 48px;
   box-sizing: border-box;
   color: #ffffff;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
-/* Top Layout Wrapper */
 .calculate-content-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 48px;
-  margin-bottom: 50px;
 }
 
-/* Left Hero Typography */
+/* Left Hero Section */
 .calculate-left {
-  flex: 1;
-  padding-top: 20px;
+  flex: 1.1;
+  padding-top: 10px;
 }
 
+.contact-badge-pill {
+  display: inline-block;
+  background-color: rgba(91, 225, 97, 0.15);
+  border: 1px solid #5be161;
+  color: #5be161;
+  font-size: 13px;
+  font-weight: 750;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Primary Main H1 Heading */
 .calc-heading {
-  font-size: 42px;
+  font-size: 36px;
   font-weight: 800;
-  line-height: 1.2;
+  line-height: 1.25;
   color: #ffffff;
-  margin: 0 0 20px 0;
-  letter-spacing: -0.8px;
+  margin: 0 0 14px 0;
+  letter-spacing: -0.6px;
 }
 
-.calc-subtext {
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 1.6;
-  color: #a0aec0;
+/* Secondary Descriptive H1 managed via CSS */
+.calc-sub-heading-seo {
+  font-size: 15.5px;
+  font-weight: 500;
+  line-height: 1.65;
+  color: #d1d5db;
+  margin: 0 0 24px 0;
+  letter-spacing: normal;
+}
+
+/* Benefits Section */
+.contact-benefits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.benefit-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #5be161;
+  color: #000000;
+  font-size: 11px;
+  font-weight: 900;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.benefit-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Benefit Specific H1 Headings */
+.benefit-title-h1 {
+  font-size: 14.5px;
+  font-weight: 750;
+  color: #ffffff;
   margin: 0;
+  line-height: 1.4;
+  letter-spacing: normal;
 }
 
-/* Right Calculator Card */
-.calculate-card {
-  width: 100%;
-  max-width: 470px;
-  background: #ffffff;
+.benefit-desc {
+  font-size: 13.5px;
+  color: #9ca3af;
+  margin: 0;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* Left NAP Box */
+.contact-left-nap {
+  background: rgba(255, 255, 255, 0.06);
+  border-left: 4px solid #5be161;
   border-radius: 12px;
-  padding: 32px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  padding: 16px 20px;
+}
+
+.contact-left-nap h4 {
+  font-size: 15px;
+  font-weight: 800;
+  color: #5be161;
+  margin: 0 0 6px 0;
+}
+
+.contact-left-nap p {
+  font-size: 13px;
+  color: #e5e7eb;
+  margin: 3px 0;
+  line-height: 1.45;
+}
+
+.contact-left-nap strong {
+  color: #ffffff;
+}
+
+.contact-left-nap a {
+  color: #5be161;
+  text-decoration: none;
+  font-weight: 750;
+}
+
+/* Right Contact Card */
+.calculate-card {
+  flex: 1;
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 32px 28px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
   box-sizing: border-box;
   color: #0c0f12;
 }
 
 .card-title {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   color: #0c0f12;
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0;
   letter-spacing: -0.4px;
 }
 
 .card-subtitle {
   font-size: 13px;
-  color: #71717a;
-  margin: 0 0 24px 0;
-  line-height: 1.4;
+  color: #6b7280;
+  margin: 0 0 20px 0;
+  line-height: 1.45;
 }
 
-/* Grid of 2 Columns for Inputs */
+.inquiry-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 .calc-form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 12px;
 }
 
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .input-label {
   font-size: 12px;
-  font-weight: 700;
-  color: #18181b;
+  font-weight: 750;
+  color: #374151;
 }
 
 .input-field-wrapper {
   display: flex;
   align-items: center;
-  border: 1px solid #e4e4e7;
+  border: 1px solid #e5e7eb;
   border-radius: 10px;
-  padding: 0 14px;
-  height: 46px;
+  padding: 0 12px;
+  height: 44px;
   background-color: #ffffff;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .input-field-wrapper:focus-within {
-  border-color: #5be161;
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
 }
 
-.unit-prefix,
-.unit-suffix {
-  font-size: 14px;
-  color: #71717a;
-  font-weight: 500;
+.unit-prefix {
+  font-size: 13.5px;
+  color: #6b7280;
+  font-weight: 700;
+  margin-right: 6px;
 }
 
 .calc-input {
@@ -130,222 +236,114 @@
   border: none;
   outline: none;
   background: transparent;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  color: #0c0f12;
-  padding: 0 4px;
+  color: #111827;
   font-family: inherit;
 }
 
-/* Remove Number Input Spinners */
-.calc-input::-webkit-outer-spin-button,
-.calc-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Calculation Breakdown List */
-.calc-summary-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.calc-select {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
   font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  font-family: inherit;
+  cursor: pointer;
 }
 
-.summary-label {
-  font-weight: 700;
-  color: #0c0f12;
+.select-wrapper {
+  padding-right: 8px;
 }
 
-.summary-value {
-  font-weight: 700;
-  color: #0c0f12;
+.calc-textarea {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #111827;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  min-height: 60px;
+  transition: border-color 0.2s ease;
 }
 
-.green-text {
-  color: #22c55e !important;
+.calc-textarea:focus {
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
 }
 
-/* Primary Green Action Button */
+/* Submit Action Button */
 .apply-loan-btn {
   width: 100%;
-  height: 52px;
+  height: 48px;
   background-color: #5be161;
   color: #000000;
   border: none;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 800;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 750;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  transition: all 0.25s ease;
+  gap: 8px;
+  margin-top: 4px;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .apply-loan-btn:hover {
-  background-color: #4cd152;
+  opacity: 0.92;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(91, 225, 97, 0.35);
 }
 
-/* Divider Line */
-.calc-divider {
-  border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  margin: 0 0 32px 0;
+.apply-loan-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
-/* Bottom Stats & Badge Area */
-.calc-bottom-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0 20px;
-  box-sizing: border-box;
-}
-
-.stats-grid {
-  display: flex;
-  align-items: center;
-  gap: 48px; /* Increased spacing between stats */
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 12px; /* Gap between the big number and text */
-}
-
-.stat-number {
-  font-size: 38px; /* Bigger font size to match reference */
-  font-weight: 800;
-  color: #ffffff;
-  line-height: 1;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: #e4e4e7;
-  line-height: 1.3;
-  font-weight: 600;
-}
-
-/* Floating White Badge */
-.social-proof-badge {
-  background-color: #ffffff;
-  border-radius: 20px;
-  padding: 12px 24px; /* Increased padding inside badge */
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-}
-
-.avatar-group {
-  display: flex;
-  align-items: center;
-}
-
-.avatar-img {
-  width: 38px;  /* Increased avatar image size */
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ffffff;
-  margin-left: -12px; /* Overlapping effect */
-}
-
-.avatar-img:first-child {
-  margin-left: 0;
-}
-
-.avatar-plus-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background-color: #5be161;
-  color: #0c0f12;
-  
-  /* PERFECT CENTERING FIX */
-  display: grid;
-  place-items: center;
-  padding-bottom: 2px; /* Offsets character font-baseline */
-  
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 0; /* Prevents line-height from pushing it down */
-  border: 2px solid #ffffff;
-  margin-left: -10px;
-  box-sizing: border-box;
-  flex-shrink: 0;
-}
-
-.badge-text {
-  font-size: 14px;
-  color: #1a1a1a;
-  margin: 0;
-  line-height: 1.4;
-  white-space: nowrap;
-}
-
-.badge-text strong {
-  font-weight: 700;
-  color: #000000;
+.form-secure-hint {
+  text-align: center;
+  font-size: 11.5px;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 /* --- RESPONSIVE MEDIA QUERIES --- */
 @media (max-width: 1024px) {
   .calculate-content-wrapper {
     flex-direction: column;
+    gap: 36px;
   }
 
   .calculate-card {
     max-width: 100%;
   }
-
-  .calc-bottom-wrapper {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 28px;
-  }
-
-  .stats-grid {
-    flex-wrap: wrap;
-    gap: 24px 36px;
-  }
 }
 
 @media (max-width: 640px) {
   .calculate-container {
-    padding: 36px 20px 28px 20px;
+    padding: 36px 20px;
   }
 
   .calc-heading {
-    font-size: 30px;
+    font-size: 26px;
+  }
+
+  .calc-sub-heading-seo {
+    font-size: 14px;
   }
 
   .calc-form-grid {
     grid-template-columns: 1fr;
   }
 
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    display: grid;
-    width: 100%;
-  }
-
-  .social-proof-badge {
-    width: 100%;
-    box-sizing: border-box;
+  .calculate-card {
+    padding: 24px 18px;
   }
 }
