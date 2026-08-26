@@ -621,39 +621,69 @@ exports.createBooking = async (req, res) => {
     ===================================================== */
 
     const bookingData = {
-      customerName: req.body.customerName,
-      fullName: req.body.fullName,
-      email: req.body.email,
-      phone: req.body.phone,
+      // =====================================================
+      // CUSTOMER
+      // =====================================================
+
+      customerName: finalCustomerName.trim(),
+
+      email: email.trim(),
+
+      phone: phone.trim(),
+
+      // =====================================================
+      // VEHICLE
+      // =====================================================
 
       vehicle: selectedListing._id,
 
-      vehicleName:
-        selectedListing.vehicleBrand + " " + selectedListing.vehicleModel,
+      vehicleName: finalVehicleName,
 
-      vehicleImage: selectedListing.images?.[0] || "",
+      vehicleImage: finalVehicleImage,
 
-      bookingDate: req.body.bookingDate,
+      // =====================================================
+      // BOOKING DATE
+      // =====================================================
 
-      pickupDate: req.body.pickupDate,
+      bookingDate: finalBookingDate,
 
-      pickupTime: req.body.pickupTime,
+      bookingTime: bookingTime || "10:00 AM",
 
-      dropoffDate: req.body.dropoffDate || req.body.returnDate,
+      // =====================================================
+      // PICKUP
+      // =====================================================
 
-      dropoffTime: req.body.dropoffTime,
+      pickupDate: pickupDateObject,
 
-      pickupLocation: req.body.pickupLocation,
+      pickupTime: pickupTime || "10:00 AM",
 
-      dropoffLocation: req.body.dropoffLocation,
+      pickupLocation: finalPickupLocation.trim(),
 
-      amount: Number(req.body.amount) || 0,
+      // =====================================================
+      // RETURN / DROP-OFF
+      // =====================================================
 
-      status: req.body.status || "Pending",
+      returnDate: dropoffDateObject,
 
-      paymentStatus: req.body.paymentStatus || "Unpaid",
+      dropoffDate: dropoffDateObject,
 
-      additionalMessage: req.body.additionalMessage || "",
+      dropoffTime: dropoffTime || "10:00 AM",
+
+      dropoffLocation: finalDropoffLocation.trim(),
+
+      // =====================================================
+      // PAYMENT / BOOKING
+      // =====================================================
+
+      amount: finalAmount,
+
+      status: status || "Pending",
+
+      paymentStatus: paymentStatus || "Unpaid",
+
+      paymentMethod: req.body.paymentMethod || "",
+
+      additionalMessage: additionalMessage || message || "",
     };
     console.log("==============================================");
 

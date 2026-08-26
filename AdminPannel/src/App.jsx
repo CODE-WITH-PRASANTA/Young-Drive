@@ -8,10 +8,8 @@ import {
 } from "react-router-dom";
 
 import MainLayout from "./Layout/MainLayout/MainLayout";
-
-import VehicleManagement from "./Components/Profile/VehicleManagement/VehicleManagement";
-import FeatureListing from "./Components/Profile/FeatureListing/FeatureListing";
-
+import VehicleManagement from "./Components/VehicleManagement/VehicleManagement";
+import FeatureListing from "./Components/FeatureListing/FeatureListing";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 
 import AllBookings from "./Components/AllBookings/AllBookings";
@@ -23,17 +21,15 @@ import BookingRequest from "./Components/BookingRequest/BookingRequest";
 import BookingCalender from "./Components/BookingCalender/BookingCalender";
 
 import Login from "./Components/Login/Login";
-
 import ProtectedRoute from "./Components/protectedRoute/protectedRoute";
 
 /* =========================================
-   APP
+    APP
 ========================================= */
 
 function App() {
   return (
     <BrowserRouter>
-
       <Routes>
 
         {/* =================================
@@ -50,7 +46,6 @@ function App() {
         ================================== */}
 
         <Route element={<ProtectedRoute />}>
-
           <Route
             path="/"
             element={<MainLayout />}
@@ -141,7 +136,6 @@ function App() {
             />
 
           </Route>
-
         </Route>
 
         {/* =================================
@@ -168,7 +162,6 @@ function App() {
         />
 
       </Routes>
-
     </BrowserRouter>
   );
 }
