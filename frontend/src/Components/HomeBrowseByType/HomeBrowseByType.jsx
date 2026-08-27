@@ -19,25 +19,7 @@ const HomeBrowseByType = () => {
 
   const [error, setError] = useState("");
 
-  /*
-   * =========================================================
-   * GET ARRAY FROM API RESPONSE
-   * =========================================================
-   *
-   * Supports different backend response formats:
-   *
-   * 1. []
-   *
-   * 2. { data: [] }
-   *
-   * 3. { listings: [] }
-   *
-   * 4. { vehicles: [] }
-   *
-   * 5. { results: [] }
-   *
-   * =========================================================
-   */
+  
 
   const getResponseArray = (response) => {
     const data = response?.data;
@@ -74,10 +56,7 @@ const HomeBrowseByType = () => {
       /*
        * Nested data
        */
-      if (
-        candidate &&
-        typeof candidate === "object"
-      ) {
+      if (candidate && typeof candidate === "object") {
         if (Array.isArray(candidate.data)) {
           return candidate.data;
         }
@@ -126,16 +105,9 @@ const HomeBrowseByType = () => {
       return "Vehicle";
     }
 
-    const brand =
-      vehicle.vehicleBrand ||
-      vehicle.brand ||
-      vehicle.make ||
-      "";
+    const brand = vehicle.vehicleBrand || vehicle.brand || vehicle.make || "";
 
-    const model =
-      vehicle.vehicleModel ||
-      vehicle.model ||
-      "";
+    const model = vehicle.vehicleModel || vehicle.model || "";
 
     /*
      * Example:
@@ -145,13 +117,7 @@ const HomeBrowseByType = () => {
      * => Toyota Camry
      */
 
-    const brandModel = [
-      brand,
-      model,
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .trim();
+    const brandModel = [brand, model].filter(Boolean).join(" ").trim();
 
     if (brandModel) {
       return brandModel;
@@ -195,34 +161,18 @@ const HomeBrowseByType = () => {
      * Single image
      */
 
-    if (
-      vehicle.image &&
-      typeof vehicle.image === "string"
-    ) {
+    if (vehicle.image && typeof vehicle.image === "string") {
       image = vehicle.image;
-    }
-
-    /*
-     * imageUrl
-     */
-
-    else if (
-      vehicle.imageUrl &&
-      typeof vehicle.imageUrl === "string"
-    ) {
+    } else if (vehicle.imageUrl && typeof vehicle.imageUrl === "string") {
+      /*
+       * imageUrl
+       */
       image = vehicle.imageUrl;
-    }
-
-    /*
-     * Multiple images
-     */
-
-    else if (
-      Array.isArray(vehicle.images) &&
-      vehicle.images.length > 0
-    ) {
-      const firstImage =
-        vehicle.images[0];
+    } else if (Array.isArray(vehicle.images) && vehicle.images.length > 0) {
+      /*
+       * Multiple images
+       */
+      const firstImage = vehicle.images[0];
 
       /*
        * If images is:
@@ -230,22 +180,14 @@ const HomeBrowseByType = () => {
        * ["car1.jpg"]
        */
 
-      if (
-        typeof firstImage === "string"
-      ) {
+      if (typeof firstImage === "string") {
         image = firstImage;
-      }
-
-      /*
-       * If images is:
-       *
-       * [{ url: "car1.jpg" }]
-       */
-
-      else if (
-        firstImage &&
-        typeof firstImage === "object"
-      ) {
+      } else if (firstImage && typeof firstImage === "object") {
+        /*
+         * If images is:
+         *
+         * [{ url: "car1.jpg" }]
+         */
         image =
           firstImage.url ||
           firstImage.path ||
@@ -287,10 +229,7 @@ const HomeBrowseByType = () => {
      * uploads/cars/car.jpg
      */
 
-    return `${IMG_URL}/${image.replace(
-      /^\/+/,
-      ""
-    )}`;
+    return `${IMG_URL}/${image.replace(/^\/+/, "")}`;
   };
 
   /*
@@ -298,125 +237,253 @@ const HomeBrowseByType = () => {
    * FETCH ALL UPLOADED VEHICLES
    * =========================================================
    */
+const fetchVehicles = async () => {
+  try {
+    setLoading(true);
+    setError("");
 
-  const fetchVehicles = async () => {
-    try {
-      setLoading(true);
+    const response = await API.get("/listings");
 
-      setError("");
+  
 
-      console.log(
-        "======================================"
+    /*
+     * =================================================
+     * GET ARRAY FROM RESPONSE
+     * =================================================
+     */
+    const vehicleData =
+      getResponseArray(response);
+
+   
+
+    /*
+     * =================================================
+     * KEEP ONLY VALID VEHICLES
+     * =================================================
+     */
+    const validVehicles =
+      vehicleData.filter(
+        (vehicle) =>
+          vehicle &&
+          typeof vehicle === "object"
       );
 
-      console.log(
-        "FETCHING ALL UPLOADED VEHICLES"
-      );
+    /*
+     * =================================================
+     * GROUP VEHICLES BY CAR NAME
+     * =================================================
+     *
+     * Kia Sonet
+     * kia sonet
+     * KIA SONET
+     *
+     * All become ONE card.
+     *
+     * =================================================
+     */
 
-      console.log(
-        "======================================"
-      );
+    const vehicleGroups = {};
 
-      const response =
-        await API.get("/listings");
-
-      console.log(
-        "LISTINGS API RESPONSE:",
-        response.data
-      );
+    validVehicles.forEach((vehicle) => {
+      const vehicleName =
+        getVehicleName(vehicle);
 
       /*
-       * Get array from response
+       * Name shown in UI
        */
-
-      const vehicleData =
-        getResponseArray(response);
-
-      console.log(
-        "UPLOADED VEHICLES:",
-        vehicleData
-      );
+      const displayName = String(
+        vehicleName || "Vehicle"
+      ).trim();
 
       /*
-       * Keep only valid objects
+       * Name used for grouping
+       *
+       * This prevents:
+       *
+       * Kia Sonet
+       * kia sonet
+       * KIA SONET
+       *
+       * from creating 3 cards.
        */
-
-      const validVehicles =
-        vehicleData.filter(
-          (vehicle) =>
-            vehicle &&
-            typeof vehicle === "object"
-        );
+      const groupKey =
+        displayName.toLowerCase();
 
       /*
-       * Convert backend data
-       * into UI structure.
+       * Create group
        */
+      if (!vehicleGroups[groupKey]) {
+        vehicleGroups[groupKey] = {
+          name: displayName,
+          vehicles: [],
+        };
+      }
 
-      const formattedVehicles =
-        validVehicles.map(
-          (vehicle, index) => {
-            const image =
-              getVehicleImage(
-                vehicle
-              );
+      /*
+       * Add vehicle to group
+       */
+      vehicleGroups[groupKey].vehicles.push(
+        vehicle
+      );
+    });
 
-            const name =
-              getVehicleName(
-                vehicle
-              );
+  
 
-            return {
-              id:
-                vehicle._id ||
-                vehicle.id ||
-                `vehicle-${index}`,
 
-              title: name,
+    /*
+     * =================================================
+     * CREATE UI VEHICLES
+     * =================================================
+     */
 
-              count:
-                vehicle.vehicleType ||
-                vehicle.type ||
-                vehicle.category ||
-                "Vehicle",
+    const formattedVehicles =
+      Object.entries(vehicleGroups).map(
+        ([groupKey, group], index) => {
 
-              image: image,
+          /*
+           * First vehicle is used for
+           * card image.
+           */
+          const firstVehicle =
+            group.vehicles[0];
 
-              originalVehicle:
-                vehicle,
-            };
-          }
-        );
+          /*
+           * Get image
+           */
+          const image =
+            getVehicleImage(
+              firstVehicle
+            );
 
-      console.log(
-        "FORMATTED VEHICLES:",
-        formattedVehicles
+          /*
+           * Total vehicles with
+           * same name
+           */
+          const vehicleCount =
+            group.vehicles.length;
+
+          /*
+           * Create safe group ID.
+           *
+           * IMPORTANT:
+           * This is NOT MongoDB _id.
+           */
+          const groupId =
+            `vehicle-group-${groupKey
+              .trim()
+              .replace(/\s+/g, "-")
+              .replace(
+                /[^a-z0-9-]/gi,
+                ""
+              )}`;
+
+          return {
+            /*
+             * =================================================
+             * GROUP ID
+             * =================================================
+             */
+            id:
+              groupId ||
+              `vehicle-group-${index}`,
+
+            /*
+             * =================================================
+             * DISPLAY NAME
+             * =================================================
+             */
+            title: group.name,
+
+            /*
+             * =================================================
+             * VEHICLE COUNT
+             * =================================================
+             */
+            count: `${vehicleCount} ${
+              vehicleCount === 1
+                ? "Vehicle"
+                : "Vehicles"
+            }`,
+
+            /*
+             * =================================================
+             * CARD IMAGE
+             * =================================================
+             */
+            image,
+
+            /*
+             * =================================================
+             * ALL VEHICLES OF SAME TYPE
+             * =================================================
+             *
+             * Example:
+             *
+             * vehicles: [
+             *   Kia Sonet listing 1,
+             *   Kia Sonet listing 2,
+             *   Kia Sonet listing 3
+             * ]
+             */
+            vehicles:
+              group.vehicles,
+
+            /*
+             * =================================================
+             * FIRST VEHICLE
+             * =================================================
+             *
+             * Used only as preview data.
+             *
+             * DO NOT use this _id for the grouped
+             * card navigation.
+             */
+            originalVehicle:
+              firstVehicle,
+          };
+        }
       );
 
-      setVehicles(
-        formattedVehicles
-      );
-    } catch (err) {
-      console.error(
-        "FETCH VEHICLES ERROR:",
-        err
-      );
+    /*
+     * =================================================
+     * FINAL RESULT
+     * =================================================
+     */
 
-      console.error(
-        "API ERROR RESPONSE:",
-        err?.response?.data
-      );
+   
 
-      setVehicles([]);
+    /*
+     * =================================================
+     * SET VEHICLES
+     * =================================================
+     */
 
-      setError(
-        err?.response?.data?.message ||
-          "Failed to load vehicles."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    setVehicles(
+      formattedVehicles
+    );
+
+  } catch (err) {
+    console.error(
+      "FETCH VEHICLES ERROR:",
+      err
+    );
+
+    console.error(
+      "API ERROR RESPONSE:",
+      err?.response?.data
+    );
+
+    setVehicles([]);
+
+    setError(
+      err?.response?.data?.message ||
+        "Failed to load vehicles."
+    );
+
+  } finally {
+    setLoading(false);
+  }
+};
 
   /*
    * =========================================================
@@ -454,8 +521,7 @@ const HomeBrowseByType = () => {
    * =========================================================
    */
 
-  const carCategories =
-    vehicles;
+  const carCategories = vehicles;
 
   /*
    * =========================================================
@@ -463,24 +529,18 @@ const HomeBrowseByType = () => {
    * =========================================================
    */
 
-  const handleVehicleClick = (
-    vehicle
-  ) => {
-    console.log(
-      "SELECTED VEHICLE:",
-      vehicle
-    );
+  // const handleVehicleClick = (vehicle) => {
+  //   console.log("SELECTED VEHICLE:", vehicle);
 
-    /*
-     * If your vehicle/listing details route
-     * is different, change this URL.
-     */
+  //   /*
+  //    * If your vehicle/listing details route
+  //    * is different, change this URL.
+  //    */
 
-    if (vehicle?.id) {
-      window.location.href =
-        `/vehicles/${vehicle.id}`;
-    }
-  };
+  //   if (vehicle?.id) {
+  //     window.location.href = `/vehicles/${vehicle.id}`;
+  //   }
+  // };
 
   /*
    * =========================================================
@@ -489,8 +549,7 @@ const HomeBrowseByType = () => {
    */
 
   const handleViewMore = () => {
-    window.location.href =
-      "/vehicles";
+    window.location.href = "/vehicles";
   };
 
   /*
@@ -525,11 +584,7 @@ const HomeBrowseByType = () => {
 
           <path d="M24 4C19.5 4 16 7.5 16 12C16 18 24 25 24 25C24 25 32 18 32 12C32 7.5 28.5 4 24 4Z" />
 
-          <circle
-            cx="24"
-            cy="11"
-            r="2.5"
-          />
+          <circle cx="24" cy="11" r="2.5" />
 
           {/* Front of Car */}
 
@@ -541,17 +596,9 @@ const HomeBrowseByType = () => {
 
           <path d="M31 36C31 37.5 32 39 33.5 39C35 39 36 37.5 36 36" />
 
-          <circle
-            cx="18"
-            cy="32"
-            r="1.5"
-          />
+          <circle cx="18" cy="32" r="1.5" />
 
-          <circle
-            cx="30"
-            cy="32"
-            r="1.5"
-          />
+          <circle cx="30" cy="32" r="1.5" />
         </svg>
       ),
     },
@@ -561,8 +608,7 @@ const HomeBrowseByType = () => {
 
       title: "Choose Your Vehicle",
 
-      description:
-        "Browse our fleet and find the perfect car for your needs",
+      description: "Browse our fleet and find the perfect car for your needs",
 
       icon: (
         /* Clipboard with Car Sketch & Checkboxes */
@@ -579,13 +625,7 @@ const HomeBrowseByType = () => {
         >
           {/* Clipboard Board */}
 
-          <rect
-            x="11"
-            y="8"
-            width="26"
-            height="36"
-            rx="3"
-          />
+          <rect x="11" y="8" width="26" height="36" rx="3" />
 
           <path d="M19 5H29V9H19V5Z" />
 
@@ -593,25 +633,11 @@ const HomeBrowseByType = () => {
 
           <path d="M16 23C16 21 17.5 20 20 20H28C30.5 20 32 21 32 23L33 26H15L16 23Z" />
 
-          <rect
-            x="15"
-            y="26"
-            width="18"
-            height="6"
-            rx="1"
-          />
+          <rect x="15" y="26" width="18" height="6" rx="1" />
 
-          <circle
-            cx="18"
-            cy="32"
-            r="1.5"
-          />
+          <circle cx="18" cy="32" r="1.5" />
 
-          <circle
-            cx="30"
-            cy="32"
-            r="1.5"
-          />
+          <circle cx="30" cy="32" r="1.5" />
 
           {/* Checkboxes at bottom */}
 
@@ -625,8 +651,7 @@ const HomeBrowseByType = () => {
 
       title: "Verification",
 
-      description:
-        "Review your information and confirm your booking",
+      description: "Review your information and confirm your booking",
 
       icon: (
         /* Side-view SUV / Crossover */
@@ -655,17 +680,9 @@ const HomeBrowseByType = () => {
 
           {/* Wheels */}
 
-          <circle
-            cx="14"
-            cy="33"
-            r="4"
-          />
+          <circle cx="14" cy="33" r="4" />
 
-          <circle
-            cx="34"
-            cy="33"
-            r="4"
-          />
+          <circle cx="34" cy="33" r="4" />
         </svg>
       ),
     },
@@ -675,8 +692,7 @@ const HomeBrowseByType = () => {
 
       title: "Begin Your Journey",
 
-      description:
-        "Start your adventure with confidence and ease",
+      description: "Start your adventure with confidence and ease",
 
       icon: (
         /* Car Front with Key Above */
@@ -695,37 +711,19 @@ const HomeBrowseByType = () => {
 
           <path d="M13 10H22M20 10V13M17 10V12" />
 
-          <circle
-            cx="10"
-            cy="10"
-            r="3"
-          />
+          <circle cx="10" cy="10" r="3" />
 
           {/* Car Front View */}
 
           <path d="M14 22L17 16H31L34 22" />
 
-          <rect
-            x="12"
-            y="22"
-            width="24"
-            height="11"
-            rx="2"
-          />
+          <rect x="12" y="22" width="24" height="11" rx="2" />
 
           <path d="M12 33V36M36 33V36" />
 
-          <circle
-            cx="17"
-            cy="27"
-            r="2"
-          />
+          <circle cx="17" cy="27" r="2" />
 
-          <circle
-            cx="31"
-            cy="27"
-            r="2"
-          />
+          <circle cx="31" cy="27" r="2" />
 
           <path d="M20 28H28" />
         </svg>
@@ -736,21 +734,15 @@ const HomeBrowseByType = () => {
   return (
     <section className="browse-type-section">
       <div className="browse-type-container">
-
         {/* --- HEADER SECTION --- */}
 
         <div className="browse-type-header">
-
           <div className="header-text-group">
-
-            <h2 className="section-title">
-              Browse by Type
-            </h2>
+            <h2 className="section-title">Browse by Type</h2>
 
             <p className="section-subtitle">
               Find the perfect ride for any occasion
             </p>
-
           </div>
 
           <button
@@ -758,85 +750,55 @@ const HomeBrowseByType = () => {
             onClick={handleViewMore}
             type="button"
           >
-            <span>
-              View More
-            </span>
+            <span>View More</span>
 
-            <span className="btn-arrow">
-              →
-            </span>
+            <span className="btn-arrow">→</span>
           </button>
-
         </div>
 
         {/* --- CAR CATEGORIES GRID --- */}
 
         <div className="car-cards-grid">
-
           {loading ? (
             /*
              * LOADING
              */
-            <div>
-              Loading vehicles...
-            </div>
+            <div>Loading vehicles...</div>
           ) : carCategories.length === 0 ? (
             /*
              * NO VEHICLES
              */
-            <div>
-              No vehicles uploaded yet.
-            </div>
+            <div>No vehicles uploaded yet.</div>
           ) : (
             /*
              * ALL UPLOADED VEHICLES
              */
-            carCategories.map(
-              (car) => (
+            carCategories.map((car) => (
+              <div className="car-card" key={car.id}>
+                {/* Image Container */}
 
-                <div
-                  className="car-card"
-                  key={car.id}
-                  onClick={() =>
-                    handleVehicleClick(
-                      car
-                    )
-                  }
-                >
+                <div className="car-image-wrapper">
+                  {car.image ? (
+                    <img
+                      src={car.image}
+                      alt={car.title}
+                      className="car-image"
+                    />
+                  ) : (
+                    <div>No Image</div>
+                  )}
+                </div>
 
-                  {/* Image Container */}
+                {/* Title Header */}
 
-                  <div className="car-image-wrapper">
+                <h3 className="car-title">{car.title}</h3>
 
-                    {car.image ? (
-                      <img
-                        src={car.image}
-                        alt={car.title}
-                        className="car-image"
-                      />
-                    ) : (
-                      <div>
-                        No Image
-                      </div>
-                    )}
+                {/* Footer info: Badge & Hover Arrow */}
 
-                  </div>
+                <div className="car-card-footer">
+                  <span className="vehicle-count-badge">{car.count}</span>
 
-                  {/* Title Header */}
-
-                  <h3 className="car-title">
-                    {car.title}
-                  </h3>
-
-                  {/* Footer info: Badge & Hover Arrow */}
-
-                  <div className="car-card-footer">
-
-                    <span className="vehicle-count-badge">
-                      {car.count}
-                    </span>
-
-                    {/* <button
+                  {/* <button
                       className="card-arrow-btn"
                       aria-label={`View ${car.title}`}
                       type="button"
@@ -850,15 +812,10 @@ const HomeBrowseByType = () => {
                     >
                       →
                     </button> */}
-
-                  </div>
-
                 </div>
-
-              )
-            )
+              </div>
+            ))
           )}
-
         </div>
 
         {/* --- ERROR --- */}
@@ -878,10 +835,7 @@ const HomeBrowseByType = () => {
         {/* --- HOW IT WORKS SECTION --- */}
 
         <div className="how-it-works-container">
-
-          <span className="how-tag">
-            HOW IT WORKS
-          </span>
+          <span className="how-tag">HOW IT WORKS</span>
 
           <h2 className="how-title">
             Presenting Your New Go-To Car
@@ -890,36 +844,17 @@ const HomeBrowseByType = () => {
           </h2>
 
           <div className="steps-grid">
+            {steps.map((step) => (
+              <div className="step-item" key={step.id}>
+                <div className="step-icon-wrapper">{step.icon}</div>
 
-            {steps.map(
-              (step) => (
+                <h3 className="step-title">{step.title}</h3>
 
-                <div
-                  className="step-item"
-                  key={step.id}
-                >
-
-                  <div className="step-icon-wrapper">
-                    {step.icon}
-                  </div>
-
-                  <h3 className="step-title">
-                    {step.title}
-                  </h3>
-
-                  <p className="step-desc">
-                    {step.description}
-                  </p>
-
-                </div>
-
-              )
-            )}
-
+                <p className="step-desc">{step.description}</p>
+              </div>
+            ))}
           </div>
-
         </div>
-
       </div>
     </section>
   );

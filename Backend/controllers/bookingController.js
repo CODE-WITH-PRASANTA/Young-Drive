@@ -370,15 +370,7 @@ exports.getBookingById = async (req, res) => {
 
 exports.createBooking = async (req, res) => {
   try {
-    console.log("==============================================");
-
-    console.log("CREATE BOOKING");
-
-    console.log("==============================================");
-
-    console.log("REQUEST BODY:");
-
-    console.log(req.body);
+   
 
     const {
       customerName,
@@ -451,7 +443,7 @@ exports.createBooking = async (req, res) => {
 
     const selectedVehicleId = vehicleId || vehicle || "";
 
-    console.log("SELECTED LISTING ID:", selectedVehicleId);
+    
 
     if (!selectedVehicleId) {
       return res.status(400).json({
@@ -481,16 +473,13 @@ exports.createBooking = async (req, res) => {
        Therefore we search Listing here.
     ===================================================== */
 
-    console.log("Searching Listing collection...");
-
+   
     const selectedListing = await Listing.findById(selectedVehicleId).lean();
 
-    console.log("LISTING FOUND:");
-
-    console.log(selectedListing);
+   
 
     if (!selectedListing) {
-      console.log("LISTING NOT FOUND:", selectedVehicleId);
+      
 
       return res.status(404).json({
         success: false,
@@ -685,13 +674,7 @@ exports.createBooking = async (req, res) => {
 
       additionalMessage: additionalMessage || message || "",
     };
-    console.log("==============================================");
-
-    console.log("FINAL BOOKING DATA:");
-
-    console.log(bookingData);
-
-    console.log("==============================================");
+   
 
     /* =====================================================
        SAVE
@@ -699,9 +682,7 @@ exports.createBooking = async (req, res) => {
 
     const booking = await Booking.create(bookingData);
 
-    console.log("BOOKING CREATED:");
-
-    console.log(booking._id);
+    
 
     /* =====================================================
        RETURN POPULATED BOOKING

@@ -146,9 +146,68 @@ const getInputDate = (value) => {
   return date.toISOString().slice(0, 10);
 };
 
+const getCurrentTimeOption = () => {
+  const date = new Date();
+
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  const period = hours >= 12 ? "PM" : "AM";
+
+  hours = hours % 12 || 12;
+
+  // Find the closest hour from your available options
+  if (minutes >= 30) {
+    hours += 1;
+
+    if (hours === 12) {
+      return period === "AM" ? "01:00 AM" : "01:00 PM";
+    }
+  }
+
+  return `${String(hours).padStart(2, "0")}:00 ${period}`;
+};
 /* =========================================================
    VEHICLE NORMALIZER
 ========================================================= */
+
+const getImageUrl = (image) => {
+  if (!image) return "";
+
+  // Object image
+  if (typeof image === "object") {
+    const imageValue =
+      image.url ||
+      image.path ||
+      image.src ||
+      image.image ||
+      image.secure_url ||
+      image.filename ||
+      "";
+
+    return getImageUrl(imageValue);
+  }
+
+  const imageString = String(image).trim();
+
+  if (!imageString) return "";
+
+  // Already full URL
+  if (
+    imageString.startsWith("http://") ||
+    imageString.startsWith("https://") ||
+    imageString.startsWith("blob:") ||
+    imageString.startsWith("data:")
+  ) {
+    return imageString;
+  }
+
+  const baseURL =
+    API?.defaults?.baseURL?.replace(/\/api\/?$/, "").replace(/\/$/, "") ||
+    "http://localhost:5000";
+
+  return `${baseURL}/${imageString.replace(/^\/+/, "")}`;
+};
 
 const normalizeVehicle = (vehicle, index = 0) => {
   if (!vehicle) return null;
@@ -183,9 +242,17 @@ const normalizeVehicle = (vehicle, index = 0) => {
   const category =
     vehicle.category || vehicle.vehicleType || vehicle.type || "Vehicle";
 
-  const images = Array.isArray(vehicle.images) ? vehicle.images : [];
+  const rawImages = Array.isArray(vehicle.images) ? vehicle.images : [];
 
-  const image = vehicle.image || vehicle.thumbnail || images[0] || "";
+  const images = rawImages.map((img) => getImageUrl(img)).filter(Boolean);
+
+  const image = getImageUrl(
+    vehicle.image ||
+      vehicle.thumbnail ||
+      vehicle.vehicleImage ||
+      images[0] ||
+      "",
+  );
 
   return {
     ...vehicle,
@@ -275,13 +342,40 @@ const normalizeBooking = (booking) => {
   const customerPhone =
     customerObject?.phone || booking.phone || booking.customerPhone || "";
 
-  const vehicle = vehicleObject || {
-    name: vehicleName,
-    title: vehicleName,
-    type: "Vehicle",
-    category: "Vehicle",
-    image: "",
-  };
+  const vehicle = vehicleObject
+    ? normalizeVehicle({
+        ...vehicleObject,
+
+        image:
+          vehicleObject.image ||
+          vehicleObject.thumbnail ||
+          vehicleObject.vehicleImage ||
+          booking.vehicleImage ||
+          booking.image ||
+          "",
+
+        images:
+          Array.isArray(vehicleObject.images) && vehicleObject.images.length > 0
+            ? vehicleObject.images
+            : booking.vehicleImage
+              ? [booking.vehicleImage]
+              : [],
+      })
+    : {
+        id: booking.vehicleId || booking.vehicle || "",
+
+        name: vehicleName,
+
+        title: vehicleName,
+
+        type: "Vehicle",
+
+        category: "Vehicle",
+
+        image: getImageUrl(booking.vehicleImage || booking.image || ""),
+
+        images: booking.vehicleImage ? [getImageUrl(booking.vehicleImage)] : [],
+      };
 
   /*
    * IMPORTANT
@@ -546,26 +640,21 @@ const BookingCalender = () => {
 
       const response = await API.get("/bookings");
 
-      console.log("RAW BOOKINGS:", response.data);
+     
 
       const data = getResponseArray(response);
 
-      console.log("BOOKING ARRAY:", data);
+     
 
       const normalized = data
         .map((booking) => {
-          console.log(
-            "RAW BOOKING ID:",
-            booking?._id,
-            "BOOKING ID:",
-            booking?.bookingId,
-          );
+          
 
           return normalizeBooking(booking);
         })
         .filter(Boolean);
 
-      console.log("NORMALIZED BOOKINGS:", normalized);
+     
 
       setBookings(normalized);
     } catch (error) {
@@ -680,75 +769,218 @@ const BookingCalender = () => {
 
   const handleOpenModal = (booking = null) => {
     if (booking) {
-      /*
-       * ============================================
-       * GET REAL MONGODB BOOKING ID
-       * ============================================
-       */
-
+      /* =========================================================
+       GET REAL MONGODB BOOKING ID
+    ========================================================= */
       const mongoBookingId =
         booking._id || booking.mongoId || booking.idMongo || null;
 
-      console.log("====================================");
-
-      console.log("EDIT BOOKING OBJECT:", booking);
-
-      console.log("MONGODB BOOKING ID:", mongoBookingId);
-
-      console.log("BUSINESS BOOKING ID:", booking.bookingId);
-
-      console.log("====================================");
-
       if (!mongoBookingId) {
         alert("MongoDB booking ID not found. Cannot edit this booking.");
-
         return;
       }
 
       setEditingBookingId(String(mongoBookingId));
-
       setEditingBooking(booking);
 
-      /*
-       * ============================================
-       * VEHICLE
-       * ============================================
-       */
+      /* =========================================================
+       VEHICLE
+    ========================================================= */
 
       const bookingVehicleId =
         booking.vehicle?._id ||
         booking.vehicle?.id ||
         booking.vehicleId ||
-        booking.vehicle;
+        (typeof booking.vehicle === "string" ? booking.vehicle : null);
+
+      const bookingVehicleName =
+        booking.vehicleName ||
+        booking.vehicle?.name ||
+        booking.vehicle?.title ||
+        booking.car ||
+        "";
+
+      /* =========================================================
+       FIND VEHICLE BY ID
+    ========================================================= */
 
       const foundVehicle = vehicles.find(
-        (vehicle) => String(vehicle.id) === String(bookingVehicleId),
+        (vehicle) =>
+          String(vehicle.id || vehicle._id) === String(bookingVehicleId),
       );
 
       if (foundVehicle) {
-        setSelectedVehicle(foundVehicle);
-      } else if (booking.vehicle && typeof booking.vehicle === "object") {
-        setSelectedVehicle(normalizeVehicle(booking.vehicle));
-      } else {
-        /*
-         * Try vehicleName if ID is not
-         * available in the populated object.
-         */
+        setSelectedVehicle({
+          ...foundVehicle,
 
+          id: foundVehicle.id || foundVehicle._id || bookingVehicleId,
+
+          name: foundVehicle.name || bookingVehicleName || "Vehicle",
+
+          image:
+            foundVehicle.image ||
+            getImageUrl(booking.vehicleImage) ||
+            getImageUrl(booking.image) ||
+            "",
+
+          images:
+            Array.isArray(foundVehicle.images) && foundVehicle.images.length > 0
+              ? foundVehicle.images
+              : booking.vehicleImage
+                ? [getImageUrl(booking.vehicleImage)]
+                : [],
+
+          shortDesc:
+            foundVehicle.shortDesc ||
+            booking.vehicle?.shortDesc ||
+            booking.shortDesc ||
+            "",
+
+          fullDesc:
+            foundVehicle.fullDesc ||
+            booking.vehicle?.fullDesc ||
+            booking.fullDesc ||
+            "",
+        });
+      } else if (booking.vehicle && typeof booking.vehicle === "object") {
+
+      /* =========================================================
+       POPULATED VEHICLE OBJECT
+    ========================================================= */
+        const normalizedVehicle = normalizeVehicle(booking.vehicle);
+
+        const vehicleImage =
+          normalizedVehicle?.image ||
+          getImageUrl(booking.vehicleImage) ||
+          getImageUrl(booking.vehicle?.image) ||
+          getImageUrl(booking.vehicle?.thumbnail) ||
+          "";
+
+        setSelectedVehicle({
+          ...normalizedVehicle,
+
+          id: normalizedVehicle?.id || bookingVehicleId || "",
+
+          name: normalizedVehicle?.name || bookingVehicleName || "Vehicle",
+
+          image: vehicleImage,
+
+          images:
+            normalizedVehicle?.images?.length > 0
+              ? normalizedVehicle.images
+              : vehicleImage
+                ? [vehicleImage]
+                : [],
+
+          shortDesc:
+            normalizedVehicle?.shortDesc ||
+            booking.vehicle?.shortDesc ||
+            booking.shortDesc ||
+            "",
+
+          fullDesc:
+            normalizedVehicle?.fullDesc ||
+            booking.vehicle?.fullDesc ||
+            booking.fullDesc ||
+            "",
+        });
+      } else {
+
+      /* =========================================================
+       FIND VEHICLE BY NAME
+    ========================================================= */
         const foundByName = vehicles.find(
-          (vehicle) => vehicle.name === booking.vehicleName,
+          (vehicle) =>
+            String(vehicle.name || "")
+              .trim()
+              .toLowerCase() ===
+            String(bookingVehicleName || "")
+              .trim()
+              .toLowerCase(),
         );
 
         if (foundByName) {
-          setSelectedVehicle(foundByName);
+          setSelectedVehicle({
+            ...foundByName,
+
+            image:
+              foundByName.image ||
+              getImageUrl(booking.vehicleImage) ||
+              getImageUrl(booking.image) ||
+              "",
+
+            images:
+              foundByName.images?.length > 0
+                ? foundByName.images
+                : booking.vehicleImage
+                  ? [getImageUrl(booking.vehicleImage)]
+                  : [],
+
+            shortDesc: foundByName.shortDesc || booking.shortDesc || "",
+
+            fullDesc: foundByName.fullDesc || booking.fullDesc || "",
+          });
+        } else {
+          /* =====================================================
+           CREATE VEHICLE FROM BOOKING DATA
+        ===================================================== */
+
+          const vehicleImage = getImageUrl(
+            booking.vehicleImage ||
+              booking.image ||
+              booking.vehicle?.image ||
+              booking.vehicle?.thumbnail ||
+              "",
+          );
+
+          setSelectedVehicle({
+            id: bookingVehicleId || "",
+
+            name: bookingVehicleName || "Vehicle",
+
+            title: bookingVehicleName || "Vehicle",
+
+            type:
+              booking.vehicle?.vehicleType ||
+              booking.vehicle?.type ||
+              "Vehicle",
+
+            category:
+              booking.vehicle?.category ||
+              booking.vehicle?.vehicleType ||
+              "Vehicle",
+
+            image: vehicleImage,
+
+            images: vehicleImage ? [vehicleImage] : [],
+
+            transmission:
+              booking.vehicle?.transmission ||
+              booking.vehicle?.gearbox ||
+              "Automatic",
+
+            fuel:
+              booking.vehicle?.fuelType || booking.vehicle?.fuel || "Petrol",
+
+            fuelType:
+              booking.vehicle?.fuelType || booking.vehicle?.fuel || "Petrol",
+
+            seats:
+              booking.vehicle?.seatingCapacity ||
+              booking.vehicle?.seats ||
+              booking.vehicle?.capacity ||
+              "5 Seats",
+
+            shortDesc: booking.vehicle?.shortDesc || booking.shortDesc || "",
+
+            fullDesc: booking.vehicle?.fullDesc || booking.fullDesc || "",
+          });
         }
       }
 
-      /*
-       * ============================================
-       * CUSTOMER
-       * ============================================
-       */
+      /* =========================================================
+       CUSTOMER
+    ========================================================= */
 
       setFullName(
         booking.customer?.name ||
@@ -759,11 +991,9 @@ const BookingCalender = () => {
 
       setEmail(booking.customer?.email || booking.email || "");
 
-      /*
-       * ============================================
-       * PHONE
-       * ============================================
-       */
+      /* =========================================================
+       PHONE
+    ========================================================= */
 
       const existingPhone = String(
         booking.customer?.phone || booking.phone || "",
@@ -785,54 +1015,42 @@ const BookingCalender = () => {
         setPhone(existingPhone.replace(/\D/g, ""));
       }
 
-      /*
-       * ============================================
-       * MESSAGE
-       * ============================================
-       */
+      /* =========================================================
+       MESSAGE
+    ========================================================= */
 
       setAdditionalMessage(booking.additionalMessage || booking.message || "");
 
-      /*
-       * ============================================
-       * PICKUP LOCATION
-       * ============================================
-       */
+      /* =========================================================
+       PICKUP LOCATION
+    ========================================================= */
 
-      const existingPickupLocation =
-        booking.pickupLocation || booking.pickupLoc || booking.location || "";
+      setPickupLocation(
+        booking.pickupLocation || booking.pickupLoc || booking.location || "",
+      );
 
-      setPickupLocation(existingPickupLocation);
+      /* =========================================================
+       DROP-OFF LOCATION
+    ========================================================= */
 
-      /*
-       * ============================================
-       * DROP-OFF LOCATION
-       * ============================================
-       */
-
-      const existingDropoffLocation =
+      setDropoffLocation(
         booking.dropoffLocation ||
-        booking.dropLocation ||
-        booking.returnLoc ||
-        "";
+          booking.dropLocation ||
+          booking.returnLoc ||
+          "",
+      );
 
-      setDropoffLocation(existingDropoffLocation);
-
-      /*
-       * ============================================
-       * BOOKING DATE
-       * ============================================
-       */
+      /* =========================================================
+       BOOKING DATE
+    ========================================================= */
 
       setBookingDate(
         getInputDate(booking.bookingDate || booking.date || booking.createdAt),
       );
 
-      /*
-       * ============================================
-       * PICKUP DATE
-       * ============================================
-       */
+      /* =========================================================
+       PICKUP DATE
+    ========================================================= */
 
       setPickupDate(
         getInputDate(
@@ -840,11 +1058,9 @@ const BookingCalender = () => {
         ),
       );
 
-      /*
-       * ============================================
-       * DROP-OFF DATE
-       * ============================================
-       */
+      /* =========================================================
+       DROP-OFF DATE
+    ========================================================= */
 
       setDropoffDate(
         getInputDate(
@@ -855,29 +1071,23 @@ const BookingCalender = () => {
         ),
       );
 
-      /*
-       * ============================================
-       * BOOKING TIME
-       * ============================================
-       */
+      /* =========================================================
+       BOOKING TIME
+    ========================================================= */
 
-      setBookingTime(booking.bookingTime || "10:00 AM");
+      setBookingTime(booking.bookingTime || getCurrentTimeOption());
 
-      /*
-       * ============================================
-       * PICKUP TIME
-       * ============================================
-       */
+      /* =========================================================
+       PICKUP TIME
+    ========================================================= */
 
       setPickupTime(
         booking.pickupTime || formatTime(booking.pickupDate) || "10:00 AM",
       );
 
-      /*
-       * ============================================
-       * DROP-OFF TIME
-       * ============================================
-       */
+      /* =========================================================
+       DROP-OFF TIME
+    ========================================================= */
 
       setDropoffTime(
         booking.dropoffTime ||
@@ -885,15 +1095,13 @@ const BookingCalender = () => {
           "10:00 AM",
       );
     } else {
-      /*
-       * ============================================
-       * NEW BOOKING
-       * ============================================
-       */
+      /* =========================================================
+       NEW BOOKING
+    ========================================================= */
 
       setEditingBookingId(null);
-
       setEditingBooking(null);
+      setSelectedVehicle(null);
 
       resetBookingForm();
     }
@@ -960,10 +1168,6 @@ const BookingCalender = () => {
 
   const handleCreateBookingSubmit = async (event) => {
     event.preventDefault();
-
-    console.log("====================================");
-    console.log("UPDATE BOOKING BUTTON CLICKED");
-    console.log("====================================");
 
     /*
      * ============================================
@@ -1049,11 +1253,7 @@ const BookingCalender = () => {
       editingBookingId ||
       null;
 
-    console.log("EDITING BOOKING:", editingBooking);
-
-    console.log("EDITING BOOKING ID:", editingBookingId);
-
-    console.log("MONGODB BOOKING ID:", updateId);
+   
 
     /*
      * ============================================
@@ -1169,22 +1369,7 @@ const BookingCalender = () => {
       additionalMessage: additionalMessage.trim(),
     };
 
-    console.log("====================================");
-
-    console.log("FINAL BOOKING PAYLOAD:", payload);
-
-    console.log("BOOKING DATE:", payload.bookingDate);
-
-    console.log("PICKUP DATE:", payload.pickupDate);
-
-    console.log("RETURN DATE:", payload.returnDate);
-
-    console.log("PICKUP LOCATION:", payload.pickupLocation);
-
-    console.log("DROP-OFF LOCATION:", payload.dropoffLocation);
-
-    console.log("====================================");
-
+  
     try {
       setSaving(true);
 
@@ -1199,9 +1384,7 @@ const BookingCalender = () => {
       if (updateId) {
         const updateUrl = `/bookings/${encodeURIComponent(String(updateId))}`;
 
-        console.log("UPDATE URL:", updateUrl);
-
-        console.log("METHOD: PUT");
+       
 
         response = await API.put(updateUrl, payload);
       } else {
@@ -1210,9 +1393,7 @@ const BookingCalender = () => {
          * CREATE NEW BOOKING
          * ============================================
          */
-        console.log("CREATE URL: /bookings");
-
-        console.log("METHOD: POST");
+      
 
         response = await API.post("/bookings", payload);
       }
@@ -1223,14 +1404,7 @@ const BookingCalender = () => {
        * ============================================
        */
 
-      console.log("====================================");
-
-      console.log("BOOKING RESPONSE STATUS:", response.status);
-
-      console.log("BOOKING RESPONSE:", response.data);
-
-      console.log("====================================");
-
+ 
       /*
        * ============================================
        * SUCCESS
@@ -1325,7 +1499,7 @@ const BookingCalender = () => {
         `/bookings/${encodeURIComponent(String(id))}`,
       );
 
-      console.log("DELETE RESPONSE:", response.data);
+     
 
       if (response.data?.success) {
         alert(response.data?.message || "Booking deleted successfully.");
@@ -1371,7 +1545,7 @@ const BookingCalender = () => {
         },
       );
 
-      console.log("STATUS RESPONSE:", response.data);
+     
 
       if (response.data?.success) {
         await fetchBookings();
@@ -2087,10 +2261,24 @@ const BookingCalender = () => {
 
                         {selectedVehicle && (
                           <div className="selected-vehicle-preview">
-                            {selectedVehicle.image && (
+                            {selectedVehicle && (
                               <img
-                                src={selectedVehicle.image}
-                                alt={selectedVehicle.name}
+                                src={
+                                  selectedVehicle.image ||
+                                  selectedVehicle.images?.[0] ||
+                                  getImageUrl(editingBooking?.vehicleImage) ||
+                                  getImageUrl(editingBooking?.image) ||
+                                  ""
+                                }
+                                alt={selectedVehicle.name || "Vehicle"}
+                                onError={(e) => {
+                                  console.error(
+                                    "VEHICLE IMAGE FAILED:",
+                                    e.currentTarget.src,
+                                  );
+
+                                  e.currentTarget.style.display = "none";
+                                }}
                               />
                             )}
 

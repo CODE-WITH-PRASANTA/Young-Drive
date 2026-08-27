@@ -1,19 +1,68 @@
-const express = require('express');
-const router = express.Router();
+const express = require("express");
 
-const { 
-  getListings, 
-  createListing, 
-  updateListing, 
-  deleteListing 
-} = require('../controllers/listingController');
+const router =
+  express.Router();
 
-// FIXED: Changed processImages to convertToWebp
-const { upload, convertToWebp } = require('../middleware/upload');
+const {
+  getListings,
+  getListingById,
+  createListing,
+  updateListing,
+  deleteListing,
+} = require("../controllers/listingController");
 
-router.get('/', getListings);
-router.post('/', upload.array('images', 10), convertToWebp, createListing);
-router.put('/:id', upload.array('images', 10), convertToWebp, updateListing);
-router.delete('/:id', deleteListing);
+const {
+  upload,
+  convertToWebp,
+} = require("../middleware/upload");
+
+// =====================================================
+// GET ALL LISTINGS
+// =====================================================
+
+router.get(
+  "/",
+  getListings
+);
+
+// =====================================================
+// GET SINGLE LISTING
+// =====================================================
+
+router.get(
+  "/:id",
+  getListingById
+);
+
+// =====================================================
+// CREATE LISTING
+// =====================================================
+
+router.post(
+  "/",
+  upload.array("images", 10),
+  convertToWebp,
+  createListing
+);
+
+// =====================================================
+// UPDATE LISTING
+// =====================================================
+
+router.put(
+  "/:id",
+  upload.array("images", 10),
+  convertToWebp,
+  updateListing
+);
+
+// =====================================================
+// DELETE LISTING
+// =====================================================
+
+router.delete(
+  "/:id",
+  deleteListing
+);
 
 module.exports = router;

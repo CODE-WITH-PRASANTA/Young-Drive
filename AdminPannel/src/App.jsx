@@ -22,6 +22,8 @@ import BookingCalender from "./Components/BookingCalender/BookingCalender";
 
 import Login from "./Components/Login/Login";
 import ProtectedRoute from "./Components/protectedRoute/protectedRoute";
+import Category from "./Components/Category/Category";
+import AdminEnquiry from "./Components/AdminEnquiry/AdminEnquiry";
 
 /* =========================================
     APP
@@ -110,6 +112,12 @@ function App() {
                 <BookingCalender />
               }
             />
+            <Route
+              path="enquiry"
+              element={
+                <AdminEnquiry />
+              }
+            />
 
             {/* =================================
                 GENERAL
@@ -133,6 +141,10 @@ function App() {
             <Route
               path="settings"
               element={<MyProfile />}
+            />
+            <Route
+              path="category"
+              element={<Category />}
             />
 
           </Route>
