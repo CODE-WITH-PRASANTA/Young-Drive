@@ -113,7 +113,7 @@ const Footer = () => {
               </div>
               <div className="footer__contact-item">
                 <Phone size={16} className="footer__contact-icon" />
-                <span>+91 (800) 123-4567</span>
+                <span>+91 90784 55208</span>
               </div>
             </div>
           </div>
