@@ -8,10 +8,12 @@ import {
 const ProtectedRoute = () => {
   const location = useLocation();
 
-  const isAuthenticated =
-    localStorage.getItem("adminAuth") === "true";
+  const token = localStorage.getItem("adminToken");
 
-  // User is NOT logged in
+  const isAuthenticated =
+    typeof token === "string" &&
+    token.trim().length > 0;
+
   if (!isAuthenticated) {
     return (
       <Navigate
@@ -24,7 +26,6 @@ const ProtectedRoute = () => {
     );
   }
 
-  // User is logged in
   return <Outlet />;
 };
 

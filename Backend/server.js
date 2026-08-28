@@ -18,6 +18,9 @@ const locationRoutes = require("./routes/locationRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const carCategoryRoutes = require("./routes/carCategoryRoutes");
 const enquiryRoutes = require("./routes/enquiryRoutes");
+const authRoutes = require("./routes/authRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
+
 require("dotenv").config();
 
 const app = express();
@@ -60,6 +63,12 @@ app.use("/api/reviews", reviewRoutes);
 
 app.use("/api/car-categories", carCategoryRoutes);
 app.use("/api/enquiries", enquiryRoutes);
+
+app.use("/api/auth", authRoutes);
+app.use(
+  "/api/payments",
+  paymentRoutes
+);
 
 // =====================================================
 // TEST ROUTE
