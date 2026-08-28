@@ -3,7 +3,14 @@ import './FloatingIcons.css';
 
 const FloatingIcons = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const phoneNumber = '9876543210';
+
+  // Updated phone number details
+  const countryCode = '91';
+  const phoneNumber = '9078455208';
+  const fullPhoneNumber = `+${countryCode}${phoneNumber}`;
+  const whatsappMessage = encodeURIComponent(
+    'Hi, I want to enquire about driving courses.'
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,7 +36,7 @@ const FloatingIcons = () => {
     <div className="FloatingIcons-container">
       {/* Call Button */}
       <a
-        href={`tel:${phoneNumber}`}
+        href={`tel:${fullPhoneNumber}`}
         className="FloatingIcons-btn FloatingIcons-call-btn"
         aria-label="Call Us"
         title="Call Us"
@@ -45,7 +52,7 @@ const FloatingIcons = () => {
 
       {/* WhatsApp Button */}
       <a
-        href={`https://wa.me/91${phoneNumber}?text=Hi%2C%20I%20want%20to%20enquire%20about%20driving%20courses.`}
+        href={`https://wa.me/${countryCode}${phoneNumber}?text=${whatsappMessage}`}
         target="_blank"
         rel="noopener noreferrer"
         className="FloatingIcons-btn FloatingIcons-whatsapp-btn"
