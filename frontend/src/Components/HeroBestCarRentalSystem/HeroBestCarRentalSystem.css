@@ -33,7 +33,7 @@
 .hero-image {
   width: 100%;
   height: 100%;
-  max-height: 440px;
+  max-height: 480px;
   object-fit: cover;
   display: block;
   transition: transform 0.3s ease;
@@ -85,60 +85,54 @@
 .badge-tag {
   display: inline-block;
   background-color: #ffffff;
-  padding: 10px 20px;
+  padding: 8px 18px;
   border-radius: 12px;
   font-size: 13px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 24px;
-  cursor: pointer;
+  font-weight: 750;
+  color: #059669;
+  margin-bottom: 18px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  border: 1px solid #d1fae5;
 }
 
-.badge-tag:hover {
-  background-color: #5be161;
-  color: #000000;
-  transform: translateY(-2px);
-}
-
-/* HEADING */
+/* MAIN H1 HEADING */
 .hero-heading {
-  font-size: 38px;
+  font-size: 36px;
   font-weight: 800;
   color: #0f1216;
   line-height: 1.25;
   letter-spacing: -0.6px;
-  margin: 0 0 16px 0;
+  margin: 0 0 14px 0;
 }
 
-/* SUBTEXT */
-.hero-subtext {
+/* DESCRIPTIVE CONTENT H1 (Styled like clean readable paragraph) */
+.hero-sub-heading-seo {
   font-size: 15px;
-  color: #777777;
-  line-height: 1.6;
-  margin: 0 0 28px 0;
+  color: #555555;
+  line-height: 1.65;
+  margin: 0 0 24px 0;
   font-weight: 500;
-  max-width: 520px;
+  letter-spacing: normal;
 }
 
 /* --- FEATURES GRID --- */
 .features-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px 28px;
+  gap: 14px 20px;
   width: 100%;
+  margin-bottom: 24px;
 }
 
 .features-column {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .feature-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
 }
 
@@ -154,12 +148,56 @@
   font-size: 11px;
   font-weight: 800;
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
-.feature-text {
-  font-size: 14px;
+/* FEATURE ITEM H1 (Styled cleanly like list label) */
+.feature-text-h1 {
+  font-size: 13.5px;
   font-weight: 700;
   color: #121212;
+  line-height: 1.4;
+  margin: 0;
+  letter-spacing: normal;
+}
+
+/* --- NAP INFO BOX --- */
+.hero-nap-box {
+  width: 100%;
+  background-color: #ffffff;
+  border-left: 4px solid #5be161;
+  border-radius: 10px;
+  padding: 14px 18px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+}
+
+.nap-title-h1 {
+  font-size: 14px;
+  font-weight: 800;
+  color: #111111;
+  margin: 0 0 6px 0;
+  letter-spacing: normal;
+}
+
+.nap-item {
+  font-size: 13px;
+  color: #555555;
+  margin: 3px 0;
+  line-height: 1.45;
+}
+
+.nap-item strong {
+  color: #111111;
+}
+
+.nap-item a {
+  color: #059669;
+  text-decoration: none;
+  font-weight: 750;
+}
+
+.nap-item a:hover {
+  text-decoration: underline;
 }
 
 /* --- YOUTUBE VIDEO POPUP MODAL --- */
@@ -187,7 +225,6 @@
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
 }
 
-/* VISIBLE CANCEL / CLOSE BUTTON */
 .video-close-btn {
   position: absolute;
   top: -48px;
@@ -216,7 +253,7 @@
 
 .iframe-container {
   position: relative;
-  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+  padding-bottom: 56.25%;
   height: 0;
   overflow: hidden;
   border-radius: 16px;
@@ -232,13 +269,10 @@
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
+
 /* --- RESPONSIVE BREAKPOINTS --- */
 @media (max-width: 992px) {
   .hero-rental-container {
@@ -248,6 +282,10 @@
 
   .hero-heading {
     font-size: 30px;
+  }
+
+  .hero-sub-heading-seo {
+    font-size: 14px;
   }
 
   .hero-image {

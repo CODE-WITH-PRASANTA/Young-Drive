@@ -36,17 +36,17 @@ body {
   height: 100%;
   background: linear-gradient(
     90deg,
-    rgba(15, 18, 22, 0.92) 0%,
-    rgba(15, 18, 22, 0.75) 45%,
-    rgba(15, 18, 22, 0.2) 100%
+    rgba(15, 18, 22, 0.94) 0%,
+    rgba(15, 18, 22, 0.78) 45%,
+    rgba(15, 18, 22, 0.3) 100%
   );
   display: flex;
   align-items: flex-start;
-  padding: 60px 8% 0 8%;
+  padding: 50px 8% 0 8%;
 }
 
 .hero-content {
-  max-width: 650px;
+  max-width: 760px;
   color: #ffffff;
 }
 
@@ -57,20 +57,22 @@ body {
   margin-bottom: 12px;
   display: inline-block;
   letter-spacing: 0.2px;
+  text-transform: uppercase;
 }
 
 .hero-title {
-  font-size: 46px;
+  font-size: 38px;
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 1.2;
   letter-spacing: -0.5px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  color: #ffffff;
 }
 
 .features-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 16px;
 }
 
 .feature-item {
@@ -119,15 +121,16 @@ body {
 
 .tabs {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .tab-btn {
   border: none;
   background: transparent;
-  padding: 8px 18px;
+  padding: 8px 16px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   color: #222;
   cursor: pointer;
@@ -141,16 +144,16 @@ body {
 
 .need-help {
   text-decoration: none;
-  color: #666;
-  font-size: 13.5px;
-  font-weight: 600;
+  color: #111;
+  font-size: 14px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
 .need-help:hover {
-  color: #000;
+  color: #25a82b;
 }
 
 /* --- BOOKING FORM GRID --- */
@@ -188,14 +191,16 @@ body {
   color: #111;
 }
 
-.field-input input {
+.field-input select {
   border: none;
   outline: none;
+  background: transparent;
+  width: 100%;
+  cursor: pointer;
+  font-family: inherit;
   font-size: 14px;
   font-weight: 700;
   color: #111;
-  width: 100%;
-  font-family: inherit;
 }
 
 .field-input.clickable {
@@ -224,7 +229,7 @@ body {
   background-color: #5be161;
   color: #000;
   border: none;
-  padding: 14px 24px;
+  padding: 14px 22px;
   border-radius: 10px;
   font-weight: 700;
   font-size: 14px;
@@ -333,7 +338,7 @@ body {
 }
 
 .brands-title {
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 800;
   color: #111;
   letter-spacing: -0.5px;
@@ -391,14 +396,223 @@ body {
 }
 
 @keyframes marqueeScroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
+/* --- SEO CONTENT SECTION & NAP --- */
+.seo-content-section {
+  padding: 60px 8% 20px 8%;
+}
+
+.seo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.seo-card {
+  background: #ffffff;
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.seo-card h2 {
+  font-size: 20px;
+  font-weight: 750;
+  color: #111;
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.seo-card p {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.65;
+}
+
+.seo-card strong {
+  color: #111;
+}
+
+.nap-container {
+  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+  color: #fff;
+  border-radius: 16px;
+  padding: 32px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.nap-details h3 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #5be161;
+  margin-bottom: 10px;
+}
+
+.nap-details p {
+  font-size: 14px;
+  color: #e5e7eb;
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.nap-details a {
+  color: #5be161;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.contact-call-btn {
+  background-color: #5be161;
+  color: #000;
+  text-decoration: none;
+  font-weight: 750;
+  font-size: 14px;
+  padding: 14px 24px;
+  border-radius: 10px;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.contact-call-btn:hover {
+  opacity: 0.9;
+}
+
+/* --- POPUP COMPONENT STYLES --- */
+.popup-status-badge {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  color: #6b7280;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.05);
+}
+
+.popup-status-badge strong {
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.popup-vehicle-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 65px;
+  padding: 14px 10px;
+  border-bottom: 1px solid #edf0f3;
+  transition: background 0.2s ease;
+}
+
+.popup-vehicle-item:hover {
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.popup-vehicle-item strong {
+  color: #1f2937;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.popup-vehicle-item span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* =========================================================
+   PREMIUM VEHICLE POPUP MODAL
+   ========================================================= */
+.video-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(10, 14, 20, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: popupOverlayIn 0.25s ease forwards;
+}
+
+.video-modal-content {
+  position: relative;
+  width: min(620px, 100%);
+  max-height: 82vh;
+  overflow-y: auto;
+  padding: 34px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 24px;
+  box-shadow: 0 35px 90px rgba(0, 0, 0, 0.28), 0 10px 30px rgba(0, 0, 0, 0.12);
+  animation: popupContentIn 0.3s ease forwards;
+}
+
+.video-modal-content h2 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.video-modal-content p {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+.video-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #111827;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.video-close-btn:hover {
+  background: #111827;
+  color: #ffffff;
+}
+
+@keyframes popupOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popupContentIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 
 /* --- RESPONSIVE DESIGN --- */
 @media (max-width: 1024px) {
@@ -432,11 +646,20 @@ body {
   .brands-section {
     margin-top: 40px;
   }
+
+  .seo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nap-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 @media (max-width: 600px) {
   .hero-title {
-    font-size: 30px;
+    font-size: 28px;
   }
 
   .booking-form-grid {
@@ -451,418 +674,5 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-/* =========================================================
-   PREMIUM VEHICLE POPUP
-   ========================================================= */
-
-.video-modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 24px;
-
-  background: rgba(10, 14, 20, 0.72);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  animation: popupOverlayIn 0.25s ease forwards;
-}
-
-/* =========================================================
-   POPUP CONTENT
-   ========================================================= */
-
-.video-modal-content {
-  position: relative;
-
-  width: min(620px, 100%);
-  max-height: 82vh;
-
-  overflow: hidden;
-  overflow-y: auto;
-
-  padding: 34px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.98),
-      rgba(248, 250, 252, 0.98)
-    );
-
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 24px;
-
-  box-shadow:
-    0 35px 90px rgba(0, 0, 0, 0.28),
-    0 10px 30px rgba(0, 0, 0, 0.12);
-
-  animation: popupContentIn 0.3s ease forwards;
-}
-
-/* Premium top glow */
-
-.video-modal-content::before {
-  content: "";
-
-  position: absolute;
-  top: -100px;
-  left: 50%;
-  transform: translateX(-50%);
-
-  width: 300px;
-  height: 180px;
-
-  background: rgba(20, 20, 20, 0.06);
-
-  filter: blur(55px);
-  pointer-events: none;
-}
-
-/* =========================================================
-   CLOSE BUTTON
-   ========================================================= */
-
-.video-close-btn {
-  position: absolute;
-
-  top: 18px;
-  right: 18px;
-
-  width: 42px;
-  height: 42px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid #e5e7eb;
-  border-radius: 50%;
-
-  background: #ffffff;
-
-  color: #111827;
-  font-size: 18px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  box-shadow:
-    0 5px 18px rgba(0, 0, 0, 0.08);
-
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.video-close-btn:hover {
-  transform: rotate(90deg) scale(1.05);
-
-  background: #111827;
-  color: #ffffff;
-
-  box-shadow:
-    0 8px 25px rgba(0, 0, 0, 0.18);
-}
-
-/* =========================================================
-   POPUP HEADING
-   ========================================================= */
-
-.video-modal-content h2 {
-  position: relative;
-
-  margin: 0 55px 8px 0;
-
-  color: #111827;
-
-  font-size: 27px;
-  font-weight: 750;
-  line-height: 1.25;
-  letter-spacing: -0.6px;
-}
-
-.video-modal-content > div > p {
-  position: relative;
-
-  margin: 0 0 24px;
-
-  color: #6b7280;
-
-  font-size: 14px;
-  font-weight: 500;
-}
-
-/* =========================================================
-   TOTAL VEHICLES BOX
-   ========================================================= */
-
-.video-modal-content > div > div > div:first-child {
-  position: relative;
-
-  padding: 18px 20px;
-
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-
-  background: linear-gradient(
-    135deg,
-    #ffffff,
-    #f8fafc
-  );
-
-  color: #6b7280;
-
-  box-shadow:
-    0 8px 25px rgba(15, 23, 42, 0.05);
-}
-
-.video-modal-content
-  > div
-  > div
-  > div:first-child
-  strong {
-  color: #111827;
-
-  font-size: 25px;
-  font-weight: 800;
-}
-
-/* =========================================================
-   VEHICLE LIST
-   ========================================================= */
-
-.video-modal-content
-  > div
-  > div
-  > div:not(:first-child) {
-  position: relative;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  min-height: 70px;
-
-  padding: 14px 4px;
-
-  border-bottom: 1px solid #edf0f3;
-
-  transition:
-    padding 0.2s ease,
-    background 0.2s ease;
-}
-
-.video-modal-content
-  > div
-  > div
-  > div:not(:first-child):hover {
-  padding-left: 12px;
-  padding-right: 12px;
-
-  background: #f8fafc;
-
-  border-radius: 12px;
-}
-
-/* =========================================================
-   VEHICLE NAME
-   ========================================================= */
-
-.video-modal-content
-  > div
-  > div
-  > div:not(:first-child)
-  strong {
-  color: #1f2937;
-
-  font-size: 16px;
-  font-weight: 700;
-}
-
-/* =========================================================
-   VEHICLE COUNT BADGE
-   ========================================================= */
-
-.video-modal-content
-  > div
-  > div
-  > div:not(:first-child)
-  span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-width: 95px;
-
-  padding: 8px 13px;
-
-  border: 1px solid #e5e7eb;
-  border-radius: 999px;
-
-  background: #ffffff;
-
-  color: #374151;
-
-  font-size: 12px;
-  font-weight: 700;
-
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-/* =========================================================
-   SCROLLBAR
-   ========================================================= */
-
-.video-modal-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.video-modal-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.video-modal-content::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 20px;
-}
-
-.video-modal-content::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
-}
-
-/* =========================================================
-   EMPTY STATE
-   ========================================================= */
-
-.video-modal-content h3 {
-  margin: 0 0 8px;
-
-  color: #111827;
-
-  font-size: 19px;
-  font-weight: 750;
-}
-
-.video-modal-content h3 + p {
-  margin: 0;
-
-  color: #6b7280;
-
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-/* =========================================================
-   ANIMATIONS
-   ========================================================= */
-
-@keyframes popupOverlayIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes popupContentIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.96);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 768px) {
-  .video-modal-overlay {
-    padding: 16px;
-  }
-
-  .video-modal-content {
-    width: 100%;
-    max-height: 88vh;
-
-    padding: 26px 20px;
-
-    border-radius: 20px;
-  }
-
-  .video-modal-content h2 {
-    font-size: 23px;
-    margin-right: 45px;
-  }
-
-  .video-close-btn {
-    top: 14px;
-    right: 14px;
-
-    width: 38px;
-    height: 38px;
-  }
-
-  .video-modal-content
-    > div
-    > div
-    > div:not(:first-child) {
-    min-height: 64px;
-  }
-
-  .video-modal-content
-    > div
-    > div
-    > div:not(:first-child)
-    strong {
-    font-size: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .video-modal-content {
-    padding: 24px 16px;
-  }
-
-  .video-modal-content h2 {
-    font-size: 21px;
-  }
-
-  .video-modal-content
-    > div
-    > div
-    > div:not(:first-child)
-    span {
-    min-width: 80px;
-    padding: 7px 9px;
-
-    font-size: 11px;
   }
 }
