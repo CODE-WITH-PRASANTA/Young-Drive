@@ -4,16 +4,26 @@ import {
   MapPin, 
   Phone, 
   Mail, 
-  Heart 
+  Clock, 
+  ShieldCheck, 
+  Sparkles,
+  ExternalLink
 } from 'lucide-react';
 import logoImg from '../../assets/Young Drives Logo (1).png';
 import './Footer.css';
 
-// SVG Icon Components for Brand Logos (Lucide-compatible sizing)
-const GithubIcon = ({ size = 18 }) => (
+// SVG Icons for Social Media
+const FacebookIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-    <path d="M9 18c-4.51 2-5-2-7-2" />
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+  </svg>
+);
+
+const InstagramIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
   </svg>
 );
 
@@ -31,52 +41,47 @@ const LinkedinIcon = ({ size = 18 }) => (
   </svg>
 );
 
-const InstagramIcon = ({ size = 18 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-  </svg>
-);
-
-const footerSections = [
+const footerNavSections = [
   {
-    title: 'Quick Links',
+    title: 'Car Rental Services',
     links: [
-      { name: 'Home', path: '/' },
-      { name: 'About Us', path: '/about' },
-      { name: 'Services', path: '/services' },
-      { name: 'Portfolio', path: '/projects' },
-      { name: 'Contact', path: '/contact' },
+      { name: 'Self Drive Car Rental', path: '/services/self-drive' },
+      { name: 'Car Rental with Driver', path: '/services/chauffeur-drive' },
+      { name: 'Airport Pickup & Drop', path: '/services/airport-transfer' },
+      { name: 'Wedding & Luxury Cars', path: '/services/wedding-cars' },
+      { name: 'EV Car Hire Bhubaneswar', path: '/services/ev-rental' },
+      { name: 'Outstation Tour Packages', path: '/services/outstation' },
     ],
   },
   {
-    title: 'Services',
+    title: 'Featured Fleets',
     links: [
-      { name: 'Web Development', path: '/services/web-dev' },
-      { name: 'UI/UX Design', path: '/services/ui-ux' },
-      { name: 'App Development', path: '/services/app-dev' },
-      { name: 'Digital Marketing', path: '/services/marketing' },
-      { name: 'SEO Optimization', path: '/services/seo' },
+      { name: 'Hatchbacks (Swift, Baleno)', path: '/fleet/hatchback' },
+      { name: 'Sedans (Dzire, Verna)', path: '/fleet/sedan' },
+      { name: 'SUVs (Thar, Scorpio, Creta)', path: '/fleet/suv' },
+      { name: '7 Seaters (Innova, Ertiga)', path: '/fleet/7-seater' },
+      { name: 'EV Rentals (Nexon EV)', path: '/fleet/ev' },
+      { name: 'Tariff & Rental Plans', path: '/pricing' },
     ],
   },
   {
-    title: 'Resources',
+    title: 'Help & Policy',
     links: [
-      { name: 'Documentation', path: '/docs' },
+      { name: 'About Young Drives', path: '/about' },
+      { name: 'Rental Terms & Conditions', path: '/terms' },
+      { name: 'Refund & Security Policy', path: '/refund-policy' },
       { name: 'Privacy Policy', path: '/privacy' },
-      { name: 'Terms of Service', path: '/terms' },
-      { name: 'Help Center', path: '/help' },
-      { name: 'Blog Posts', path: '/blog' },
+      { name: 'Rental FAQs', path: '/faq' },
+      { name: 'Customer Testimonials', path: '/reviews' },
     ],
   },
 ];
 
 const socialLinks = [
-  { icon: GithubIcon, href: 'https://github.com', label: 'GitHub' },
+  { icon: InstagramIcon, href: 'https://instagram.com', label: 'Instagram' },
+  { icon: FacebookIcon, href: 'https://facebook.com', label: 'Facebook' },
   { icon: TwitterIcon, href: 'https://twitter.com', label: 'Twitter' },
   { icon: LinkedinIcon, href: 'https://linkedin.com', label: 'LinkedIn' },
-  { icon: InstagramIcon, href: 'https://instagram.com', label: 'Instagram' },
 ];
 
 const Footer = () => {
@@ -85,43 +90,60 @@ const Footer = () => {
   };
 
   return (
-    <footer className="footer">
+    <footer className="footer" itemScope itemType="https://schema.org/AutoRental">
+      {/* Decorative Accent Glow */}
+      <div className="footer__glow-sphere" />
+
       <div className="footer__container">
         
         {/* Top Grid Area */}
         <div className="footer__grid">
           
-          {/* Brand & About Column */}
+          {/* Brand & Local SEO Column */}
           <div className="footer__brand-col">
             <a href="/" className="footer__logo">
-              <img src={logoImg} alt="Company Logo" className="footer__logo-img" />
-            
+              <img src={logoImg} alt="Young Drives Car Rental Logo" className="footer__logo-img" />
             </a>
+
             <p className="footer__description">
-              Empowering developers and businesses with high-quality, modern web applications and scalable layout templates.
+              <strong itemProp="name">Young Drives</strong> is Bhubaneswar’s trusted car rental service offering well-maintained self-drive cars, chauffeured fleets, EV rentals, and airport taxis across Odisha at transparent pricing.
             </p>
-            
-            {/* Contact Details */}
-            <div className="footer__contact-info">
+
+            <address className="footer__contact-info">
               <div className="footer__contact-item">
-                <MapPin size={16} className="footer__contact-icon" />
-                <span>Bhubaneswar, Odisha, India</span>
+                <MapPin size={17} className="footer__contact-icon" />
+                <span itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
+                  <span itemProp="streetAddress">Plot No. 001, CRP Square, Vanik Road, Back Side of Ama Bus Stand</span>,{' '}
+                  <span itemProp="addressLocality">Bhubaneswar</span>,{' '}
+                  <span itemProp="addressRegion">Odisha</span>, India
+                </span>
               </div>
+
               <div className="footer__contact-item">
-                <Mail size={16} className="footer__contact-icon" />
-                <span>contact@coreadmin.com</span>
+                <Phone size={17} className="footer__contact-icon" />
+                <a href="tel:+919078455208" className="footer__contact-link" itemProp="telephone">
+                  +91 90784 55208
+                </a>
               </div>
+
               <div className="footer__contact-item">
-                <Phone size={16} className="footer__contact-icon" />
-                <span>+91 90784 55208</span>
+                <Mail size={17} className="footer__contact-icon" />
+                <a href="mailto:booking@youngdrives.com" className="footer__contact-link" itemProp="email">
+                  booking@youngdrives.com
+                </a>
               </div>
-            </div>
+
+              <div className="footer__contact-item">
+                <Clock size={17} className="footer__contact-icon" />
+                <span>Available 24/7 for Car Bookings</span>
+              </div>
+            </address>
           </div>
 
-          {/* Navigation Links Columns */}
-          {footerSections.map((section, idx) => (
+          {/* Quick Links Columns */}
+          {footerNavSections.map((section, idx) => (
             <div key={idx} className="footer__nav-col">
-              <h3 className="footer__col-title">{section.title}</h3>
+              <h4 className="footer__col-title">{section.title}</h4>
               <ul className="footer__link-list">
                 {section.links.map((link, linkIdx) => (
                   <li key={linkIdx} className="footer__link-item">
@@ -136,36 +158,59 @@ const Footer = () => {
 
           {/* Newsletter Column */}
           <div className="footer__newsletter-col">
-            <h3 className="footer__col-title">Stay Updated</h3>
+            <h4 className="footer__col-title">Rental Offers</h4>
             <p className="footer__newsletter-desc">
-              Subscribe to our newsletter to receive the latest updates, news, and special offers directly in your inbox.
+              Subscribe to get exclusive road trip discounts, coupon codes, and weekend offers.
             </p>
+            
             <form className="footer__newsletter-form" onSubmit={handleNewsletterSubmit}>
               <div className="footer__input-wrapper">
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Enter email address"
                   className="footer__newsletter-input"
                   required
                 />
                 <button type="submit" className="footer__newsletter-btn" aria-label="Subscribe">
-                  <Send size={16} />
+                  <Send size={15} />
                 </button>
               </div>
             </form>
+
+            <div className="footer__trust-card">
+              <ShieldCheck size={18} className="footer__trust-icon" />
+              <span>100% Verified Fleet & Zero Hidden Charges</span>
+            </div>
+          </div>
+
+        </div>
+
+        {/* SEO Keywords Tag Cloud */}
+        <div className="footer__seo-tags">
+          <span className="footer__seo-title">
+            <Sparkles size={14} className="footer__seo-icon" /> Popular Searches:
+          </span>
+          <div className="footer__tags-list">
+            <a href="/services/self-drive">Self Drive Car Bhubaneswar</a>
+            <a href="/services/airport-transfer">Bhubaneswar Airport Taxi</a>
+            <a href="/fleet/suv">Mahindra Thar on Rent</a>
+            <a href="/fleet/7-seater">Innova Crysta Rental</a>
+            <a href="/services/wedding-cars">Wedding Luxury Car Odisha</a>
+            <a href="/services/ev-rental">Electric Car Hire</a>
+            <a href="/services/outstation">Puri Konark Sightseeing Cabs</a>
           </div>
         </div>
 
-        {/* Divider */}
+        {/* Horizontal Divider */}
         <div className="footer__divider" />
 
-        {/* Bottom Bar Area */}
+        {/* Bottom Copyright & Social Area */}
         <div className="footer__bottom">
           <p className="footer__copyright">
-            © {new Date().getFullYear()} PR WEBSTOCK. Crafted with <Heart size={14} className="footer__heart-icon" /> All rights reserved.
+            © {new Date().getFullYear()} <strong>Young Drives</strong>. All rights reserved. Designed & Developed by{' '}
+            <span className="footer__creator">PR WEBSTOCK</span>.
           </p>
 
-          {/* Social Icons */}
           <div className="footer__socials">
             {socialLinks.map((social, index) => {
               const Icon = social.icon;
@@ -178,7 +223,7 @@ const Footer = () => {
                   className="footer__social-btn"
                   aria-label={social.label}
                 >
-                  <Icon size={18} />
+                  <Icon size={17} />
                 </a>
               );
             })}
