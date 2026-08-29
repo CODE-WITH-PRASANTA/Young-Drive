@@ -11,7 +11,8 @@ const createEnquiry = async (req, res) => {
       name,
       phone,
       email,
-      course,
+      service,
+      location,
       date,
       message,
     } = req.body;
@@ -34,17 +35,17 @@ const createEnquiry = async (req, res) => {
       });
     }
 
-    if (!email || !email.trim()) {
+    if (!service || !service.trim()) {
       return res.status(400).json({
         success: false,
-        message: "Email is required.",
+        message: "Service type is required.",
       });
     }
 
-    if (!course) {
+    if (!location || !location.trim()) {
       return res.status(400).json({
         success: false,
-        message: "Course is required.",
+        message: "Pickup location is required.",
       });
     }
 
@@ -52,14 +53,15 @@ const createEnquiry = async (req, res) => {
        EMAIL VALIDATION
     ===================================================== */
 
-    const emailRegex =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (email && email.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(email.trim())) {
-      return res.status(400).json({
-        success: false,
-        message: "Please enter a valid email address.",
-      });
+      if (!emailRegex.test(email.trim())) {
+        return res.status(400).json({
+          success: false,
+          message: "Please enter a valid email address.",
+        });
+      }
     }
 
     /* =====================================================
@@ -78,6 +80,25 @@ const createEnquiry = async (req, res) => {
     }
 
     /* =====================================================
+       DATE VALIDATION
+    ===================================================== */
+
+    let enquiryDate = new Date();
+
+    if (date) {
+      const parsedDate = new Date(date);
+
+      if (isNaN(parsedDate.getTime())) {
+        return res.status(400).json({
+          success: false,
+          message: "Please enter a valid date.",
+        });
+      }
+
+      enquiryDate = parsedDate;
+    }
+
+    /* =====================================================
        CREATE ENQUIRY
     ===================================================== */
 
@@ -86,13 +107,15 @@ const createEnquiry = async (req, res) => {
 
       phone: cleanPhone,
 
-      email: email.trim().toLowerCase(),
-
-      course,
-
-      date: date
-        ? String(date).trim()
+      email: email
+        ? email.trim().toLowerCase()
         : "",
+
+      service: service.trim(),
+
+      location: location.trim(),
+
+      date: enquiryDate,
 
       message: message
         ? message.trim()
@@ -107,21 +130,15 @@ const createEnquiry = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message:
-        "Your enquiry has been submitted successfully.",
-
+      message: "Your enquiry has been submitted successfully.",
       data: enquiry,
     });
   } catch (error) {
-    console.error(
-      "CREATE ENQUIRY ERROR:",
-      error
-    );
+    console.error("CREATE ENQUIRY ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      message:
-        "Failed to submit enquiry.",
+      message: "Failed to submit enquiry.",
       error: error.message,
     });
   }
@@ -134,10 +151,9 @@ const createEnquiry = async (req, res) => {
 
 const getEnquiries = async (req, res) => {
   try {
-    const enquiries = await Enquiry.find()
-      .sort({
-        createdAt: -1,
-      });
+    const enquiries = await Enquiry.find().sort({
+      createdAt: -1,
+    });
 
     return res.status(200).json({
       success: true,
@@ -145,15 +161,11 @@ const getEnquiries = async (req, res) => {
       data: enquiries,
     });
   } catch (error) {
-    console.error(
-      "GET ENQUIRIES ERROR:",
-      error
-    );
+    console.error("GET ENQUIRIES ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      message:
-        "Failed to fetch enquiries.",
+      message: "Failed to fetch enquiries.",
       error: error.message,
     });
   }
@@ -166,8 +178,7 @@ const getEnquiries = async (req, res) => {
 
 const getEnquiryById = async (req, res) => {
   try {
-    const enquiry =
-      await Enquiry.findById(req.params.id);
+    const enquiry = await Enquiry.findById(req.params.id);
 
     if (!enquiry) {
       return res.status(404).json({
@@ -181,15 +192,11 @@ const getEnquiryById = async (req, res) => {
       data: enquiry,
     });
   } catch (error) {
-    console.error(
-      "GET ENQUIRY ERROR:",
-      error
-    );
+    console.error("GET ENQUIRY ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      message:
-        "Failed to fetch enquiry.",
+      message: "Failed to fetch enquiry.",
       error: error.message,
     });
   }
@@ -206,14 +213,18 @@ const updateEnquiry = async (req, res) => {
       name,
       phone,
       email,
-      course,
+      service,
+      location,
       date,
       message,
       status,
     } = req.body;
 
-    const enquiry =
-      await Enquiry.findById(req.params.id);
+    /* =====================================================
+       FIND ENQUIRY
+    ===================================================== */
+
+    const enquiry = await Enquiry.findById(req.params.id);
 
     if (!enquiry) {
       return res.status(404).json({
@@ -223,11 +234,11 @@ const updateEnquiry = async (req, res) => {
     }
 
     /* =====================================================
-       UPDATE FIELDS
+       UPDATE NAME
     ===================================================== */
 
     if (name !== undefined) {
-      if (!name.trim()) {
+      if (!name || !name.trim()) {
         return res.status(400).json({
           success: false,
           message: "Name cannot be empty.",
@@ -237,66 +248,161 @@ const updateEnquiry = async (req, res) => {
       enquiry.name = name.trim();
     }
 
+    /* =====================================================
+       UPDATE PHONE
+    ===================================================== */
+
     if (phone !== undefined) {
-      if (!phone.trim()) {
+      if (!phone || !phone.trim()) {
+        return res.status(400).json({
+          success: false,
+          message: "Phone number cannot be empty.",
+        });
+      }
+
+      const cleanPhone = phone
+        .trim()
+        .replace(/\s+/g, "");
+
+      if (!/^[+]?[\d-]{7,15}$/.test(cleanPhone)) {
+        return res.status(400).json({
+          success: false,
+          message: "Please enter a valid phone number.",
+        });
+      }
+
+      enquiry.phone = cleanPhone;
+    }
+
+    /* =====================================================
+       UPDATE EMAIL
+    ===================================================== */
+
+    if (email !== undefined) {
+      if (email && email.trim()) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email.trim())) {
+          return res.status(400).json({
+            success: false,
+            message: "Please enter a valid email address.",
+          });
+        }
+
+        enquiry.email = email.trim().toLowerCase();
+      } else {
+        enquiry.email = "";
+      }
+    }
+
+    /* =====================================================
+       UPDATE SERVICE
+    ===================================================== */
+
+    if (service !== undefined) {
+      if (!service || !service.trim()) {
+        return res.status(400).json({
+          success: false,
+          message: "Service type cannot be empty.",
+        });
+      }
+
+      enquiry.service = service.trim();
+    }
+
+    /* =====================================================
+       UPDATE LOCATION
+    ===================================================== */
+
+    if (location !== undefined) {
+      if (!location || !location.trim()) {
+        return res.status(400).json({
+          success: false,
+          message: "Pickup location cannot be empty.",
+        });
+      }
+
+      enquiry.location = location.trim();
+    }
+
+    /* =====================================================
+       UPDATE DATE
+    ===================================================== */
+
+    if (date !== undefined) {
+      if (!date) {
+        return res.status(400).json({
+          success: false,
+          message: "Date cannot be empty.",
+        });
+      }
+
+      const parsedDate = new Date(date);
+
+      if (isNaN(parsedDate.getTime())) {
+        return res.status(400).json({
+          success: false,
+          message: "Please enter a valid date.",
+        });
+      }
+
+      enquiry.date = parsedDate;
+    }
+
+    /* =====================================================
+       UPDATE MESSAGE
+    ===================================================== */
+
+    if (message !== undefined) {
+      enquiry.message = message
+        ? message.trim()
+        : "";
+    }
+
+    /* =====================================================
+       UPDATE STATUS
+    ===================================================== */
+
+    if (status !== undefined) {
+      const allowedStatuses = [
+        "New",
+        "Contacted",
+        "Converted",
+        "Closed",
+      ];
+
+      if (!allowedStatuses.includes(status)) {
         return res.status(400).json({
           success: false,
           message:
-            "Phone number cannot be empty.",
+            "Invalid status. Allowed values are New, Contacted, Converted, Closed.",
         });
       }
 
-      enquiry.phone = phone
-        .trim()
-        .replace(/\s+/g, "");
-    }
-
-    if (email !== undefined) {
-      if (!email.trim()) {
-        return res.status(400).json({
-          success: false,
-          message: "Email cannot be empty.",
-        });
-      }
-
-      enquiry.email =
-        email.trim().toLowerCase();
-    }
-
-    if (course !== undefined) {
-      enquiry.course = course;
-    }
-
-    if (date !== undefined) {
-      enquiry.date = date;
-    }
-
-    if (message !== undefined) {
-      enquiry.message = message.trim();
-    }
-
-    if (status !== undefined) {
       enquiry.status = status;
     }
 
+    /* =====================================================
+       SAVE UPDATED ENQUIRY
+    ===================================================== */
+
     await enquiry.save();
+
+    /* =====================================================
+       RESPONSE
+    ===================================================== */
 
     return res.status(200).json({
       success: true,
-      message:
-        "Enquiry updated successfully.",
+      message: "Enquiry updated successfully.",
       data: enquiry,
     });
   } catch (error) {
-    console.error(
-      "UPDATE ENQUIRY ERROR:",
-      error
-    );
+    console.error("UPDATE ENQUIRY ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      message:
-        "Failed to update enquiry.",
+      message: "Failed to update enquiry.",
       error: error.message,
     });
   }
@@ -309,8 +415,7 @@ const updateEnquiry = async (req, res) => {
 
 const deleteEnquiry = async (req, res) => {
   try {
-    const enquiry =
-      await Enquiry.findById(req.params.id);
+    const enquiry = await Enquiry.findById(req.params.id);
 
     if (!enquiry) {
       return res.status(404).json({
@@ -319,29 +424,26 @@ const deleteEnquiry = async (req, res) => {
       });
     }
 
-    await Enquiry.findByIdAndDelete(
-      req.params.id
-    );
+    await Enquiry.findByIdAndDelete(req.params.id);
 
     return res.status(200).json({
       success: true,
-      message:
-        "Enquiry deleted successfully.",
+      message: "Enquiry deleted successfully.",
     });
   } catch (error) {
-    console.error(
-      "DELETE ENQUIRY ERROR:",
-      error
-    );
+    console.error("DELETE ENQUIRY ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      message:
-        "Failed to delete enquiry.",
+      message: "Failed to delete enquiry.",
       error: error.message,
     });
   }
 };
+
+/* =====================================================
+   EXPORT ALL CONTROLLERS
+===================================================== */
 
 module.exports = {
   createEnquiry,

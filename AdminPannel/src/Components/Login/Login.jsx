@@ -526,7 +526,7 @@ const Login = () => {
             <div className="company-info">
 
               <h3>
-                YOUNG DRIVEX
+                YOUNG DRIVES
               </h3>
 
               <span>
@@ -544,7 +544,7 @@ const Login = () => {
             <h1>
              YOUNG DRIVE
              
-              X
+              S
             </h1>
 
             <div className="line"></div>

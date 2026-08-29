@@ -16,25 +16,33 @@ const enquirySchema = new mongoose.Schema(
 
     email: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
       lowercase: true,
+      default: "",
     },
 
-    // Selected vehicle name
-    course: {
+    // Service selected by user
+    service: {
       type: String,
       required: true,
       trim: true,
     },
 
-    
-    date: {
+    // Pickup location selected by user
+    location: {
       type: String,
-      default: "",
+      required: true,
       trim: true,
     },
 
+    // Travel date / enquiry date
+    date: {
+      type: Date,
+      default: Date.now,
+    },
+
+    // Trip details / requirements
     message: {
       type: String,
       default: "",
