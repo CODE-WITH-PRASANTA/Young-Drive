@@ -45,34 +45,23 @@ const footerNavSections = [
   {
     title: 'Car Rental Services',
     links: [
-      { name: 'Self Drive Car Rental', path: '/services/self-drive' },
-      { name: 'Car Rental with Driver', path: '/services/chauffeur-drive' },
-      { name: 'Airport Pickup & Drop', path: '/services/airport-transfer' },
-      { name: 'Wedding & Luxury Cars', path: '/services/wedding-cars' },
-      { name: 'EV Car Hire Bhubaneswar', path: '/services/ev-rental' },
-      { name: 'Outstation Tour Packages', path: '/services/outstation' },
+      { name: 'Self Drive Car Rental', path: '/' },
+      { name: 'Car Rental with Driver', path: '/' },
+      { name: 'Airport Pickup & Drop', path: '/' },
+      { name: 'Wedding & Luxury Cars', path: '/' },
+      { name: 'EV Car Hire Bhubaneswar', path: '/' },
+      { name: 'Outstation Tour Packages', path: '/' },
     ],
   },
   {
     title: 'Featured Fleets',
     links: [
-      { name: 'Hatchbacks (Swift, Baleno)', path: '/fleet/hatchback' },
-      { name: 'Sedans (Dzire, Verna)', path: '/fleet/sedan' },
-      { name: 'SUVs (Thar, Scorpio, Creta)', path: '/fleet/suv' },
-      { name: '7 Seaters (Innova, Ertiga)', path: '/fleet/7-seater' },
-      { name: 'EV Rentals (Nexon EV)', path: '/fleet/ev' },
-      { name: 'Tariff & Rental Plans', path: '/pricing' },
-    ],
-  },
-  {
-    title: 'Help & Policy',
-    links: [
-      { name: 'About Young Drives', path: '/about' },
-      { name: 'Rental Terms & Conditions', path: '/terms' },
-      { name: 'Refund & Security Policy', path: '/refund-policy' },
-      { name: 'Privacy Policy', path: '/privacy' },
-      { name: 'Rental FAQs', path: '/faq' },
-      { name: 'Customer Testimonials', path: '/reviews' },
+      { name: 'Hatchbacks (Swift, Baleno)', path: '/' },
+      { name: 'Sedans (Dzire, Verna)', path: '/' },
+      { name: 'SUVs (Thar, Scorpio, Creta)', path: '/' },
+      { name: '7 Seaters (Innova, Ertiga)', path: '/' },
+      { name: 'EV Rentals (Nexon EV)', path: '/' },
+      { name: 'Tariff & Rental Plans', path: '/' },
     ],
   },
 ];
@@ -207,9 +196,16 @@ const Footer = () => {
         {/* Bottom Copyright & Social Area */}
         <div className="footer__bottom">
           <p className="footer__copyright">
-            © {new Date().getFullYear()} <strong>Young Drives</strong>. All rights reserved. Designed & Developed by{' '}
-            <span className="footer__creator">PR WEBSTOCK</span>.
-          </p>
+                © {new Date().getFullYear()} <strong>Young Drives</strong>. All rights reserved. Designed & Developed by{' '}
+                <a 
+                  href="https://prwebstock.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="footer__creator"
+                >
+                  PR WEBSTOCK
+                </a>.
+              </p>
 
           <div className="footer__socials">
             {socialLinks.map((social, index) => {

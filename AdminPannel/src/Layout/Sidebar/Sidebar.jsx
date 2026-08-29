@@ -530,7 +530,7 @@ const Sidebar = ({
               <span className="brand-name">
                 Young Drive
                 <span className="brand-accent">
-                  X
+                  S
                 </span>
               </span>
 
