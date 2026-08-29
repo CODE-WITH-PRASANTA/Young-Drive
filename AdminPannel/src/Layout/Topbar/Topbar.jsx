@@ -26,6 +26,10 @@ import {
 
 import "./Topbar.css";
 
+// IMPORTANT:
+// Change this import path only if your axios file is located elsewhere.
+import API from "../../api/axios";
+
 /* =========================================
    DEFAULT NOTIFICATIONS
 ========================================= */
@@ -106,28 +110,41 @@ const NOTIF_ICON = {
 };
 
 /* =========================================
+   DEFAULT ADMIN
+========================================= */
+
+const DEFAULT_ADMIN = {
+  name: "Admin User",
+  username: "admin",
+  email: "",
+  role: "Super Admin",
+  avatar: null,
+};
+
+/* =========================================
    TOPBAR
 ========================================= */
 
 const Topbar = ({
   toggleSidebar = () => {},
-
-  user = {
-    name: "Admin User",
-    role: "Super Admin",
-    avatar:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
-  },
-
+  user: userProp = null,
   notifications = DEFAULT_NOTIFICATIONS,
-
   messages = DEFAULT_MESSAGES,
-
   onSearch = () => {},
-
   onLogout = null,
 }) => {
   const navigate = useNavigate();
+
+  /* =========================================
+     ADMIN STATE
+  ========================================= */
+
+  const [user, setUser] = useState(
+    userProp || DEFAULT_ADMIN
+  );
+
+  const [loadingUser, setLoadingUser] =
+    useState(false);
 
   /* =========================================
      STATES
@@ -170,14 +187,240 @@ const Topbar = ({
     useRef(null);
 
   /* =========================================
+     LOAD ADMIN
+  ========================================= */
+
+  const loadAdmin = useCallback(
+    async () => {
+      const token =
+        localStorage.getItem(
+          "adminToken"
+        );
+
+      /*
+       * No token means user is not logged in.
+       */
+      if (!token) {
+        setUser(DEFAULT_ADMIN);
+        return;
+      }
+
+      /*
+       * First load cached admin information.
+       * This makes the UI appear immediately.
+       */
+      try {
+        const storedAdmin =
+          localStorage.getItem(
+            "adminUser"
+          );
+
+        if (storedAdmin) {
+          const parsedAdmin =
+            JSON.parse(storedAdmin);
+
+          setUser((prev) => ({
+            ...prev,
+            ...parsedAdmin,
+          }));
+        }
+      } catch (error) {
+        console.error(
+          "ADMIN LOCAL STORAGE ERROR:",
+          error
+        );
+      }
+
+      /*
+       * Then get the latest admin
+       * information from backend.
+       */
+      try {
+        setLoadingUser(true);
+
+        const response =
+          await API.get("/auth/me");
+
+        const admin =
+          response.data?.admin;
+
+        if (!admin) {
+          return;
+        }
+
+        const adminData = {
+          id:
+            admin._id ||
+            admin.id,
+
+          name:
+            admin.name ||
+            admin.username ||
+            "Admin User",
+
+          username:
+            admin.username ||
+            "",
+
+          email:
+            admin.email ||
+            "",
+
+          phone:
+            admin.phone ||
+            "",
+
+          role:
+            admin.role ||
+            "Super Admin",
+
+          avatar:
+            admin.avatar ||
+            null,
+        };
+
+        setUser(adminData);
+
+        /*
+         * Save latest admin information
+         * for the rest of the application.
+         */
+        localStorage.setItem(
+          "adminUser",
+          JSON.stringify(
+            adminData
+          )
+        );
+
+        /*
+         * Reset avatar error after
+         * receiving a new avatar.
+         */
+        setAvatarError(false);
+      } catch (error) {
+        console.error(
+          "ADMIN FETCH ERROR:",
+          error
+        );
+
+        /*
+         * Invalid/expired token.
+         */
+        if (
+          error.response?.status ===
+          401
+        ) {
+          localStorage.removeItem(
+            "adminToken"
+          );
+
+          localStorage.removeItem(
+            "adminAuth"
+          );
+
+          localStorage.removeItem(
+            "adminUser"
+          );
+
+          navigate("/login", {
+            replace: true,
+          });
+        }
+      } finally {
+        setLoadingUser(false);
+      }
+    },
+    [navigate]
+  );
+
+  /* =========================================
+     FETCH ADMIN WHEN TOPBAR LOADS
+  ========================================= */
+
+  useEffect(() => {
+    loadAdmin();
+  }, [loadAdmin]);
+
+  /* =========================================
+     UPDATE WHEN USER PROP CHANGES
+  ========================================= */
+
+  useEffect(() => {
+    if (userProp) {
+      setUser((prev) => ({
+        ...prev,
+        ...userProp,
+      }));
+
+      setAvatarError(false);
+    }
+  }, [userProp]);
+
+  /* =========================================
+     UPDATE AFTER PROFILE CHANGE
+  ========================================= */
+
+  useEffect(() => {
+    const handleStorageChange = (
+      event
+    ) => {
+      if (
+        event.key ===
+        "adminUser"
+      ) {
+        loadAdmin();
+      }
+
+      if (
+        event.key ===
+        "adminToken"
+      ) {
+        loadAdmin();
+      }
+    };
+
+    window.addEventListener(
+      "storage",
+      handleStorageChange
+    );
+
+    /*
+     * Custom event allows MyProfile
+     * in the same browser tab to
+     * notify Topbar.
+     */
+    const handleAdminUpdated = () => {
+      loadAdmin();
+    };
+
+    window.addEventListener(
+      "adminProfileUpdated",
+      handleAdminUpdated
+    );
+
+    return () => {
+      window.removeEventListener(
+        "storage",
+        handleStorageChange
+      );
+
+      window.removeEventListener(
+        "adminProfileUpdated",
+        handleAdminUpdated
+      );
+    };
+  }, [loadAdmin]);
+
+  /* =========================================
      CLOSE ALL POPOVERS
   ========================================= */
 
-  const closeAllPopovers = useCallback(() => {
-    setNotificationsOpen(false);
-    setMessagesOpen(false);
-    setUserOpen(false);
-  }, []);
+  const closeAllPopovers =
+    useCallback(() => {
+      setNotificationsOpen(false);
+      setMessagesOpen(false);
+      setUserOpen(false);
+    }, []);
 
   /* =========================================
      CLOSE MOBILE SEARCH
@@ -197,7 +440,9 @@ const Topbar = ({
   ========================================= */
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (
+      event
+    ) => {
       if (
         notificationsRef.current &&
         !notificationsRef.current.contains(
@@ -323,12 +568,17 @@ const Topbar = ({
      SEARCH
   ========================================= */
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = (
+    e
+  ) => {
     const value = e.target.value;
 
     setSearchValue(value);
 
-    if (typeof onSearch === "function") {
+    if (
+      typeof onSearch ===
+      "function"
+    ) {
       onSearch(value);
     }
   };
@@ -336,7 +586,10 @@ const Topbar = ({
   const clearSearch = () => {
     setSearchValue("");
 
-    if (typeof onSearch === "function") {
+    if (
+      typeof onSearch ===
+      "function"
+    ) {
       onSearch("");
     }
 
@@ -350,29 +603,47 @@ const Topbar = ({
   const handleLogout = (e) => {
     e.preventDefault();
 
-    // Close user menu
     setUserOpen(false);
 
-    // Close all popovers
     closeAllPopovers();
 
-    // Remove authentication
-    localStorage.removeItem("adminAuth");
+    /*
+     * Remove ALL admin authentication data.
+     */
+    localStorage.removeItem(
+      "adminToken"
+    );
 
-    // Remove admin information
-    localStorage.removeItem("adminUser");
+    localStorage.removeItem(
+      "adminAuth"
+    );
 
-    // Remove delivery partner data if present
+    localStorage.removeItem(
+      "adminUser"
+    );
+
     localStorage.removeItem(
       "deliveryPartner"
     );
 
-    // Call parent logout if provided
-    if (typeof onLogout === "function") {
+    /*
+     * Reset Topbar user.
+     */
+    setUser(DEFAULT_ADMIN);
+
+    /*
+     * Parent logout callback.
+     */
+    if (
+      typeof onLogout ===
+      "function"
+    ) {
       onLogout();
     }
 
-    // Redirect to login page
+    /*
+     * Redirect to login.
+     */
     navigate("/login", {
       replace: true,
     });
@@ -382,29 +653,37 @@ const Topbar = ({
      OPEN ONLY ONE POPOVER
   ========================================= */
 
-  const openOnly = (setter) => {
+  const openOnly = (
+    setter
+  ) => {
     setNotificationsOpen(false);
-
     setMessagesOpen(false);
-
     setUserOpen(false);
-
     setMobileSearchOpen(false);
 
     setter(true);
   };
 
   /* =========================================
-     MENU ITEM
+     MENU ITEM CLICK
   ========================================= */
 
-  const handleMenuItemClick = (e) => {
+  const handleMenuItemClick = (
+    e,
+    path
+  ) => {
     e.preventDefault();
 
     setUserOpen(false);
+
+    if (path) {
+      navigate(path);
+    }
   };
 
-  const handleFooterLinkClick = (e) => {
+  const handleFooterLinkClick = (
+    e
+  ) => {
     e.preventDefault();
   };
 
@@ -412,10 +691,21 @@ const Topbar = ({
      INITIALS
   ========================================= */
 
+  const displayName =
+    user?.name ||
+    user?.username ||
+    "Admin User";
+
+  const displayRole =
+    user?.role ||
+    "Super Admin";
+
   const initials =
-    user.name
+    displayName
       ?.split(" ")
-      .map((name) => name[0])
+      .map((name) =>
+        name[0]
+      )
       .slice(0, 2)
       .join("")
       .toUpperCase() || "AU";
@@ -434,6 +724,7 @@ const Topbar = ({
       <div className="Topbar-left">
 
         {/* SIDEBAR */}
+
         <button
           type="button"
           className="Topbar-icon-btn Topbar-toggle-btn"
@@ -444,6 +735,7 @@ const Topbar = ({
         </button>
 
         {/* SEARCH */}
+
         <div
           className={`Topbar-search ${
             mobileSearchOpen
@@ -451,6 +743,7 @@ const Topbar = ({
               : ""
           }`}
         >
+
           <Search
             size={17}
             className="Topbar-search-icon"
@@ -462,9 +755,13 @@ const Topbar = ({
             className="Topbar-search-input"
             placeholder="Search here..."
             value={searchValue}
-            onChange={handleSearchChange}
+            onChange={
+              handleSearchChange
+            }
             onFocus={() =>
-              setMobileSearchOpen(true)
+              setMobileSearchOpen(
+                true
+              )
             }
             aria-label="Search"
           />
@@ -473,7 +770,9 @@ const Topbar = ({
             <button
               type="button"
               className="Topbar-search-clear"
-              onClick={clearSearch}
+              onClick={
+                clearSearch
+              }
               aria-label="Clear search"
             >
               <X size={14} />
@@ -487,16 +786,22 @@ const Topbar = ({
           <button
             type="button"
             className="Topbar-search-close"
-            onClick={closeMobileSearch}
+            onClick={
+              closeMobileSearch
+            }
             aria-label="Close search"
           >
             <X size={18} />
           </button>
+
         </div>
 
         {/* MOBILE SEARCH */}
+
         <button
-          ref={searchTriggerRef}
+          ref={
+            searchTriggerRef
+          }
           type="button"
           className={`Topbar-icon-btn Topbar-search-trigger ${
             mobileSearchOpen
@@ -506,16 +811,21 @@ const Topbar = ({
           onClick={() => {
             closeAllPopovers();
 
-            setMobileSearchOpen(true);
+            setMobileSearchOpen(
+              true
+            );
 
-            requestAnimationFrame(() => {
-              searchRef.current?.focus();
-            });
+            requestAnimationFrame(
+              () => {
+                searchRef.current?.focus();
+              }
+            );
           }}
           aria-label="Open search"
         >
           <Search size={19} />
         </button>
+
       </div>
 
       {/* =====================================
@@ -536,8 +846,11 @@ const Topbar = ({
 
         <div
           className="Topbar-popover-wrap"
-          ref={notificationsRef}
+          ref={
+            notificationsRef
+          }
         >
+
           <button
             type="button"
             className={`Topbar-icon-btn ${
@@ -546,8 +859,12 @@ const Topbar = ({
                 : ""
             }`}
             onClick={() => {
-              if (notificationsOpen) {
-                setNotificationsOpen(false);
+              if (
+                notificationsOpen
+              ) {
+                setNotificationsOpen(
+                  false
+                );
               } else {
                 openOnly(
                   setNotificationsOpen
@@ -561,9 +878,12 @@ const Topbar = ({
           >
             <Bell size={19} />
 
-            {notifications.length > 0 && (
+            {notifications.length >
+              0 && (
               <span className="Topbar-badge">
-                {notifications.length}
+                {
+                  notifications.length
+                }
               </span>
             )}
           </button>
@@ -575,6 +895,7 @@ const Topbar = ({
                 : ""
             }`}
           >
+
             <div className="Topbar-popover-header">
 
               <h3>
@@ -582,7 +903,8 @@ const Topbar = ({
               </h3>
 
               <span className="Topbar-popover-count">
-                {notifications.length} new
+                {notifications.length}{" "}
+                new
               </span>
 
             </div>
@@ -590,10 +912,14 @@ const Topbar = ({
             <div className="Topbar-popover-list">
 
               {notifications.map(
-                (notification) => (
+                (
+                  notification
+                ) => (
                   <div
                     className="Notification-item"
-                    key={notification.id}
+                    key={
+                      notification.id
+                    }
                   >
 
                     <div
@@ -609,24 +935,31 @@ const Topbar = ({
                     <div className="Notification-content">
 
                       <p className="Notification-title-text">
-                        {notification.title}
+                        {
+                          notification.title
+                        }
                       </p>
 
                       <p className="Notification-subtitle">
-                        {notification.subtitle}
+                        {
+                          notification.subtitle
+                        }
                       </p>
 
                     </div>
 
                     <span className="Notification-time">
-                      {notification.time}
+                      {
+                        notification.time
+                      }
                     </span>
 
                   </div>
                 )
               )}
 
-              {notifications.length === 0 && (
+              {notifications.length ===
+                0 && (
                 <p className="Topbar-empty">
                   You're all caught up.
                 </p>
@@ -646,7 +979,9 @@ const Topbar = ({
               </a>
 
             </div>
+
           </div>
+
         </div>
 
         {/* =================================
@@ -657,6 +992,7 @@ const Topbar = ({
           className="Topbar-popover-wrap"
           ref={messagesRef}
         >
+
           <button
             type="button"
             className={`Topbar-icon-btn ${
@@ -666,7 +1002,9 @@ const Topbar = ({
             }`}
             onClick={() => {
               if (messagesOpen) {
-                setMessagesOpen(false);
+                setMessagesOpen(
+                  false
+                );
               } else {
                 openOnly(
                   setMessagesOpen
@@ -674,15 +1012,22 @@ const Topbar = ({
               }
             }}
             aria-label="Messages"
-            aria-expanded={messagesOpen}
+            aria-expanded={
+              messagesOpen
+            }
           >
-            <MessageSquare size={19} />
 
-            {messages.length > 0 && (
+            <MessageSquare
+              size={19}
+            />
+
+            {messages.length >
+              0 && (
               <span className="Topbar-badge">
                 {messages.length}
               </span>
             )}
+
           </button>
 
           <div
@@ -692,6 +1037,7 @@ const Topbar = ({
                 : ""
             }`}
           >
+
             <div className="Topbar-popover-header">
 
               <h3>
@@ -699,45 +1045,59 @@ const Topbar = ({
               </h3>
 
               <span className="Topbar-popover-count">
-                {messages.length} unread
+                {messages.length}{" "}
+                unread
               </span>
 
             </div>
 
             <div className="Topbar-popover-list">
 
-              {messages.map((message) => (
-                <div
-                  className="Message-item"
-                  key={message.id}
-                >
+              {messages.map(
+                (message) => (
+                  <div
+                    className="Message-item"
+                    key={
+                      message.id
+                    }
+                  >
 
-                  <img
-                    className="Message-avatar"
-                    src={message.avatar}
-                    alt=""
-                  />
+                    <img
+                      className="Message-avatar"
+                      src={
+                        message.avatar
+                      }
+                      alt=""
+                    />
 
-                  <div className="Notification-content">
+                    <div className="Notification-content">
 
-                    <p className="Notification-title-text">
-                      {message.name}
-                    </p>
+                      <p className="Notification-title-text">
+                        {
+                          message.name
+                        }
+                      </p>
 
-                    <p className="Notification-subtitle">
-                      {message.preview}
-                    </p>
+                      <p className="Notification-subtitle">
+                        {
+                          message.preview
+                        }
+                      </p>
+
+                    </div>
+
+                    <span className="Notification-time">
+                      {
+                        message.time
+                      }
+                    </span>
 
                   </div>
+                )
+              )}
 
-                  <span className="Notification-time">
-                    {message.time}
-                  </span>
-
-                </div>
-              ))}
-
-              {messages.length === 0 && (
+              {messages.length ===
+                0 && (
                 <p className="Topbar-empty">
                   No new messages.
                 </p>
@@ -757,10 +1117,13 @@ const Topbar = ({
               </a>
 
             </div>
+
           </div>
+
         </div>
 
         {/* DIVIDER */}
+
         <div
           className="Topbar-divider"
           aria-hidden="true"
@@ -784,30 +1147,45 @@ const Topbar = ({
             }`}
             onClick={() => {
               if (userOpen) {
-                setUserOpen(false);
+                setUserOpen(
+                  false
+                );
               } else {
-                openOnly(setUserOpen);
+                openOnly(
+                  setUserOpen
+                );
               }
             }}
-            aria-expanded={userOpen}
+            aria-expanded={
+              userOpen
+            }
             aria-label="Account menu"
           >
 
             <span className="Topbar-avatar-wrap">
 
-              {avatarError ? (
+              {avatarError ||
+              !user.avatar ? (
+
                 <span className="Topbar-avatar-fallback">
                   {initials}
                 </span>
+
               ) : (
+
                 <img
                   className="Topbar-avatar"
-                  src={user.avatar}
+                  src={
+                    user.avatar
+                  }
                   alt=""
                   onError={() =>
-                    setAvatarError(true)
+                    setAvatarError(
+                      true
+                    )
                   }
                 />
+
               )}
 
               <span className="Topbar-avatar-status" />
@@ -817,11 +1195,13 @@ const Topbar = ({
             <span className="Topbar-user-info">
 
               <span className="Topbar-username">
-                {user.name}
+                {loadingUser
+                  ? "Loading..."
+                  : displayName}
               </span>
 
               <span className="Topbar-role">
-                {user.role}
+                {displayRole}
               </span>
 
             </span>
@@ -850,35 +1230,55 @@ const Topbar = ({
             <div className="Topbar-user-menu-header">
 
               <span className="Topbar-username">
-                {user.name}
+                {displayName}
               </span>
 
               <span className="Topbar-role">
-                {user.role}
+                {displayRole}
               </span>
+
+              {user.email && (
+                <span
+                  style={{
+                    fontSize:
+                      "12px",
+                    opacity: 0.7,
+                    marginTop:
+                      "3px",
+                  }}
+                >
+                  {user.email}
+                </span>
+              )}
 
             </div>
 
             {/* PROFILE */}
 
-            <a
-              href="#profile"
+            {/* <a
+              href="/settings"
               className="Topbar-menu-item"
-              onClick={
-                handleMenuItemClick
+              onClick={(e) =>
+                handleMenuItemClick(
+                  e,
+                  "/settings"
+                )
               }
             >
               <User size={16} />
               My Profile
-            </a>
+            </a> */}
 
             {/* SETTINGS */}
 
             <a
-              href="#settings"
+              href="/settings"
               className="Topbar-menu-item"
-              onClick={
-                handleMenuItemClick
+              onClick={(e) =>
+                handleMenuItemClick(
+                  e,
+                  "/settings"
+                )
               }
             >
               <Settings size={16} />
@@ -888,10 +1288,13 @@ const Topbar = ({
             {/* SECURITY */}
 
             <a
-              href="#security"
+              href="/settings"
               className="Topbar-menu-item"
-              onClick={
-                handleMenuItemClick
+              onClick={(e) =>
+                handleMenuItemClick(
+                  e,
+                  "/settings"
+                )
               }
             >
               <Shield size={16} />
@@ -900,20 +1303,21 @@ const Topbar = ({
 
             <div className="Topbar-menu-divider" />
 
-            {/* =================================
-                LOGOUT
-            ================================== */}
+            {/* LOGOUT */}
 
             <button
               type="button"
               className="Topbar-menu-item logout"
-              onClick={handleLogout}
+              onClick={
+                handleLogout
+              }
             >
               <LogOut size={16} />
               Logout
             </button>
 
           </div>
+
         </div>
 
       </div>
@@ -923,7 +1327,9 @@ const Topbar = ({
       {mobileSearchOpen && (
         <div
           className="Topbar-search-backdrop"
-          onClick={closeMobileSearch}
+          onClick={
+            closeMobileSearch
+          }
           aria-hidden="true"
         />
       )}
@@ -935,7 +1341,9 @@ const Topbar = ({
         userOpen) && (
         <div
           className="Topbar-popover-backdrop"
-          onClick={closeAllPopovers}
+          onClick={
+            closeAllPopovers
+          }
           aria-hidden="true"
         />
       )}

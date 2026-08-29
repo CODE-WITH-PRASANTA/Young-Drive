@@ -31,11 +31,11 @@ const AdminEnquiry = () => {
       setLoading(true);
       setError("");
 
-      console.log("FETCHING ENQUIRIES...");
+     
 
       const response = await API.get("/enquiries");
 
-      console.log("ENQUIRIES RESPONSE:", response.data);
+     
 
       const enquiryData =
         response.data?.data ||
@@ -179,7 +179,7 @@ const AdminEnquiry = () => {
         `/enquiries/${enquiry._id}`
       );
 
-      console.log("DELETE RESPONSE:", response.data);
+    ;
 
       if (response.data?.success) {
         alert("Enquiry deleted successfully.");

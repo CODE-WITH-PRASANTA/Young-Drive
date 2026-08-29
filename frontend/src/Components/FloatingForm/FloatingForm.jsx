@@ -45,16 +45,11 @@ const FloatingForm = ({ isOpen: controlledIsOpen, onClose }) => {
       setLoadingVehicles(true);
       setVehicleError("");
 
-      console.log("======================================");
-      console.log("FETCHING VEHICLES FOR ENQUIRY FORM");
-      console.log("======================================");
+     
 
       const response = await API.get("/listings");
 
-      console.log(
-        "LISTINGS API RESPONSE:",
-        response.data
-      );
+     
 
       const vehicleData =
         response.data?.data ||
@@ -124,10 +119,7 @@ const FloatingForm = ({ isOpen: controlledIsOpen, onClose }) => {
         }
       });
 
-      console.log(
-        "UNIQUE VEHICLES:",
-        uniqueVehicles
-      );
+     
 
       setVehicles(uniqueVehicles);
     } catch (error) {
@@ -208,22 +200,7 @@ const FloatingForm = ({ isOpen: controlledIsOpen, onClose }) => {
       setSubmitMessage("");
       setSubmitError("");
 
-      console.log(
-        "======================================"
-      );
-
-      console.log(
-        "SUBMITTING ENQUIRY"
-      );
-
-      console.log(
-        "FORM DATA:",
-        formData
-      );
-
-      console.log(
-        "======================================"
-      );
+     
 
       const response = await API.post(
         "/enquiries",
@@ -242,10 +219,7 @@ const FloatingForm = ({ isOpen: controlledIsOpen, onClose }) => {
         }
       );
 
-      console.log(
-        "ENQUIRY RESPONSE:",
-        response.data
-      );
+    
 
       if (response.data?.success) {
         setSubmitMessage(
