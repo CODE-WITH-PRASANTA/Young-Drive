@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 
 import {
@@ -19,10 +20,20 @@ import {
 import './Contact.css';
 
 // =====================================================
+// AXIOS API
+// =====================================================
+
+import API from '../../api/axios';
+
+// =====================================================
 // CONTACT COMPONENT
 // =====================================================
 
 const Contact = () => {
+  // =====================================================
+  // FORM DATA
+  // =====================================================
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -30,6 +41,18 @@ const Contact = () => {
     subject: '',
     message: '',
   });
+
+  // =====================================================
+  // LOADING STATE
+  // =====================================================
+
+  const [loading, setLoading] = useState(false);
+
+  // =====================================================
+  // ERROR STATE
+  // =====================================================
+
+  const [error, setError] = useState('');
 
   // =====================================================
   // HANDLE INPUT CHANGE
@@ -42,25 +65,217 @@ const Contact = () => {
       ...prev,
       [name]: value,
     }));
+
+    // Clear error when user starts typing
+    if (error) {
+      setError('');
+    }
   };
 
   // =====================================================
   // HANDLE FORM SUBMIT
   // =====================================================
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    alert('Thank you! Your message has been sent.');
+    // Prevent multiple submissions
+    if (loading) return;
 
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      subject: '',
-      message: '',
-    });
+    setLoading(true);
+    setError('');
+
+    try {
+      // =================================================
+      // PREPARE DATA FOR BACKEND
+      // =================================================
+      //
+      // Backend expects:
+      //
+      // name
+      // phone
+      // email
+      // service
+      // location
+      // date
+      // message
+      //
+      // Frontend currently has:
+      //
+      // name
+      // email
+      // phone
+      // subject
+      // message
+      //
+      // Therefore:
+      //
+      // subject -> service
+      // location -> Contact Form
+      //
+      // =================================================
+
+      const enquiryData = {
+        name: formData.name.trim(),
+
+        email: formData.email.trim(),
+
+        phone: formData.phone.trim(),
+
+        service: formData.subject.trim(),
+
+        location: 'Contact Form',
+
+        message: formData.message.trim(),
+      };
+
+      // =================================================
+      // FRONTEND VALIDATION
+      // =================================================
+
+      if (!enquiryData.name) {
+        setError('Please enter your full name.');
+        setLoading(false);
+        return;
+      }
+
+      if (!enquiryData.phone) {
+        setError('Please enter your phone number.');
+        setLoading(false);
+        return;
+      }
+
+      if (!enquiryData.service) {
+        setError('Please enter a subject/service.');
+        setLoading(false);
+        return;
+      }
+
+      if (!enquiryData.message) {
+        setError('Please enter your message.');
+        setLoading(false);
+        return;
+      }
+
+     
+
+      // =================================================
+      // POST REQUEST
+      // =================================================
+      //
+      // API baseURL:
+      // http://localhost:5000/api
+      //
+      // Final URL:
+      // http://localhost:5000/api/enquiries
+      //
+      // =================================================
+
+      const response = await API.post(
+        '/enquiries',
+        enquiryData
+      );
+
+
+      // =================================================
+      // SUCCESS
+      // =================================================
+
+      alert(
+        response.data?.message ||
+          'Thank you! Your enquiry has been submitted successfully.'
+      );
+
+      // =================================================
+      // RESET FORM
+      // =================================================
+
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: '',
+      });
+
+    } catch (err) {
+      // =================================================
+      // ERROR
+      // =================================================
+
+      console.error(
+        '========================================'
+      );
+
+      console.error(
+        'ENQUIRY SUBMISSION ERROR:'
+      );
+
+      console.error(err);
+
+      console.error(
+        '========================================'
+      );
+
+      // =================================================
+      // BACKEND ERROR
+      // =================================================
+
+      if (err.response) {
+        console.error(
+          'BACKEND STATUS:',
+          err.response.status
+        );
+
+        console.error(
+          'BACKEND RESPONSE:',
+          err.response.data
+        );
+
+        setError(
+          err.response.data?.message ||
+            err.response.data?.error ||
+            'Failed to submit enquiry. Please try again.'
+        );
+      }
+
+      // =================================================
+      // NO RESPONSE FROM SERVER
+      // =================================================
+
+      else if (err.request) {
+        console.error(
+          'NO RESPONSE FROM BACKEND'
+        );
+
+        setError(
+          'Unable to connect to the server. Please make sure the backend server is running.'
+        );
+      }
+
+      // =================================================
+      // OTHER ERROR
+      // =================================================
+
+      else {
+        setError(
+          err.message ||
+            'Something went wrong. Please try again.'
+        );
+      }
+
+    } finally {
+      // =================================================
+      // STOP LOADING
+      // =================================================
+
+      setLoading(false);
+    }
   };
+
+  // =====================================================
+  // JSX
+  // =====================================================
 
   return (
     <div className="contact-page">
@@ -70,11 +285,14 @@ const Contact = () => {
       ====================================================== */}
 
       <section className="contact-hero">
+
         <div className="contact-hero__container">
 
           <div className="contact-hero__text">
+
             <h1 className="contact-hero__title">
               CONTACT{' '}
+
               <span className="contact-hero__title-accent">
                 US
               </span>
@@ -83,25 +301,29 @@ const Contact = () => {
             <p className="contact-hero__subtitle">
               Get in touch with Young Drives
             </p>
+
           </div>
 
           <div className="contact-hero__image-wrapper">
+
             <img
               src="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&w=1200&q=80"
               alt="Young Drives Luxury Car"
               className="contact-hero__image"
             />
+
           </div>
 
         </div>
-      </section>
 
+      </section>
 
       {/* =====================================================
           2. MAIN CONTENT - INFO + FORM
       ====================================================== */}
 
       <section className="contact-content">
+
         <div className="contact-content__container">
 
           {/* =================================================
@@ -118,11 +340,16 @@ const Contact = () => {
 
             <div className="contact-info__list">
 
-              {/* ADDRESS */}
+              {/* =================================================
+                  ADDRESS
+              ================================================= */}
+
               <div className="contact-info__item">
 
                 <div className="contact-info__icon-box contact-info__icon-box--blue">
+
                   <MapPin size={20} />
+
                 </div>
 
                 <div className="contact-info__details">
@@ -132,8 +359,10 @@ const Contact = () => {
                   </h3>
 
                   <p className="contact-info__text">
-                    Plot No: 001, CRP Square<br />
-                    Vanik Road, Back Side of Ama Bus Stand<br />
+                    Plot No: 001, CRP Square
+                    <br />
+                    Vanik Road, Back Side of Ama Bus Stand
+                    <br />
                     751011, Bhubaneswar, Odisha
                   </p>
 
@@ -141,12 +370,16 @@ const Contact = () => {
 
               </div>
 
+              {/* =================================================
+                  PHONE
+              ================================================= */}
 
-              {/* PHONE */}
               <div className="contact-info__item">
 
                 <div className="contact-info__icon-box contact-info__icon-box--blue">
+
                   <Phone size={20} />
+
                 </div>
 
                 <div className="contact-info__details">
@@ -163,12 +396,16 @@ const Contact = () => {
 
               </div>
 
+              {/* =================================================
+                  EMAIL
+              ================================================= */}
 
-              {/* EMAIL */}
               <div className="contact-info__item">
 
                 <div className="contact-info__icon-box contact-info__icon-box--blue">
+
                   <Mail size={20} />
+
                 </div>
 
                 <div className="contact-info__details">
@@ -185,12 +422,16 @@ const Contact = () => {
 
               </div>
 
+              {/* =================================================
+                  WORKING HOURS
+              ================================================= */}
 
-              {/* WORKING HOURS */}
               <div className="contact-info__item">
 
                 <div className="contact-info__icon-box contact-info__icon-box--blue">
+
                   <Clock size={20} />
+
                 </div>
 
                 <div className="contact-info__details">
@@ -200,7 +441,8 @@ const Contact = () => {
                   </h3>
 
                   <p className="contact-info__text">
-                    Mon – Sun<br />
+                    Mon – Sun
+                    <br />
                     24/7 Support
                   </p>
 
@@ -211,7 +453,6 @@ const Contact = () => {
             </div>
 
           </div>
-
 
           {/* =================================================
               RIGHT PANEL - CONTACT FORM
@@ -230,7 +471,10 @@ const Contact = () => {
               className="contact-form__body"
             >
 
-              {/* FULL NAME */}
+              {/* =================================================
+                  FULL NAME
+              ================================================= */}
+
               <div className="contact-form__field">
 
                 <User
@@ -249,8 +493,10 @@ const Contact = () => {
 
               </div>
 
+              {/* =================================================
+                  EMAIL
+              ================================================= */}
 
-              {/* EMAIL */}
               <div className="contact-form__field">
 
                 <AtSign
@@ -264,13 +510,14 @@ const Contact = () => {
                   placeholder="Email Address"
                   value={formData.email}
                   onChange={handleChange}
-                  required
                 />
 
               </div>
 
+              {/* =================================================
+                  PHONE
+              ================================================= */}
 
-              {/* PHONE */}
               <div className="contact-form__field">
 
                 <Smartphone
@@ -284,12 +531,15 @@ const Contact = () => {
                   placeholder="Phone Number"
                   value={formData.phone}
                   onChange={handleChange}
+                  required
                 />
 
               </div>
 
+              {/* =================================================
+                  SUBJECT / SERVICE
+              ================================================= */}
 
-              {/* SUBJECT */}
               <div className="contact-form__field">
 
                 <FileText
@@ -300,15 +550,18 @@ const Contact = () => {
                 <input
                   type="text"
                   name="subject"
-                  placeholder="Subject"
+                  placeholder="Subject / Service"
                   value={formData.subject}
                   onChange={handleChange}
+                  required
                 />
 
               </div>
 
+              {/* =================================================
+                  MESSAGE
+              ================================================= */}
 
-              {/* MESSAGE */}
               <div className="contact-form__field contact-form__field--textarea">
 
                 <MessageSquare
@@ -327,14 +580,37 @@ const Contact = () => {
 
               </div>
 
+              {/* =================================================
+                  ERROR MESSAGE
+              ================================================= */}
 
-              {/* SUBMIT BUTTON */}
+              {error && (
+                <div
+                  className="contact-form__error"
+                  role="alert"
+                >
+                  {error}
+                </div>
+              )}
+
+              {/* =================================================
+                  SUBMIT BUTTON
+              ================================================= */}
+
               <button
                 type="submit"
                 className="contact-form__btn"
+                disabled={loading}
               >
+
                 <Send size={16} />
-                <span>SEND MESSAGE</span>
+
+                <span>
+                  {loading
+                    ? 'SENDING...'
+                    : 'SEND MESSAGE'}
+                </span>
+
               </button>
 
             </form>
@@ -342,8 +618,8 @@ const Contact = () => {
           </div>
 
         </div>
-      </section>
 
+      </section>
 
       {/* =====================================================
           3. MAP SECTION
@@ -371,7 +647,6 @@ const Contact = () => {
 
       </section>
 
-
       {/* =====================================================
           4. GET IN TOUCH - CALL & WHATSAPP
       ====================================================== */}
@@ -380,7 +655,9 @@ const Contact = () => {
 
         <div className="contact-social__container">
 
-          {/* HEADING */}
+          {/* =================================================
+              HEADING
+          ================================================= */}
 
           <h3 className="contact-social__title">
             GET IN TOUCH
@@ -394,7 +671,6 @@ const Contact = () => {
             <br />
             Connect with Young Drives today!
           </p>
-
 
           {/* =================================================
               CALL + WHATSAPP
@@ -413,7 +689,10 @@ const Contact = () => {
 
               <div className="contact-social-action__icon">
 
-                <PhoneCall size={42} strokeWidth={2.2} />
+                <PhoneCall
+                  size={42}
+                  strokeWidth={2.2}
+                />
 
               </div>
 
@@ -426,7 +705,6 @@ const Contact = () => {
               </p>
 
             </a>
-
 
             {/* =================================================
                 WHATSAPP
@@ -469,3 +747,4 @@ const Contact = () => {
 };
 
 export default Contact;
+

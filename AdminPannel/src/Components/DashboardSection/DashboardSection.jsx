@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import "./DashboardSection.css";
+import API from "../../api/axios";
 
 /* ------------------------------------------------------------------ */
 /*  Icons                                                             */
@@ -66,96 +67,56 @@ const PAYMENT_META = {
   Paid: "green",
   Unpaid: "red",
   Refunded: "gray",
+  Pending: "orange",
 };
 
 const AVATAR_PALETTE = ["#f97066", "#60a5fa", "#34d399", "#fbbf24", "#a78bfa", "#f472b6", "#38bdf8"];
 
-const INITIAL_BOOKINGS = [
-  {
-    id: "#BK2489",
-    customer: { name: "John Smith", email: "john.smith@email.com" },
-    vehicle: { name: "Audi A3 1.6 TDI S line", color: "White" },
-    pickup: { date: "May 18, 2025", time: "10:00 AM" },
-    ret: { date: "May 22, 2025", time: "10:00 AM" },
-    amount: "$498.25",
-    status: "Confirmed",
-    payment: "Paid",
-  },
-  {
-    id: "#BK2488",
-    customer: { name: "Sarah Johnson", email: "sarah.j@email.com" },
-    vehicle: { name: "Mercedes-Benz C220d", color: "Silver" },
-    pickup: { date: "May 18, 2025", time: "02:00 PM" },
-    ret: { date: "May 21, 2025", time: "02:00 PM" },
-    amount: "$525.50",
-    status: "Ongoing",
-    payment: "Paid",
-  },
-  {
-    id: "#BK2487",
-    customer: { name: "Michael Brown", email: "michael.b@email.com" },
-    vehicle: { name: "Volkswagen Golf GTD", color: "Gray" },
-    pickup: { date: "May 17, 2025", time: "09:00 AM" },
-    ret: { date: "May 20, 2025", time: "09:00 AM" },
-    amount: "$450.75",
-    status: "Completed",
-    payment: "Paid",
-  },
-  {
-    id: "#BK2486",
-    customer: { name: "David Wilson", email: "david.w@email.com" },
-    vehicle: { name: "Volvo S60 D4 R-Design", color: "Black" },
-    pickup: { date: "May 17, 2025", time: "11:00 AM" },
-    ret: { date: "May 19, 2025", time: "11:00 AM" },
-    amount: "$480.00",
-    status: "Confirmed",
-    payment: "Unpaid",
-  },
-  {
-    id: "#BK2485",
-    customer: { name: "Emma Davis", email: "emma.d@email.com" },
-    vehicle: { name: "Jaguar XE 2.0d R-Sport", color: "Blue" },
-    pickup: { date: "May 17, 2025", time: "01:00 PM" },
-    ret: { date: "May 23, 2025", time: "01:00 PM" },
-    amount: "$575.25",
-    status: "Pending",
-    payment: "Unpaid",
-  },
-  {
-    id: "#BK2484",
-    customer: { name: "Olivia Taylor", email: "olivia.t@email.com" },
-    vehicle: { name: "BMW 3 Series 320d", color: "White" },
-    pickup: { date: "May 16, 2025", time: "08:00 AM" },
-    ret: { date: "May 18, 2025", time: "08:00 AM" },
-    amount: "$410.00",
-    status: "Completed",
-    payment: "Paid",
-  },
-  {
-    id: "#BK2483",
-    customer: { name: "James Anderson", email: "james.a@email.com" },
-    vehicle: { name: "Audi Q5 40 TDI", color: "Gray" },
-    pickup: { date: "May 16, 2025", time: "03:00 PM" },
-    ret: { date: "May 19, 2025", time: "03:00 PM" },
-    amount: "$610.40",
-    status: "Ongoing",
-    payment: "Paid",
-  },
-  {
-    id: "#BK2482",
-    customer: { name: "Sophie Clark", email: "sophie.c@email.com" },
-    vehicle: { name: "Ford Focus ST-Line", color: "Red" },
-    pickup: { date: "May 15, 2025", time: "12:00 PM" },
-    ret: { date: "May 17, 2025", time: "12:00 PM" },
-    amount: "$305.00",
-    status: "Cancelled",
-    payment: "Refunded",
-  },
-];
-
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
 /* ------------------------------------------------------------------ */
+const formatDate = (value) => {
+  if (!value || Number.isNaN(new Date(value).getTime())) return "—";
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(value));
+};
+
+const formatCurrency = (value) =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Number(value) || 0);
+
+const toDisplayBooking = (booking) => ({
+  apiId: booking._id,
+  id: `#${booking.bookingId || booking._id}`,
+  customer: {
+    name: booking.customerName || "Customer",
+    email: booking.email || "—",
+  },
+  vehicle: {
+    name: booking.vehicleName || "Vehicle",
+    color: booking.vehicleColor || "—",
+  },
+  pickup: {
+    date: formatDate(booking.pickupDate),
+    time: booking.pickupTime || "—",
+  },
+  ret: {
+    date: formatDate(booking.dropoffDate),
+    time: booking.dropoffTime || "—",
+  },
+  amount: formatCurrency(booking.amount),
+  amountValue: Number(booking.amount) || 0,
+  status: booking.status || "Pending",
+  payment: booking.paymentStatus || "Unpaid",
+});
+
 function initials(name) {
   return name
     .split(" ")
@@ -354,18 +315,34 @@ function BookingModal({ booking, onClose, onEdit }) {
 /*  Edit Booking Modal                                                */
 /* ------------------------------------------------------------------ */
 function EditModal({ booking, onClose, onSave }) {
+  const [formData, setFormData] = useState({
+    status: "Pending",
+    payment: "Unpaid",
+    amount: 0,
+  });
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (booking) {
+      setFormData({
+        status: booking.status,
+        payment: booking.payment,
+        amount: booking.amountValue,
+      });
+    }
+  }, [booking]);
+
   if (!booking) return null;
 
-  const [formData, setFormData] = useState({
-    status: booking.status,
-    payment: booking.payment,
-    amount: booking.amount,
-  });
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave(booking.id, formData);
-    onClose();
+    setIsSaving(true);
+    try {
+      const saved = await onSave(booking, formData);
+      if (saved) onClose();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -411,7 +388,9 @@ function EditModal({ booking, onClose, onSave }) {
             <div className="booking-modal__row">
               <label className="booking-modal__label">Amount</label>
               <input
-                type="text"
+                type="number"
+                min="0"
+                step="0.01"
                 className="edit-modal__input"
                 value={formData.amount}
                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
@@ -420,11 +399,11 @@ function EditModal({ booking, onClose, onSave }) {
           </div>
 
           <footer className="booking-modal__footer">
-            <button type="button" className="btn btn--ghost" onClick={onClose}>
+            <button type="button" className="btn btn--ghost" onClick={onClose} disabled={isSaving}>
               Cancel
             </button>
-            <button type="submit" className="btn btn--primary">
-              Save Changes
+            <button type="submit" className="btn btn--primary" disabled={isSaving}>
+              {isSaving ? "Saving..." : "Save Changes"}
             </button>
           </footer>
         </form>
@@ -513,13 +492,16 @@ function BookingRow({ booking, index, onView, onEdit, onInvoice, onCancel }) {
 /* ------------------------------------------------------------------ */
 /*  Main Component                                                    */
 /* ------------------------------------------------------------------ */
-const DashboardSection = () => {
-  const [bookings, setBookings] = useState(INITIAL_BOOKINGS);
+const DashboardSection = ({ bookings: apiBookings = [], loading, onBookingChanged }) => {
   const [showAll, setShowAll] = useState(false);
   const [viewBooking, setViewBooking] = useState(null);
   const [editBooking, setEditBooking] = useState(null);
   const [toast, setToast] = useState(null);
 
+  const bookings = useMemo(
+    () => apiBookings.map(toDisplayBooking),
+    [apiBookings]
+  );
   const visibleBookings = useMemo(() => (showAll ? bookings : bookings.slice(0, 5)), [showAll, bookings]);
 
   const flash = (message) => {
@@ -531,11 +513,20 @@ const DashboardSection = () => {
   const handleView = (booking) => setViewBooking(booking);
   const handleEdit = (booking) => setEditBooking(booking);
 
-  const handleSaveEdit = (bookingId, updatedData) => {
-    setBookings((prev) =>
-      prev.map((b) => (b.id === bookingId ? { ...b, ...updatedData } : b))
-    );
-    flash(`Updated booking ${bookingId} successfully`);
+  const handleSaveEdit = async (booking, updatedData) => {
+    try {
+      await API.put(`/bookings/${booking.apiId}`, {
+        status: updatedData.status,
+        paymentStatus: updatedData.payment,
+        amount: Number(updatedData.amount),
+      });
+      await onBookingChanged?.();
+      flash(`Updated booking ${booking.id} successfully`);
+      return true;
+    } catch (error) {
+      flash(error.response?.data?.message || "Unable to update this booking.");
+      return false;
+    }
   };
 
   const handleInvoice = (booking) => {
@@ -553,16 +544,18 @@ const DashboardSection = () => {
     flash(`Downloading Invoice for ${booking.id}`);
   };
 
-  const handleCancel = (booking) => {
+  const handleCancel = async (booking) => {
     if (window.confirm(`Are you sure you want to cancel booking ${booking.id}?`)) {
-      setBookings((prev) =>
-        prev.map((b) =>
-          b.id === booking.id
-            ? { ...b, status: "Cancelled", payment: b.payment === "Paid" ? "Refunded" : "Unpaid" }
-            : b
-        )
-      );
-      flash(`Booking ${booking.id} has been cancelled.`);
+      try {
+        await API.put(`/bookings/${booking.apiId}`, {
+          status: "Cancelled",
+          paymentStatus: booking.payment === "Paid" ? "Refunded" : "Unpaid",
+        });
+        await onBookingChanged?.();
+        flash(`Booking ${booking.id} has been cancelled.`);
+      } catch (error) {
+        flash(error.response?.data?.message || "Unable to cancel this booking.");
+      }
     }
   };
 
@@ -593,7 +586,7 @@ const DashboardSection = () => {
           <tbody>
             {visibleBookings.map((booking, i) => (
               <BookingRow
-                key={booking.id}
+                key={booking.apiId}
                 booking={booking}
                 index={i}
                 onView={handleView}
@@ -606,7 +599,8 @@ const DashboardSection = () => {
         </table>
       </div>
 
-      {visibleBookings.length === 0 && <p className="bookings-table__empty">No bookings found.</p>}
+      {loading && !bookings.length && <p className="bookings-table__empty">Loading bookings...</p>}
+      {!loading && visibleBookings.length === 0 && <p className="bookings-table__empty">No bookings found.</p>}
 
       {/* View Details Modal */}
       <BookingModal

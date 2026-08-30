@@ -20,6 +20,7 @@ const carCategoryRoutes = require("./routes/carCategoryRoutes");
 const enquiryRoutes = require("./routes/enquiryRoutes");
 const authRoutes = require("./routes/authRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 require("dotenv").config();
 
@@ -65,10 +66,8 @@ app.use("/api/car-categories", carCategoryRoutes);
 app.use("/api/enquiries", enquiryRoutes);
 
 app.use("/api/auth", authRoutes);
-app.use(
-  "/api/payments",
-  paymentRoutes
-);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // =====================================================
 // TEST ROUTE
