@@ -1,16 +1,20 @@
 import React from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const token = localStorage.getItem("adminToken");
-  const auth = localStorage.getItem("adminAuth");
+  const location = useLocation();
 
-  const isAuthenticated =
-    (typeof token === "string" && token.trim().length > 0) ||
-    auth === "true";
+  const isAuth =
+    sessionStorage.getItem("isAdminAuthenticated") === "true";
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  if (!isAuth) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: location }}
+      />
+    );
   }
 
   return <Outlet />;
