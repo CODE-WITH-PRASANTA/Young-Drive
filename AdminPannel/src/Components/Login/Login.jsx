@@ -38,7 +38,7 @@ const Login = () => {
         navigate("/");
       }, 2500);
     } else {
-      setErrorMessage("Invalid Credentials! Use ID: Youngdrive & Pass: 12345");
+      setErrorMessage("Invalid Credentials! Use ID: youngdrive & Pass: 12345");
     }
   };
 
@@ -176,7 +176,7 @@ const Login = () => {
             <div className="Login-credentials-box">
               <div className="Login-cred-item">
                 <span className="Login-cred-label">ID:</span>
-                <span className="Login-cred-value">Youngdrives</span>
+                <span className="Login-cred-value">youngdrive</span>
               </div>
               <div className="Login-cred-divider">|</div>
               <div className="Login-cred-item">
