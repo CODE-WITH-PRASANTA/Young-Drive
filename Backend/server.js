@@ -109,22 +109,12 @@ mongoose
     console.log("=================================");
     console.log("MongoDB Connected Successfully");
     console.log("Database:", mongoose.connection.name);
-    console.log("Host:", mongoose.connection.host);
-    console.log("=================================");
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
-      console.log(
-        `Locations API: http://localhost:${PORT}/api/locations`
-      );
-      console.log(
-        `Payments API: http://localhost:${PORT}/api/payments`
-      );
+      console.log(`Locations API: http://localhost:${PORT}/api/locations`);
     });
   })
   .catch((err) => {
-    console.error("=================================");
-    console.error("MongoDB Connection Error:");
-    console.error(err.message);
-    console.error("=================================");
+    console.error("Database connection error:", err);
   });
