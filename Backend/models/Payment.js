@@ -7,14 +7,18 @@ const paymentSchema = new mongoose.Schema(
       unique: true,
       required: true,
       trim: true,
-      uppercase: true,
+    },
+
+    companyName: {
+      type: String,
+      required: true,
+      trim: true,
     },
 
     bookingId: {
       type: String,
       required: true,
       trim: true,
-      uppercase: true,
     },
 
     customerName: {
@@ -36,65 +40,43 @@ const paymentSchema = new mongoose.Schema(
       min: 0,
     },
 
-    method: {
+    paymentMethod: {
       type: String,
-      required: true,
       enum: [
         "UPI",
         "Credit Card",
         "Debit Card",
-        "PayPal",
         "Net Banking",
         "Cash",
       ],
+      default: "UPI",
     },
 
-    details: {
+    paymentDetails: {
       type: String,
-      trim: true,
       default: "",
-    },
-
-    brand: {
-      type: String,
       trim: true,
-      default: "payment",
     },
 
     status: {
       type: String,
-      required: true,
       enum: [
         "Successful",
         "Pending",
         "Failed",
         "Refunded",
       ],
-      default: "Pending",
+      default: "Successful",
     },
 
     paymentDate: {
-      type: Date,
+      type: String,
       required: true,
-    },
-
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Admin",
-      default: null,
     },
   },
   {
     timestamps: true,
   }
 );
-
-paymentSchema.index({ transactionId: 1 });
-paymentSchema.index({ bookingId: 1 });
-paymentSchema.index({ customerName: 1 });
-paymentSchema.index({ customerEmail: 1 });
-paymentSchema.index({ status: 1 });
-paymentSchema.index({ method: 1 });
-paymentSchema.index({ paymentDate: -1 });
 
 module.exports = mongoose.model("Payment", paymentSchema);

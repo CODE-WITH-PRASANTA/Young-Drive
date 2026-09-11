@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 
 import {
   FiMapPin,
@@ -44,6 +44,10 @@ const Locations = () => {
   const [showAddModal, setShowAddModal] = useState(false);
 
   const [editingId, setEditingId] = useState(null);
+
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  const selectAllRef = useRef(null);
 
 
   /* =====================================================
@@ -235,6 +239,71 @@ const Locations = () => {
 
 
   /* =====================================================
+     SELECT ALL / SELECT ROW
+  ===================================================== */
+
+  const currentPageIds = useMemo(
+    () => currentTableData.map((loc) => loc._id),
+    [currentTableData]
+  );
+
+  const isAllSelected =
+    currentPageIds.length > 0 &&
+    currentPageIds.every((id) =>
+      selectedIds.includes(id)
+    );
+
+  const isSomeSelected =
+    !isAllSelected &&
+    currentPageIds.some((id) =>
+      selectedIds.includes(id)
+    );
+
+  useEffect(() => {
+
+    if (selectAllRef.current) {
+
+      selectAllRef.current.indeterminate =
+        isSomeSelected;
+
+    }
+
+  }, [isSomeSelected, currentPageIds]);
+
+  const handleSelectAll = (e) => {
+
+    const checked = e.target.checked;
+
+    setSelectedIds((prev) => {
+
+      if (checked) {
+
+        return Array.from(
+          new Set([...prev, ...currentPageIds])
+        );
+
+      }
+
+      return prev.filter(
+        (id) => !currentPageIds.includes(id)
+      );
+
+    });
+
+  };
+
+  const handleSelectRow = (id) => {
+
+    setSelectedIds((prev) =>
+      prev.includes(id)
+        ? prev.filter((item) => item !== id)
+        : [...prev, id]
+    );
+
+  };
+
+
+  /* =====================================================
      RESET FORM
   ===================================================== */
 
@@ -278,6 +347,12 @@ const Locations = () => {
           prev.filter(
             (item) =>
               item._id !== id
+          )
+        );
+
+        setSelectedIds((prev) =>
+          prev.filter(
+            (item) => item !== id
           )
         );
 
@@ -760,6 +835,28 @@ const Locations = () => {
           </div>
 
 
+          {selectedIds.length > 0 && (
+
+            <div className="locations-selection-bar">
+
+              <span>
+                {selectedIds.length} selected
+              </span>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setSelectedIds([])
+                }
+              >
+                Clear selection
+              </button>
+
+            </div>
+
+          )}
+
+
           {/* TABLE */}
 
           <div className="locations-table-container">
@@ -771,7 +868,17 @@ const Locations = () => {
                 <tr>
 
                   <th>
-                    <input type="checkbox" />
+                    <input
+                      type="checkbox"
+                      className="locations-checkbox"
+                      ref={selectAllRef}
+                      checked={isAllSelected}
+                      onChange={handleSelectAll}
+                      disabled={
+                        loading ||
+                        currentPageIds.length === 0
+                      }
+                    />
                   </th>
 
                   <th>
@@ -827,14 +934,23 @@ const Locations = () => {
                       <tr key={loc._id}>
 
 
-                        <td>
+                        <td data-label="Select">
 
-                          <input type="checkbox" />
+                          <input
+                            type="checkbox"
+                            className="locations-checkbox"
+                            checked={selectedIds.includes(
+                              loc._id
+                            )}
+                            onChange={() =>
+                              handleSelectRow(loc._id)
+                            }
+                          />
 
                         </td>
 
 
-                        <td>
+                        <td data-label="Location Name">
 
                           <div className="locations-name-cell">
 
@@ -857,17 +973,17 @@ const Locations = () => {
                         </td>
 
 
-                        <td>
+                        <td data-label="City">
                           {loc.city}
                         </td>
 
 
-                        <td>
+                        <td data-label="State">
                           {loc.state}
                         </td>
 
 
-                        <td>
+                        <td data-label="Type">
 
                           <span
                             className={`locations-type-badge ${
@@ -891,7 +1007,7 @@ const Locations = () => {
                         </td>
 
 
-                        <td>
+                        <td data-label="Status">
 
                           <span
                             className={`locations-status-badge ${
@@ -906,7 +1022,7 @@ const Locations = () => {
                         </td>
 
 
-                        <td>
+                        <td data-label="Action">
 
                           <div className="locations-action-btns">
 

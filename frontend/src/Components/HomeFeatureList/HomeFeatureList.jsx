@@ -11,7 +11,7 @@ import { IMG_URL } from "../../api/axios";
 
 const HomeFeatureList = () => {
   /* =====================================================
-     VEHICLE STATE
+      VEHICLE STATE
   ===================================================== */
 
   const [listings, setListings] = useState([]);
@@ -21,7 +21,7 @@ const HomeFeatureList = () => {
   const [error, setError] = useState("");
 
   /* =====================================================
-     LOCATION STATE
+      LOCATION STATE
   ===================================================== */
 
   const [locations, setLocations] = useState([]);
@@ -29,25 +29,25 @@ const HomeFeatureList = () => {
   const [locationsLoading, setLocationsLoading] = useState(false);
 
   /* =====================================================
-     BOOKING LOADING
+      BOOKING LOADING
   ===================================================== */
 
   const [bookingLoading, setBookingLoading] = useState(false);
 
   /* =====================================================
-     SELECTED VEHICLE
+      SELECTED VEHICLE
   ===================================================== */
 
   const [selectedVehicle, setSelectedVehicle] = useState(null);
 
   /* =====================================================
-     ACTIVE IMAGE
+      ACTIVE IMAGE
   ===================================================== */
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   /* =====================================================
-     DATE HELPERS
+      DATE HELPERS
   ===================================================== */
 
   const getTodayDate = () => {
@@ -65,7 +65,7 @@ const HomeFeatureList = () => {
   };
 
   /* =====================================================
-     BOOKING FORM
+      BOOKING FORM
   ===================================================== */
 
   const [formData, setFormData] = useState({
@@ -92,7 +92,7 @@ const HomeFeatureList = () => {
   });
 
   /* =====================================================
-     IMAGE URL HELPER
+      IMAGE URL HELPER
   ===================================================== */
 
   const getImageUrl = (image) => {
@@ -108,243 +108,235 @@ const HomeFeatureList = () => {
   };
 
   /* =====================================================
-     FETCH VEHICLES
+      FETCH VEHICLES
   ===================================================== */
   const fetchVehicles = async () => {
-  try {
-    setLoading(true);
-    setError("");
+    try {
+      setLoading(true);
+      setError("");
 
-    const response = await API.get("/listings");
+      const response = await API.get("/listings");
 
-   
+      const vehicleData =
+        response.data?.vehicles ||
+        response.data?.listings ||
+        response.data?.data ||
+        response.data ||
+        [];
 
-    const vehicleData =
-      response.data?.vehicles ||
-      response.data?.listings ||
-      response.data?.data ||
-      response.data ||
-      [];
-
-    if (!Array.isArray(vehicleData)) {
-      setListings([]);
-      return;
-    }
-
-    
-
-    /* =================================================
-       FORMAT BACKEND DATA
-       ================================================= */
-
-    const formattedListings = vehicleData.map((vehicle, index) => {
-      let vehicleImages = [];
-
-      /* =================================================
-         VEHICLE IMAGES
-         ================================================= */
-
-      if (Array.isArray(vehicle.images) && vehicle.images.length > 0) {
-        vehicleImages = vehicle.images
-          .filter(Boolean)
-          .map((image) => getImageUrl(image));
+      if (!Array.isArray(vehicleData)) {
+        setListings([]);
+        return;
       }
 
       /* =================================================
-         FALLBACK IMAGE
-         ================================================= */
+          FORMAT BACKEND DATA
+          ================================================= */
 
-      if (vehicleImages.length === 0) {
-        const fallbackImages = [car1, car2, car3, car4];
+      const formattedListings = vehicleData.map((vehicle, index) => {
+        let vehicleImages = [];
 
-        vehicleImages = [
-          fallbackImages[index % fallbackImages.length],
-        ];
-      }
+        /* =================================================
+            VEHICLE IMAGES
+            ================================================= */
+
+        if (Array.isArray(vehicle.images) && vehicle.images.length > 0) {
+          vehicleImages = vehicle.images
+            .filter(Boolean)
+            .map((image) => getImageUrl(image));
+        }
+
+        /* =================================================
+            FALLBACK IMAGE
+            ================================================= */
+
+        if (vehicleImages.length === 0) {
+          const fallbackImages = [car1, car2, car3, car4];
+
+          vehicleImages = [
+            fallbackImages[index % fallbackImages.length],
+          ];
+        }
+
+        /* =================================================
+            LISTING TYPE
+            ================================================= */
+
+        const isFeatured =
+          vehicle.listingType === "Featured Listings Cars";
+
+        const isMostSearched =
+          vehicle.listingType === "Most Searched Cars";
+
+        return {
+          id: vehicle._id || vehicle.id || index,
+
+          title:
+            vehicle.name ||
+            vehicle.title ||
+            vehicle.vehicleName ||
+            "Vehicle",
+
+          name:
+            vehicle.name ||
+            vehicle.title ||
+            vehicle.vehicleName ||
+            "Vehicle",
+
+          location:
+            vehicle.location ||
+            vehicle.pickupLocation ||
+            "Location not available",
+
+          rating:
+            vehicle.rating !== undefined &&
+            vehicle.rating !== null
+              ? vehicle.rating
+              : "0",
+
+          reviewsCount:
+            vehicle.reviewsCount !== undefined &&
+            vehicle.reviewsCount !== null
+              ? vehicle.reviewsCount
+              : vehicle.reviews || 0,
+
+          mileage:
+            vehicle.mileage ||
+            vehicle.kilometers ||
+            "N/A",
+
+          transmission:
+            vehicle.transmission || "N/A",
+
+          fuelType:
+            vehicle.fuelType ||
+            vehicle.fuel ||
+            "N/A",
+
+          seats:
+            vehicle.seats || "N/A",
+
+          doors:
+            vehicle.doors || "N/A",
+
+          driveType:
+            vehicle.driveType || "N/A",
+
+          price:
+            vehicle.price !== undefined &&
+            vehicle.price !== null
+              ? vehicle.price
+              : 0,
+
+          offerPrice:
+            vehicle.offerPrice !== undefined &&
+            vehicle.offerPrice !== null
+              ? vehicle.offerPrice
+              : null,
+
+          period:
+            vehicle.period || "/ day",
+
+          shortDesc:
+            vehicle.shortDesc || "",
+
+          fullDesc:
+            vehicle.fullDesc || "",
+
+          status:
+            vehicle.status || "N/A",
+
+          order:
+            vehicle.order !== undefined &&
+            vehicle.order !== null
+              ? vehicle.order
+              : null,
+
+          createdAt:
+            vehicle.createdAt || null,
+
+          updatedAt:
+            vehicle.updatedAt || null,
+
+          /* =================================================
+              CATEGORY
+              ================================================= */
+
+          category:
+            vehicle.category || null,
+
+          categoryName:
+            typeof vehicle.category === "object"
+              ? vehicle.category?.name || ""
+              : vehicle.category || "",
+
+          /* =================================================
+              LISTING TYPE
+              ================================================= */
+
+          listingType:
+            vehicle.listingType || "",
+
+          /* =================================================
+              IMAGES
+              ================================================= */
+
+          images:
+            vehicleImages,
+
+          image:
+            vehicleImages[0],
+
+          /* =================================================
+              FEATURED
+              ================================================= */
+
+          featured:
+            isFeatured,
+
+          /* =================================================
+              MOST SEARCHED
+              ================================================= */
+
+          mostSearched:
+            isMostSearched,
+        };
+      });
 
       /* =================================================
-         LISTING TYPE
-         ================================================= */
+          ONLY FEATURED LISTINGS CARS
+          ================================================= */
 
-      const isFeatured =
-        vehicle.listingType === "Featured Listings Cars";
+      const featuredListings =
+        formattedListings.filter(
+          (vehicle) =>
+            vehicle.listingType ===
+            "Featured Listings Cars"
+        );
 
-      const isMostSearched =
-        vehicle.listingType === "Most Searched Cars";
+      /* =================================================
+          SHOW ONLY FEATURED VEHICLES
+          ================================================= */
 
-      return {
-        id: vehicle._id || vehicle.id || index,
+      setListings(featuredListings);
 
-        title:
-          vehicle.name ||
-          vehicle.title ||
-          vehicle.vehicleName ||
-          "Vehicle",
-
-        name:
-          vehicle.name ||
-          vehicle.title ||
-          vehicle.vehicleName ||
-          "Vehicle",
-
-        location:
-          vehicle.location ||
-          vehicle.pickupLocation ||
-          "Location not available",
-
-        rating:
-          vehicle.rating !== undefined &&
-          vehicle.rating !== null
-            ? vehicle.rating
-            : "0",
-
-        reviewsCount:
-          vehicle.reviewsCount !== undefined &&
-          vehicle.reviewsCount !== null
-            ? vehicle.reviewsCount
-            : vehicle.reviews || 0,
-
-        mileage:
-          vehicle.mileage ||
-          vehicle.kilometers ||
-          "N/A",
-
-        transmission:
-          vehicle.transmission || "N/A",
-
-        fuelType:
-          vehicle.fuelType ||
-          vehicle.fuel ||
-          "N/A",
-
-        seats:
-          vehicle.seats || "N/A",
-
-        doors:
-          vehicle.doors || "N/A",
-
-        driveType:
-          vehicle.driveType || "N/A",
-
-        price:
-          vehicle.price !== undefined &&
-          vehicle.price !== null
-            ? vehicle.price
-            : 0,
-
-        offerPrice:
-          vehicle.offerPrice !== undefined &&
-          vehicle.offerPrice !== null
-            ? vehicle.offerPrice
-            : null,
-
-        period:
-          vehicle.period || "/ day",
-
-        shortDesc:
-          vehicle.shortDesc || "",
-
-        fullDesc:
-          vehicle.fullDesc || "",
-
-        status:
-          vehicle.status || "N/A",
-
-        order:
-          vehicle.order !== undefined &&
-          vehicle.order !== null
-            ? vehicle.order
-            : null,
-
-        createdAt:
-          vehicle.createdAt || null,
-
-        updatedAt:
-          vehicle.updatedAt || null,
-
-        /* =================================================
-           CATEGORY
-           ================================================= */
-
-        category:
-          vehicle.category || null,
-
-        categoryName:
-          typeof vehicle.category === "object"
-            ? vehicle.category?.name || ""
-            : vehicle.category || "",
-
-        /* =================================================
-           LISTING TYPE
-           ================================================= */
-
-        listingType:
-          vehicle.listingType || "",
-
-        /* =================================================
-           IMAGES
-           ================================================= */
-
-        images:
-          vehicleImages,
-
-        image:
-          vehicleImages[0],
-
-        /* =================================================
-           FEATURED
-           ================================================= */
-
-        featured:
-          isFeatured,
-
-        /* =================================================
-           MOST SEARCHED
-           ================================================= */
-
-        mostSearched:
-          isMostSearched,
-      };
-    });
-
-   
-
-    /* =================================================
-       ONLY FEATURED LISTINGS CARS
-       ================================================= */
-
-    const featuredListings =
-      formattedListings.filter(
-        (vehicle) =>
-          vehicle.listingType ===
-          "Featured Listings Cars"
+    } catch (error) {
+      console.error(
+        "Error fetching vehicles:",
+        error
       );
 
-   
-
-    /* =================================================
-       SHOW ONLY FEATURED VEHICLES
-       ================================================= */
-
-    setListings(featuredListings);
-
-  } catch (error) {
-    console.error(
-      "Error fetching vehicles:",
-      error
-    );
-
-    setError(
-      error?.response?.data?.message ||
+      setError(
+        error?.response?.data?.message ||
         "Failed to load vehicles"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /* =====================================================
-     FETCH LOCATIONS
+      FETCH LOCATIONS
   ===================================================== */
 
   const fetchLocations = async () => {
@@ -353,15 +345,13 @@ const HomeFeatureList = () => {
 
       const response = await API.get("/locations");
 
-      
-
       if (response.data?.success) {
         const locationData = Array.isArray(response.data.data)
           ? response.data.data
           : [];
 
         /* ---------------------------------------------
-           ONLY ACTIVE LOCATIONS
+            ONLY ACTIVE LOCATIONS
         --------------------------------------------- */
 
         const activeLocations = locationData.filter(
@@ -371,7 +361,7 @@ const HomeFeatureList = () => {
         setLocations(activeLocations);
 
         /* ---------------------------------------------
-           SET FIRST LOCATION
+            SET FIRST LOCATION
         --------------------------------------------- */
 
         if (activeLocations.length > 0) {
@@ -396,7 +386,7 @@ const HomeFeatureList = () => {
   };
 
   /* =====================================================
-     GET VEHICLES + LOCATIONS
+      GET VEHICLES + LOCATIONS
   ===================================================== */
 
   useEffect(() => {
@@ -406,7 +396,7 @@ const HomeFeatureList = () => {
   }, []);
 
   /* =====================================================
-     AUTO IMAGE SLIDER
+      AUTO IMAGE SLIDER
   ===================================================== */
 
   useEffect(() => {
@@ -430,7 +420,7 @@ const HomeFeatureList = () => {
   }, [selectedVehicle]);
 
   /* =====================================================
-     OPEN MODAL
+      OPEN MODAL
   ===================================================== */
 
   const handleOpenModal = (car) => {
@@ -456,7 +446,7 @@ const HomeFeatureList = () => {
   };
 
   /* =====================================================
-     CLOSE MODAL
+      CLOSE MODAL
   ===================================================== */
 
   const handleCloseModal = () => {
@@ -468,7 +458,7 @@ const HomeFeatureList = () => {
   };
 
   /* =====================================================
-     FORM INPUT CHANGE
+      FORM INPUT CHANGE
   ===================================================== */
 
   const handleInputChange = (e) => {
@@ -482,14 +472,14 @@ const HomeFeatureList = () => {
   };
 
   /* =====================================================
-     PHONE CHANGE
+      PHONE CHANGE
   ===================================================== */
 
   const handlePhoneChange = (e) => {
     const value = e.target.value.replace(/\D/g, "");
 
     /* ---------------------------------------------
-       ONLY 10 DIGITS
+        ONLY 10 DIGITS
     --------------------------------------------- */
 
     if (value.length <= 10) {
@@ -502,7 +492,7 @@ const HomeFeatureList = () => {
   };
 
   /* =====================================================
-     BOOKING VALIDATION
+      BOOKING VALIDATION
   ===================================================== */
 
   const validateBooking = () => {
@@ -531,7 +521,7 @@ const HomeFeatureList = () => {
     }
 
     /* ---------------------------------------------
-       INDIA MOBILE VALIDATION
+        INDIA MOBILE VALIDATION
     --------------------------------------------- */
 
     if (!/^[6-9]\d{9}$/.test(formData.phone)) {
@@ -576,7 +566,7 @@ const HomeFeatureList = () => {
     }
 
     /* ---------------------------------------------
-       DATE COMPARISON
+        DATE COMPARISON
     --------------------------------------------- */
 
     const pickupDateTime = new Date(
@@ -609,7 +599,7 @@ const HomeFeatureList = () => {
   };
 
   /* =====================================================
-     CONFIRM BOOKING
+      CONFIRM BOOKING
   ===================================================== */
   const handleConfirmBooking = async (e) => {
     e.preventDefault();
@@ -621,10 +611,6 @@ const HomeFeatureList = () => {
     try {
       setBookingLoading(true);
 
-      // =====================================================
-      // CREATE DATE VALUES
-      // =====================================================
-
       const pickupDateTime = new Date(
         `${formData.pickupDate}T${formData.pickupTime}:00`,
       );
@@ -632,10 +618,6 @@ const HomeFeatureList = () => {
       const returnDateTime = new Date(
         `${formData.dropoffDate}T${formData.dropoffTime}:00`,
       );
-
-      // =====================================================
-      // DATE VALIDATION
-      // =====================================================
 
       if (Number.isNaN(pickupDateTime.getTime())) {
         alert("Invalid pickup date.");
@@ -652,18 +634,10 @@ const HomeFeatureList = () => {
         return;
       }
 
-      // =====================================================
-      // VEHICLE VALIDATION
-      // =====================================================
-
       if (!selectedVehicle?.id) {
         alert("Please select a vehicle.");
         return;
       }
-
-      // =====================================================
-      // LOCATION VALIDATION
-      // =====================================================
 
       if (!formData.pickupLocation?.trim()) {
         alert("Please select pickup location.");
@@ -675,50 +649,26 @@ const HomeFeatureList = () => {
         return;
       }
 
-      // =====================================================
-      // FINAL BOOKING PAYLOAD
-      // =====================================================
-
       const bookingPayload = {
-        // ==============================
-        // CUSTOMER
-        // ==============================
-
         customerName: formData.fullName.trim(),
 
         email: formData.email.trim().toLowerCase(),
 
         phone: `${formData.countryCode}${formData.phone}`,
 
-        // ==============================
-        // VEHICLE
-        // ==============================
-
         vehicle: selectedVehicle.id,
 
         vehicleName: selectedVehicle.name || selectedVehicle.title || "Vehicle",
 
-        // ==============================
-        // BOOKING DATE
-        // ==============================
-
         bookingDate: new Date(),
 
         bookingTime: formData.pickupTime || "10:00",
-
-        // ==============================
-        // PICKUP
-        // ==============================
 
         pickupDate: pickupDateTime,
 
         pickupTime: formData.pickupTime || "10:00",
 
         pickupLocation: formData.pickupLocation.trim(),
-
-        // ==============================
-        // RETURN / DROP-OFF
-        // ==============================
 
         returnDate: returnDateTime,
 
@@ -727,10 +677,6 @@ const HomeFeatureList = () => {
         dropoffTime: formData.dropoffTime || "10:00",
 
         dropoffLocation: formData.dropoffLocation.trim(),
-
-        // ==============================
-        // DEFAULTS
-        // ==============================
 
         amount: 0,
 
@@ -743,23 +689,7 @@ const HomeFeatureList = () => {
         additionalMessage: formData.message?.trim() || "",
       };
 
-      // =====================================================
-      // DEBUG
-      // =====================================================
-
-     
-
-      // =====================================================
-      // API REQUEST
-      // =====================================================
-
       const response = await API.post("/bookings", bookingPayload);
-
-     
-
-      // =====================================================
-      // SUCCESS
-      // =====================================================
 
       if (response.data?.success) {
         alert("Booking request submitted successfully!");
@@ -801,7 +731,7 @@ const HomeFeatureList = () => {
   };
 
   /* =====================================================
-     FORMAT DATE
+      FORMAT DATE
   ===================================================== */
 
   const formatDate = (date) => {
@@ -819,7 +749,7 @@ const HomeFeatureList = () => {
   };
 
   /* =====================================================
-     LOADING
+      LOADING
   ===================================================== */
 
   if (loading) {
@@ -845,7 +775,7 @@ const HomeFeatureList = () => {
   }
 
   /* =====================================================
-     ERROR
+      ERROR
   ===================================================== */
 
   if (error) {
@@ -859,24 +789,23 @@ const HomeFeatureList = () => {
               <p className="section-subtitle">{error}</p>
             </div>
 
-            <button className="view-more-btn" onClick={fetchVehicles}>
-              <span>View More</span>
-
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="5" y1="12" x2="19" y2="12" />
-
-                <polyline points="12 5 19 12 12 19" />
-              </svg>
-            </button>
+            <div className="header-buttons-group">
+              <a className="contact-us-btn" href="tel:+919078455208">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
+                <span>Contact More</span>
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -884,7 +813,7 @@ const HomeFeatureList = () => {
   }
 
   /* =====================================================
-     MAIN UI
+      MAIN UI
   ===================================================== */
 
   return (
@@ -903,24 +832,23 @@ const HomeFeatureList = () => {
             </p>
           </div>
 
-          <button className="view-more-btn" onClick={fetchVehicles}>
-            <span>View More</span>
-
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="5" y1="12" x2="19" y2="12" />
-
-              <polyline points="12 5 19 12 12 19" />
-            </svg>
-          </button>
+          <div className="header-buttons-group">
+            <a className="contact-us-btn" href="tel:+919078455208">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+              </svg>
+              <span>Contact More</span>
+            </a>
+          </div>
         </div>
 
         {/* =================================================
@@ -1153,8 +1081,8 @@ const HomeFeatureList = () => {
 
             <div className="modal-left-panel">
               {/* =================================================
-                    IMAGE SLIDER
-                ================================================= */}
+                  IMAGE SLIDER
+              ================================================= */}
 
               <div className="modal-car-image-box">
                 <img
@@ -1188,14 +1116,14 @@ const HomeFeatureList = () => {
               </div>
 
               {/* =================================================
-                    VEHICLE NAME
-                ================================================= */}
+                  VEHICLE NAME
+              ================================================= */}
 
               <h3 className="modal-vehicle-title">{selectedVehicle.name}</h3>
 
               {/* =================================================
-                    LOCATION
-                ================================================= */}
+                  LOCATION
+              ================================================= */}
 
               <div className="modal-location-text">
                 <svg
@@ -1215,8 +1143,8 @@ const HomeFeatureList = () => {
               </div>
 
               {/* =================================================
-                    BASIC VEHICLE SPECS
-                ================================================= */}
+                  BASIC VEHICLE SPECS
+              ================================================= */}
 
               <div className="modal-specs-grid">
                 {/* Mileage */}
@@ -1339,8 +1267,8 @@ const HomeFeatureList = () => {
               </div>
 
               {/* =================================================
-                    PRICE
-                ================================================= */}
+                  PRICE
+              ================================================= */}
 
               <div className="modal-price-line">
                 <span className="price-lbl">From</span>
@@ -1353,8 +1281,8 @@ const HomeFeatureList = () => {
               </div>
 
               {/* =================================================
-                    OFFER PRICE
-                ================================================= */}
+                  OFFER PRICE
+              ================================================= */}
 
               {selectedVehicle.offerPrice !== null && (
                 <div className="modal-price-line">
@@ -1369,8 +1297,8 @@ const HomeFeatureList = () => {
               )}
 
               {/* =================================================
-                    SHORT DESCRIPTION
-                ================================================= */}
+                  SHORT DESCRIPTION
+              ================================================= */}
 
               {selectedVehicle.shortDesc && (
                 <div className="free-cancellation-banner">
@@ -1385,8 +1313,8 @@ const HomeFeatureList = () => {
               )}
 
               {/* =================================================
-                    FULL DESCRIPTION
-                ================================================= */}
+                  FULL DESCRIPTION
+              ================================================= */}
 
               {selectedVehicle.fullDesc && (
                 <div className="free-cancellation-banner">
@@ -1401,8 +1329,8 @@ const HomeFeatureList = () => {
               )}
 
               {/* =================================================
-                    CREATED / UPDATED
-                ================================================= */}
+                  CREATED / UPDATED
+              ================================================= */}
 
               <div className="modal-specs-grid">
                 <div className="modal-spec-cell">
@@ -1435,8 +1363,8 @@ const HomeFeatureList = () => {
               </div>
 
               {/* =================================================
-                    CANCELLATION
-                ================================================= */}
+                  CANCELLATION
+              ================================================= */}
 
               <div className="free-cancellation-banner">
                 <div className="info-circle-icon">i</div>

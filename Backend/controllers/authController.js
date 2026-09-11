@@ -1,288 +1,189 @@
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
 
-const setupAdmin = async (req, res) => {
+/* =====================================================
+   FORMAT ADMIN RESPONSE
+   ===================================================== */
+
+const formatAdmin = (admin) => {
+  if (!admin) {
+    return null;
+  }
+
+  return {
+    id: admin._id,
+    _id: admin._id,
+
+    name: admin.name || "",
+    username: admin.username || "",
+    email: admin.email || "",
+    phone: admin.phone || "",
+
+    role: admin.role || "Super Admin",
+
+    address: admin.address || "",
+    language: admin.language || "English",
+
+    timeZone:
+      admin.timeZone ||
+      "(UTC+05:30) India Standard Time",
+
+    bio: admin.bio || "",
+
+    avatar: admin.avatar || null,
+
+    isActive:
+      admin.isActive !== undefined
+        ? admin.isActive
+        : true,
+
+    preferences: {
+      emailNotif:
+        admin.preferences?.emailNotif !== undefined
+          ? admin.preferences.emailNotif
+          : true,
+
+      smsNotif:
+        admin.preferences?.smsNotif !== undefined
+          ? admin.preferences.smsNotif
+          : false,
+
+      darkMode:
+        admin.preferences?.darkMode !== undefined
+          ? admin.preferences.darkMode
+          : false,
+
+      twoFactor:
+        admin.preferences?.twoFactor !== undefined
+          ? admin.preferences.twoFactor
+          : false,
+    },
+
+    createdAt: admin.createdAt,
+    updatedAt: admin.updatedAt,
+  };
+};
+
+/* =====================================================
+   GET CURRENT SUPER ADMIN
+   GET /api/auth/me
+   ===================================================== */
+
+exports.getMe = async (req, res) => {
   try {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Username and password are required",
-      });
-    }
-
-    const cleanUsername = username.trim().toLowerCase();
-
-    if (cleanUsername.length < 3) {
-      return res.status(400).json({
-        success: false,
-        message: "Username must be at least 3 characters",
-      });
-    }
-
-    if (password.length < 5) {
-      return res.status(400).json({
-        success: false,
-        message: "Password must be at least 5 characters",
-      });
-    }
-
-    const existingAdmin = await Admin.findOne();
-
-    if (existingAdmin) {
-      return res.status(403).json({
-        success: false,
-        setupCompleted: true,
-        adminExists: true,
-        message: "Admin account has already been created",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    const admin = await Admin.create({
-      username: cleanUsername,
-      password: hashedPassword,
-      name: "Admin User",
-      email: "",
-      phone: "",
+    let admin = await Admin.findOne({
       role: "Super Admin",
-      address: "",
-      language: "English",
-      timeZone: "(UTC+05:30) India Standard Time",
-      bio: "",
-      avatar: "",
-      isActive: true,
-      preferences: {
-        emailNotif: true,
-        smsNotif: false,
-        darkMode: false,
-        twoFactor: false,
-      },
-      loginActivity: [],
     });
 
-    return res.status(201).json({
-      success: true,
-      message: "Admin account created successfully",
-      admin: {
-        id: admin._id,
-        username: admin.username,
-        name: admin.name,
-        role: admin.role,
-      },
-    });
-  } catch (error) {
-    console.error("SETUP ADMIN ERROR:", error);
-
-    if (error.code === 11000) {
-      return res.status(403).json({
-        success: false,
-        setupCompleted: true,
-        adminExists: true,
-        message: "Admin account has already been created",
-      });
-    }
-
-    return res.status(500).json({
-      success: false,
-      message: "Server error while creating admin",
-    });
-  }
-};
-
-const getSetupStatus = async (req, res) => {
-  try {
-    const admin = await Admin.findOne().select("_id");
-
-    return res.status(200).json({
-      success: true,
-      setupCompleted: !!admin,
-      adminExists: !!admin,
-    });
-  } catch (error) {
-    console.error("SETUP STATUS ERROR:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Unable to check setup status",
-    });
-  }
-};
-
-const loginAdmin = async (req, res) => {
-  try {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Username and password are required",
-      });
-    }
-
-    const cleanUsername = username.trim().toLowerCase();
-
-    const admin = await Admin.findOne({
-      username: cleanUsername,
-    });
+    /* =================================================
+       CREATE DEFAULT SUPER ADMIN IF NOT EXISTS
+       ================================================= */
 
     if (!admin) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid username or password",
+      admin = await Admin.create({
+        name: "Super Admin",
+
+        username: "admin",
+
+        email: "admin@youngdrive.com",
+
+        phone: "0000000000",
+
+        role: "Super Admin",
+
+        password: "password123",
+
+        address: "",
+
+        language: "English",
+
+        timeZone:
+          "(UTC+05:30) India Standard Time",
+
+        bio: "",
+
+        avatar: null,
+
+        isActive: true,
+
+        preferences: {
+          emailNotif: true,
+          smsNotif: false,
+          darkMode: false,
+          twoFactor: false,
+        },
+
+        loginActivity: [],
       });
-    }
 
-    if (admin.isActive === false) {
-      return res.status(403).json({
-        success: false,
-        message: "Admin account is disabled",
-      });
-    }
-
-    const passwordMatched = await bcrypt.compare(
-      password,
-      admin.password
-    );
-
-    if (!passwordMatched) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid username or password",
-      });
-    }
-
-    if (!process.env.JWT_SECRET) {
-      console.error("JWT_SECRET is missing");
-
-      return res.status(500).json({
-        success: false,
-        message: "JWT_SECRET is not configured on server",
-      });
-    }
-
-    const token = jwt.sign(
-      {
-        id: admin._id.toString(),
-        username: admin.username,
-        role: admin.role,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1d",
-      }
-    );
-
-    const loginRecord = {
-      loginAt: new Date(),
-      ipAddress:
-        req.headers["x-forwarded-for"] ||
-        req.socket.remoteAddress ||
-        "",
-      userAgent: req.headers["user-agent"] || "",
-    };
-
-    admin.loginActivity = [
-      loginRecord,
-      ...(admin.loginActivity || []),
-    ].slice(0, 20);
-
-    await admin.save();
-
-    return res.status(200).json({
-      success: true,
-      message: "Login successful",
-      token,
-      admin: {
-        id: admin._id,
-        username: admin.username,
-        name: admin.name,
-        email: admin.email,
-        phone: admin.phone,
-        role: admin.role,
-        avatar: admin.avatar,
-      },
-    });
-  } catch (error) {
-    console.error("LOGIN ERROR:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Server error during login",
-    });
-  }
-};
-
-const getMe = async (req, res) => {
-  try {
-    const adminId = req.admin.id || req.admin._id;
-
-    const admin = await Admin.findById(adminId).select(
-      "-password"
-    );
-
-    if (!admin) {
-      return res.status(404).json({
-        success: false,
-        message: "Admin not found",
-      });
+      console.log(
+        "DEFAULT SUPER ADMIN CREATED:",
+        admin.email
+      );
     }
 
     return res.status(200).json({
       success: true,
-      admin,
+      message: "Admin profile fetched successfully",
+      admin: formatAdmin(admin),
     });
   } catch (error) {
     console.error("GET ME ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      message: "Unable to get admin information",
+      message: "Failed to fetch admin profile",
+      error: error.message,
     });
   }
 };
 
-const updateProfile = async (req, res) => {
+/* =====================================================
+   UPDATE PROFILE
+   PUT /api/auth/profile
+   ===================================================== */
+
+exports.updateProfile = async (req, res) => {
   try {
-    const adminId = req.admin.id || req.admin._id;
-
-    const admin = await Admin.findById(adminId);
-
-    if (!admin) {
-      return res.status(404).json({
-        success: false,
-        message: "Admin not found",
-      });
-    }
-
     const {
       name,
+      username,
       email,
       phone,
       address,
       language,
       timeZone,
       bio,
-      avatar,
     } = req.body;
 
+    const admin = await Admin.findOne({
+      role: "Super Admin",
+    });
+
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: "Super Admin not found",
+      });
+    }
+
     if (name !== undefined) {
-      admin.name = String(name).trim();
+      admin.name = name;
+    }
+
+    if (username !== undefined) {
+      admin.username = username;
     }
 
     if (email !== undefined) {
-      admin.email = String(email).trim().toLowerCase();
+      admin.email = email;
     }
 
     if (phone !== undefined) {
-      admin.phone = String(phone).trim();
+      admin.phone = phone;
     }
 
     if (address !== undefined) {
-      admin.address = String(address).trim();
+      admin.address = address;
     }
 
     if (language !== undefined) {
@@ -297,20 +198,12 @@ const updateProfile = async (req, res) => {
       admin.bio = bio;
     }
 
-    if (avatar !== undefined) {
-      admin.avatar = avatar;
-    }
-
     await admin.save();
-
-    const updatedAdmin = await Admin.findById(
-      admin._id
-    ).select("-password");
 
     return res.status(200).json({
       success: true,
       message: "Profile updated successfully",
-      admin: updatedAdmin,
+      admin: formatAdmin(admin),
     });
   } catch (error) {
     console.error("UPDATE PROFILE ERROR:", error);
@@ -318,14 +211,18 @@ const updateProfile = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to update profile",
+      error: error.message,
     });
   }
 };
 
-const updatePassword = async (req, res) => {
-  try {
-    const adminId = req.admin.id || req.admin._id;
+/* =====================================================
+   UPDATE PASSWORD
+   PUT /api/auth/password
+   ===================================================== */
 
+exports.updatePassword = async (req, res) => {
+  try {
     const {
       currentPassword,
       newPassword,
@@ -339,83 +236,50 @@ const updatePassword = async (req, res) => {
       });
     }
 
-    if (newPassword.length < 5) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "New password must be at least 5 characters",
-      });
-    }
-
-    const admin = await Admin.findById(adminId);
+    const admin = await Admin.findOne({
+      role: "Super Admin",
+    });
 
     if (!admin) {
       return res.status(404).json({
         success: false,
-        message: "Admin not found",
+        message: "Super Admin not found",
       });
     }
 
-    const passwordMatched = await bcrypt.compare(
-      currentPassword,
-      admin.password
-    );
-
-    if (!passwordMatched) {
-      return res.status(401).json({
+    if (admin.password !== currentPassword) {
+      return res.status(400).json({
         success: false,
         message: "Current password is incorrect",
       });
     }
 
-    const samePassword = await bcrypt.compare(
-      newPassword,
-      admin.password
-    );
-
-    if (samePassword) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "New password must be different from current password",
-      });
-    }
-
-    admin.password = await bcrypt.hash(
-      newPassword,
-      12
-    );
+    admin.password = newPassword;
 
     await admin.save();
 
     return res.status(200).json({
       success: true,
-      message:
-        "Password changed successfully. Please login again.",
+      message: "Password updated successfully",
     });
   } catch (error) {
     console.error("UPDATE PASSWORD ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      message: "Failed to change password",
+      message: "Failed to update password",
+      error: error.message,
     });
   }
 };
 
-const updatePreferences = async (req, res) => {
+/* =====================================================
+   UPDATE PREFERENCES
+   PUT /api/auth/preferences
+   ===================================================== */
+
+exports.updatePreferences = async (req, res) => {
   try {
-    const adminId = req.admin.id || req.admin._id;
-
-    const admin = await Admin.findById(adminId);
-
-    if (!admin) {
-      return res.status(404).json({
-        success: false,
-        message: "Admin not found",
-      });
-    }
-
     const {
       emailNotif,
       smsNotif,
@@ -423,34 +287,48 @@ const updatePreferences = async (req, res) => {
       twoFactor,
     } = req.body;
 
-    admin.preferences = {
-      emailNotif:
-        emailNotif !== undefined
-          ? Boolean(emailNotif)
-          : admin.preferences?.emailNotif ?? true,
+    const admin = await Admin.findOne({
+      role: "Super Admin",
+    });
 
-      smsNotif:
-        smsNotif !== undefined
-          ? Boolean(smsNotif)
-          : admin.preferences?.smsNotif ?? false,
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: "Super Admin not found",
+      });
+    }
 
-      darkMode:
-        darkMode !== undefined
-          ? Boolean(darkMode)
-          : admin.preferences?.darkMode ?? false,
+    if (!admin.preferences) {
+      admin.preferences = {};
+    }
 
-      twoFactor:
-        twoFactor !== undefined
-          ? Boolean(twoFactor)
-          : admin.preferences?.twoFactor ?? false,
-    };
+    if (emailNotif !== undefined) {
+      admin.preferences.emailNotif =
+        emailNotif;
+    }
+
+    if (smsNotif !== undefined) {
+      admin.preferences.smsNotif =
+        smsNotif;
+    }
+
+    if (darkMode !== undefined) {
+      admin.preferences.darkMode =
+        darkMode;
+    }
+
+    if (twoFactor !== undefined) {
+      admin.preferences.twoFactor =
+        twoFactor;
+    }
 
     await admin.save();
 
     return res.status(200).json({
       success: true,
-      message: "Preferences saved successfully",
-      preferences: admin.preferences,
+      message:
+        "Preferences updated successfully",
+      admin: formatAdmin(admin),
     });
   } catch (error) {
     console.error(
@@ -460,39 +338,121 @@ const updatePreferences = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Failed to save preferences",
+      message: "Failed to update preferences",
+      error: error.message,
     });
   }
 };
 
-const getLoginActivity = async (req, res) => {
-  try {
-    const adminId = req.admin.id || req.admin._id;
+/* =====================================================
+   CREATE PROFILE
+   POST /api/auth/profiles
+   ===================================================== */
 
-    const admin = await Admin.findById(adminId)
-      .select("loginActivity")
-      .lean();
+exports.createProfile = async (req, res) => {
+  try {
+    const {
+      name,
+      username,
+      email,
+      phone,
+      role,
+      address,
+      language,
+      timeZone,
+      bio,
+      password,
+    } = req.body;
+
+    if (!name || !email || !phone) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Name, email and phone are required",
+      });
+    }
+
+    const existingAdmin =
+      await Admin.findOne({
+        email,
+      });
+
+    if (existingAdmin) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Admin with this email already exists",
+      });
+    }
+
+    const admin = await Admin.create({
+      name,
+      username:
+        username || "admin",
+      email,
+      phone,
+      role:
+        role || "Super Admin",
+      address: address || "",
+      language:
+        language || "English",
+      timeZone:
+        timeZone ||
+        "(UTC+05:30) India Standard Time",
+      bio: bio || "",
+      password:
+        password || "password123",
+      isActive: true,
+      avatar: null,
+
+      preferences: {
+        emailNotif: true,
+        smsNotif: false,
+        darkMode: false,
+        twoFactor: false,
+      },
+
+      loginActivity: [],
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Profile created successfully",
+      admin: formatAdmin(admin),
+    });
+  } catch (error) {
+    console.error("CREATE PROFILE ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to create profile",
+      error: error.message,
+    });
+  }
+};
+
+/* =====================================================
+   GET LOGIN ACTIVITY
+   GET /api/auth/login-activity
+   ===================================================== */
+
+exports.getLoginActivity = async (req, res) => {
+  try {
+    const admin = await Admin.findOne({
+      role: "Super Admin",
+    });
 
     if (!admin) {
       return res.status(404).json({
         success: false,
-        message: "Admin not found",
+        message: "Super Admin not found",
       });
     }
 
-    const activity = (
-      admin.loginActivity || []
-    )
-      .sort(
-        (a, b) =>
-          new Date(b.loginAt) -
-          new Date(a.loginAt)
-      )
-      .slice(0, 20);
-
     return res.status(200).json({
       success: true,
-      activity,
+      loginActivity:
+        admin.loginActivity || [],
     });
   } catch (error) {
     console.error(
@@ -502,18 +462,82 @@ const getLoginActivity = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Failed to fetch login activity",
+      message:
+        "Failed to fetch login activity",
+      error: error.message,
     });
   }
 };
 
-module.exports = {
-  setupAdmin,
-  getSetupStatus,
-  loginAdmin,
-  getMe,
-  updateProfile,
-  updatePassword,
-  updatePreferences,
-  getLoginActivity,
+/* =====================================================
+   UPDATE ADMIN AVATAR
+   PUT /api/auth/avatar
+   ===================================================== */
+
+exports.updateAvatar = async (req, res) => {
+  try {
+    console.log("=================================");
+    console.log("ADMIN AVATAR UPDATE");
+    console.log(
+      "Processed Avatar:",
+      req.processedAvatarImage
+    );
+    console.log("=================================");
+
+    const imagePath =
+      req.processedAvatarImage;
+
+    if (!imagePath) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "No image provided or image processing failed.",
+      });
+    }
+
+    const admin = await Admin.findOne({
+      role: "Super Admin",
+    });
+
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Super Admin not found",
+      });
+    }
+
+    /* ================================================
+       SAVE AVATAR PATH TO MONGODB
+       ================================================ */
+
+    admin.avatar = imagePath;
+
+    await admin.save();
+
+    console.log(
+      "ADMIN AVATAR SAVED:",
+      admin.avatar
+    );
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "Avatar updated successfully!",
+      avatar: admin.avatar,
+      admin: formatAdmin(admin),
+    });
+  } catch (error) {
+    console.error(
+      "UPDATE AVATAR ERROR:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Failed to update avatar",
+      error: error.message,
+    });
+  }
 };

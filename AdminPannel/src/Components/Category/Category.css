@@ -678,56 +678,135 @@
 }
 
 /* =========================================================
-   CARD ACTIONS
+   CARD ACTIONS — PREMIUM BUTTONS
    ========================================================= */
 
 .category-card-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .category-edit-btn,
 .category-delete-btn {
-  height: 29px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 0 9px;
-  border-radius: 6px;
+  gap: 6px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 20px;
   font-family: inherit;
-  font-size: 9px;
-  font-weight: 650;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .category-edit-btn {
-  border: 1px solid #e2e2e2;
-  background: #ffffff;
-  color: #444444;
+  background: linear-gradient(135deg, #1c1c1c, #3a3a3a);
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
 }
 
-.category-edit-btn:hover {
-  border-color: #222222;
-  color: #111111;
-  background: #fafafa;
+.category-edit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #000000, #444444);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.26);
+  transform: translateY(-2px);
+}
+
+.category-edit-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
 .category-delete-btn {
-  border: 1px solid #f0dddd;
-  background: #fffafa;
-  color: #c14444;
+  background: linear-gradient(135deg, #fff2f2, #ffe3e3);
+  color: #c1272d;
+  box-shadow: 0 2px 8px rgba(193, 39, 45, 0.12);
 }
 
-.category-delete-btn:hover {
-  border-color: #e4baba;
-  background: #fff2f2;
+.category-delete-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ff5b5f, #dd2c2f);
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(221, 44, 47, 0.32);
+  transform: translateY(-2px);
+}
+
+.category-delete-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(221, 44, 47, 0.24);
 }
 
 .category-edit-btn:disabled,
 .category-delete-btn:disabled {
   opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+.category-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.category-pagination-info {
+  color: #999999;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.category-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.category-pagination-btn {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 9px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #444444;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-pagination-btn:hover:not(:disabled) {
+  border-color: #111111;
+  color: #111111;
+  background: #fafafa;
+}
+
+.category-pagination-btn.active {
+  background: #111111;
+  border-color: #111111;
+  color: #ffffff;
+}
+
+.category-pagination-btn:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
@@ -831,7 +910,7 @@
 
   .category-edit-btn,
   .category-delete-btn {
-    width: 29px;
+    width: 32px;
     justify-content: center;
     padding: 0;
   }
@@ -883,6 +962,20 @@
 
   .category-created {
     white-space: normal;
+  }
+
+  .category-pagination {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .category-pagination-info {
+    text-align: center;
+  }
+
+  .category-pagination-controls {
+    justify-content: center;
   }
 }
 

@@ -3,26 +3,27 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 
+require("dotenv").config();
+
 // =====================================================
 // IMPORT ROUTES
 // =====================================================
 
 const bookingRoutes = require("./routes/bookingRoutes");
-
 const vehicleRoutes = require("./routes/vehicleRoutes");
-
 const listingRoutes = require("./routes/listingRoutes");
-
 const locationRoutes = require("./routes/locationRoutes");
-
 const reviewRoutes = require("./routes/reviewRoutes");
 const carCategoryRoutes = require("./routes/carCategoryRoutes");
 const enquiryRoutes = require("./routes/enquiryRoutes");
-const authRoutes = require("./routes/authRoutes");
-const paymentRoutes = require("./routes/paymentRoutes");
-const dashboardRoutes = require("./routes/dashboardRoutes");
 
-require("dotenv").config();
+const dashboardRoutes = require("./routes/dashboardRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
+const authRoutes = require("./routes/authRoutes");
+
+// =====================================================
+// APP
+// =====================================================
 
 const app = express();
 
@@ -37,14 +38,17 @@ app.use(express.json());
 app.use(
   express.urlencoded({
     extended: true,
-  }),
+  })
 );
 
 // =====================================================
 // UPLOADS
 // =====================================================
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"))
+);
 
 // =====================================================
 // ROUTES
@@ -56,19 +60,21 @@ app.use("/api/vehicles", vehicleRoutes);
 
 app.use("/api/listings", listingRoutes);
 
-// IMPORTANT
-// Frontend uses /api/locations
 app.use("/api/locations", locationRoutes);
 
 app.use("/api/reviews", reviewRoutes);
 
 app.use("/api/car-categories", carCategoryRoutes);
+
 app.use("/api/enquiries", enquiryRoutes);
 
-app.use("/api/auth", authRoutes);
-app.use("/api/payments", paymentRoutes);
-app.use("/api/dashboard", dashboardRoutes);
 
+
+// IMPORTANT: plural payments
+app.use("/api/payments", paymentRoutes);
+
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/auth", authRoutes);
 // =====================================================
 // TEST ROUTE
 // =====================================================
@@ -76,7 +82,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: "Server is running",
+    message: "Young Drive API Server is running",
   });
 });
 
@@ -98,18 +104,27 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 5000;
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/reviews_db")
-
+  .connect(process.env.MONGO_URI)
   .then(() => {
+    console.log("=================================");
     console.log("MongoDB Connected Successfully");
+    console.log("Database:", mongoose.connection.name);
+    console.log("Host:", mongoose.connection.host);
+    console.log("=================================");
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
-
-      console.log(`Locations API: http://localhost:${PORT}/api/locations`);
+      console.log(
+        `Locations API: http://localhost:${PORT}/api/locations`
+      );
+      console.log(
+        `Payments API: http://localhost:${PORT}/api/payments`
+      );
     });
   })
-
   .catch((err) => {
-    console.error("Database connection error:", err);
+    console.error("=================================");
+    console.error("MongoDB Connection Error:");
+    console.error(err.message);
+    console.error("=================================");
   });

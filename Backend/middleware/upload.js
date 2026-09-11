@@ -9,10 +9,7 @@ const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {
-    cb(
-      new Error("Only image files are allowed!"),
-      false
-    );
+    cb(new Error("Only image files are allowed!"), false);
   }
 };
 
@@ -26,149 +23,149 @@ const multerUpload = multer({
   fileFilter,
 });
 
-
 /* =====================================================
    MULTIPLE IMAGES
-   YOUR EXISTING MIDDLEWARE
+   EXISTING MIDDLEWARE
    ===================================================== */
 
-const convertToWebp = async (
-  req,
-  res,
-  next
-) => {
-  if (
-    !req.files ||
-    req.files.length === 0
-  ) {
+const convertToWebp = async (req, res, next) => {
+  if (!req.files || req.files.length === 0) {
     return next();
   }
 
   try {
-    const uploadDir = path.join(
-      __dirname,
-      "../uploads"
-    );
+    const uploadDir = path.join(__dirname, "../uploads");
 
     if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(
-        uploadDir,
-        {
-          recursive: true,
-        }
-      );
+      fs.mkdirSync(uploadDir, {
+        recursive: true,
+      });
     }
 
     req.processedImages = [];
 
     await Promise.all(
-      req.files.map(
-        async (file) => {
-          const filename =
-            `listing-${Date.now()}-${Math.round(
-              Math.random() * 1e9
-            )}.webp`;
+      req.files.map(async (file) => {
+        const filename = `listing-${Date.now()}-${Math.round(
+          Math.random() * 1e9
+        )}.webp`;
 
-          const filePath =
-            path.join(
-              uploadDir,
-              filename
-            );
+        const filePath = path.join(uploadDir, filename);
 
-          await sharp(
-            file.buffer
-          )
-            .webp({
-              quality: 80,
-            })
-            .toFile(filePath);
+        await sharp(file.buffer)
+          .webp({
+            quality: 80,
+          })
+          .toFile(filePath);
 
-          req.processedImages.push(
-            `/uploads/${filename}`
-          );
-        }
-      )
+        req.processedImages.push(`/uploads/${filename}`);
+      })
     );
 
     next();
   } catch (error) {
+    console.error("MULTIPLE IMAGE PROCESS ERROR:", error);
     next(error);
   }
 };
 
-
 /* =====================================================
    SINGLE CATEGORY IMAGE
+   EXISTING MIDDLEWARE
    ===================================================== */
 
-const convertCategoryToWebp =
-  async (
-    req,
-    res,
-    next
-  ) => {
-    if (!req.file) {
-      return next();
+const convertCategoryToWebp = async (req, res, next) => {
+  if (!req.file) {
+    return next();
+  }
+
+  try {
+    const uploadDir = path.join(__dirname, "../uploads");
+
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, {
+        recursive: true,
+      });
     }
 
-    try {
-      const uploadDir =
-        path.join(
-          __dirname,
-          "../uploads"
-        );
+    const filename = `category-${Date.now()}-${Math.round(
+      Math.random() * 1e9
+    )}.webp`;
 
-      if (
-        !fs.existsSync(
-          uploadDir
-        )
-      ) {
-        fs.mkdirSync(
-          uploadDir,
-          {
-            recursive: true,
-          }
-        );
-      }
+    const filePath = path.join(uploadDir, filename);
 
-      const filename =
-        `category-${Date.now()}-${Math.round(
-          Math.random() * 1e9
-        )}.webp`;
+    await sharp(req.file.buffer)
+      .webp({
+        quality: 80,
+      })
+      .toFile(filePath);
 
-      const filePath =
-        path.join(
-          uploadDir,
-          filename
-        );
+    req.processedCategoryImage = `/uploads/${filename}`;
 
-      await sharp(
-        req.file.buffer
-      )
-        .webp({
-          quality: 80,
-        })
-        .toFile(
-          filePath
-        );
+    console.log(
+      "CATEGORY IMAGE CREATED:",
+      req.processedCategoryImage
+    );
 
-      req.processedCategoryImage =
-        `/uploads/${filename}`;
+    next();
+  } catch (error) {
+    console.error("CATEGORY IMAGE PROCESS ERROR:", error);
+    next(error);
+  }
+};
 
-      next();
-    } catch (error) {
-      console.error(
-        "CATEGORY IMAGE PROCESS ERROR:",
-        error
-      );
+/* =====================================================
+   ADMIN AVATAR IMAGE
+   NEW AVATAR-SPECIFIC MIDDLEWARE
+   ===================================================== */
 
-      next(error);
+const convertAvatarToWebp = async (req, res, next) => {
+  if (!req.file) {
+    return next();
+  }
+
+  try {
+    const uploadDir = path.join(__dirname, "../uploads");
+
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, {
+        recursive: true,
+      });
     }
-  };
 
+    const filename = `admin-avatar-${Date.now()}-${Math.round(
+      Math.random() * 1e9
+    )}.webp`;
+
+    const filePath = path.join(uploadDir, filename);
+
+    await sharp(req.file.buffer)
+      .webp({
+        quality: 85,
+      })
+      .toFile(filePath);
+
+    req.processedAvatarImage = `/uploads/${filename}`;
+
+    console.log(
+      "ADMIN AVATAR CREATED:",
+      req.processedAvatarImage
+    );
+
+    next();
+  } catch (error) {
+    console.error("ADMIN AVATAR PROCESS ERROR:", error);
+    next(error);
+  }
+};
+
+/* =====================================================
+   EXPORTS
+   ===================================================== */
 
 module.exports = {
   upload: multerUpload,
   convertToWebp,
   convertCategoryToWebp,
+  convertAvatarToWebp,
 };

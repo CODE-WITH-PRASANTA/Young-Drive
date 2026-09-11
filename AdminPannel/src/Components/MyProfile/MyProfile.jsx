@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   FiUser,
   FiLock,
@@ -11,118 +11,84 @@ import {
   FiShield,
   FiClock,
   FiArrowRight,
-  FiPlus,
-  FiSearch,
-  FiEdit2,
-  FiTrash2,
   FiX,
-  FiSave,
-  FiChevronLeft,
-  FiChevronRight,
 } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
-import "./MyProfile.css";
-import API from "../../api/axios";
 
-const initialProfilesData = [
-  {
-    id: 1,
-    name: "Admin",
-    email: "admin@drivex.com",
-    phone: "+1 202-555-0182",
-    role: "Super Admin",
-    address:
-      "123 DriveX Street, New York, NY 10001, USA",
-    language: "English",
-    timeZone:
-      "(UTC-05:00) Eastern Time (US & Canada)",
-    bio:
-      "Administrator of DriveX car rental platform. Manage all operations and system settings.",
-    status: "Active",
-    created: "May 12, 2025, 10:30 AM",
-    lastLogin: "May 18, 2025, 09:15 AM",
-    avatar: null,
-  },
-];
+import "./MyProfile.css";
+import API, { IMG_URL } from "../../api/axios";
+
+const initialProfileData = {
+  id: "DRVX-ADM-001",
+  name: "Admin",
+  email: "admin@drivex.com",
+  phone: "202-555-0182",
+  role: "Super Admin",
+  address: "123 DriveX Street, New York, NY 10001, USA",
+  language: "English",
+  timeZone: "(UTC+05:30) India Standard Time",
+  bio: "Administrator of DriveX car rental platform. Manage all operations and system settings.",
+  status: "Active",
+  created: "",
+  lastLogin: "",
+  avatar: null,
+};
 
 const MyProfile = () => {
-  const navigate = useNavigate();
-
-  const [activeTab, setActiveTab] =
-    useState("Profile Settings");
-
-  const [profiles, setProfiles] =
-    useState(initialProfilesData);
+  const [activeTab, setActiveTab] = useState("Profile Settings");
 
   const [currentProfile, setCurrentProfile] =
-    useState(initialProfilesData[0]);
+    useState(initialProfileData);
 
-  const [formData, setFormData] = useState(
-    initialProfilesData[0]
-  );
+  const [formData, setFormData] =
+    useState(initialProfileData);
 
-  const [passwordData, setPasswordData] =
-    useState({
-      current: "",
-      newPass: "",
-      confirm: "",
-    });
+  const [loading, setLoading] = useState(true);
 
-  const [preferences, setPreferences] =
-    useState({
-      emailNotif: true,
-      smsNotif: false,
-      darkMode: false,
-      twoFactor: false,
-    });
-
-  const [showAddModal, setShowAddModal] =
+  const [profileSaving, setProfileSaving] =
     useState(false);
 
-  const [searchQuery, setSearchQuery] =
-    useState("");
-
-  const [isRightPanelVisible, setIsRightPanelVisible] =
-    useState(true);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [savingProfile, setSavingProfile] =
+  const [avatarUploading, setAvatarUploading] =
     useState(false);
 
-  const [savingPassword, setSavingPassword] =
+  const [passwordSaving, setPasswordSaving] =
     useState(false);
 
-  const [savingPreferences, setSavingPreferences] =
+  const [preferencesSaving, setPreferencesSaving] =
     useState(false);
 
-  const [addingProfile, setAddingProfile] =
-    useState(false);
+  const [passwordData, setPasswordData] = useState({
+    current: "",
+    newPass: "",
+    confirm: "",
+  });
+
+  const [preferences, setPreferences] = useState({
+    emailNotif: true,
+    smsNotif: false,
+    darkMode: false,
+    twoFactor: false,
+  });
 
   const [loginActivity, setLoginActivity] =
     useState([]);
 
-  const [showLoginActivity, setShowLoginActivity] =
-    useState(false);
+  const [isRightPanelVisible, setIsRightPanelVisible] =
+    useState(true);
 
   const [showSecuritySettings, setShowSecuritySettings] =
     useState(false);
 
-  const [newProfile, setNewProfile] =
-    useState({
-      name: "",
-      email: "",
-      phone: "",
-      role: "Super Admin",
-    });
+  const [showLoginActivity, setShowLoginActivity] =
+    useState(false);
 
   const fileInputRef = useRef(null);
 
+  /* =========================================================
+     FORMAT DATE
+  ========================================================= */
+
   const formatDate = (date) => {
-    if (!date) {
-      return "";
-    }
+    if (!date) return "Not available";
 
     const parsedDate = new Date(date);
 
@@ -139,132 +105,197 @@ const MyProfile = () => {
     });
   };
 
-  const loadProfile = async () => {
-    try {
-      setLoading(true);
+  /* =========================================================
+     IMAGE URL HELPER
+  ========================================================= */
 
-      const response = await API.get("/auth/me");
+  const getImageUrl = (avatar) => {
+    if (!avatar) return null;
 
-      const admin = response.data?.admin;
-
-      if (!admin) {
-        throw new Error("Admin profile not found");
-      }
-
-      const latestLogin =
-        admin.loginActivity &&
-        admin.loginActivity.length > 0
-          ? admin.loginActivity[0].loginAt
-          : admin.updatedAt;
-
-      const profileData = {
-        id: admin._id || admin.id,
-        name: admin.name || admin.username || "Admin",
-        email: admin.email || "",
-        phone: admin.phone || "",
-        role: admin.role || "Super Admin",
-        address: admin.address || "",
-        language: admin.language || "English",
-        timeZone:
-          admin.timeZone ||
-          "(UTC+05:30) India Standard Time",
-        bio: admin.bio || "",
-        status:
-          admin.isActive === false
-            ? "Inactive"
-            : "Active",
-        created: formatDate(admin.createdAt),
-        lastLogin: formatDate(latestLogin),
-        avatar: admin.avatar || null,
-      };
-
-      setCurrentProfile(profileData);
-      setFormData(profileData);
-
-      setPreferences({
-        emailNotif:
-          admin.preferences?.emailNotif ?? true,
-
-        smsNotif:
-          admin.preferences?.smsNotif ?? false,
-
-        darkMode:
-          admin.preferences?.darkMode ?? false,
-
-        twoFactor:
-          admin.preferences?.twoFactor ?? false,
-      });
-
-      setProfiles([profileData]);
-
-      localStorage.setItem(
-        "adminUser",
-        JSON.stringify({
-          id: admin._id || admin.id,
-          username: admin.username,
-          name: admin.name || admin.username,
-          email: admin.email || "",
-          phone: admin.phone || "",
-          role: admin.role || "Super Admin",
-          avatar: admin.avatar || null,
-        })
-      );
-    } catch (error) {
-      console.error(
-        "PROFILE FETCH ERROR:",
-        error
-      );
-
-      if (error.response?.status === 401) {
-        localStorage.removeItem("adminToken");
-        localStorage.removeItem("adminAuth");
-        localStorage.removeItem("adminUser");
-
-        navigate("/login", {
-          replace: true,
-        });
-      } else {
-        alert(
-          error.response?.data?.message ||
-            "Unable to load admin profile"
-        );
-      }
-    } finally {
-      setLoading(false);
+    // Complete URL
+    if (
+      avatar.startsWith("http://") ||
+      avatar.startsWith("https://")
+    ) {
+      return avatar;
     }
+
+    // Base64 compatibility
+    if (avatar.startsWith("data:image/")) {
+      return avatar;
+    }
+
+    const cleanPath = String(avatar).replace(/^\/+/, "");
+
+    const cleanBaseUrl = IMG_URL
+      ? IMG_URL.replace(/\/+$/, "")
+      : "";
+
+    return `${cleanBaseUrl}/${cleanPath}`;
   };
 
-  const loadLoginActivity = async () => {
-    try {
-      const response = await API.get(
-        "/auth/login-activity"
-      );
-
-      setLoginActivity(
-        response.data?.activity || []
-      );
-    } catch (error) {
-      console.error(
-        "LOGIN ACTIVITY ERROR:",
-        error
-      );
-
-      if (error.response?.status === 401) {
-        localStorage.removeItem("adminToken");
-        localStorage.removeItem("adminAuth");
-        localStorage.removeItem("adminUser");
-
-        navigate("/login", {
-          replace: true,
-        });
-      }
-    }
-  };
+  /* =========================================================
+     FETCH PROFILE + LOGIN ACTIVITY
+  ========================================================= */
 
   useEffect(() => {
-    loadProfile();
-    loadLoginActivity();
+    const fetchAdminData = async () => {
+      try {
+        setLoading(true);
+
+        /* ---------------------------------------------
+           GET CURRENT ADMIN
+        --------------------------------------------- */
+
+        const res = await API.get("/auth/me");
+
+        const admin = res.data?.admin;
+
+        if (admin) {
+          const lastLoginActivity =
+            admin.loginActivity?.length > 0
+              ? admin.loginActivity[
+                  admin.loginActivity.length - 1
+                ]
+              : null;
+
+          const formatted = {
+            id:
+              admin._id ||
+              admin.id ||
+              "DRVX-ADM-001",
+
+            name:
+              admin.name ||
+              "Admin",
+
+            email:
+              admin.email ||
+              "",
+
+            phone:
+              admin.phone ||
+              "",
+
+            role:
+              admin.role ||
+              "Super Admin",
+
+            address:
+              admin.address ||
+              "",
+
+            language:
+              admin.language ||
+              "English",
+
+            timeZone:
+              admin.timeZone ||
+              "(UTC+05:30) India Standard Time",
+
+            bio:
+              admin.bio ||
+              "",
+
+            status:
+              admin.isActive === false
+                ? "Inactive"
+                : "Active",
+
+            created:
+              formatDate(admin.createdAt),
+
+            lastLogin:
+              formatDate(
+                lastLoginActivity?.loginAt
+              ),
+
+            avatar:
+              admin.avatar
+                ? getImageUrl(admin.avatar)
+                : null,
+          };
+
+          setCurrentProfile(formatted);
+
+          setFormData(formatted);
+
+          /* ---------------------------------------------
+             PREFERENCES
+          --------------------------------------------- */
+
+          if (admin.preferences) {
+            setPreferences({
+              emailNotif:
+                admin.preferences.emailNotif ??
+                true,
+
+              smsNotif:
+                admin.preferences.smsNotif ??
+                false,
+
+              darkMode:
+                admin.preferences.darkMode ??
+                false,
+
+              twoFactor:
+                admin.preferences.twoFactor ??
+                false,
+            });
+          }
+        }
+
+        /* ---------------------------------------------
+           GET LOGIN ACTIVITY
+        --------------------------------------------- */
+
+        try {
+          const activityRes =
+            await API.get(
+              "/auth/login-activity"
+            );
+
+          if (
+            activityRes.data?.success &&
+            Array.isArray(
+              activityRes.data.activity
+            )
+          ) {
+            setLoginActivity(
+              activityRes.data.activity
+            );
+          } else {
+            setLoginActivity([]);
+          }
+        } catch (activityError) {
+          console.warn(
+            "Login activity unavailable:",
+            activityError
+          );
+
+          setLoginActivity([]);
+        }
+      } catch (error) {
+        console.error(
+          "Failed to load profile data:",
+          error
+        );
+
+        alert(
+          error.response?.data?.message ||
+            "Failed to load profile data."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAdminData();
   }, []);
+
+  /* =========================================================
+     INPUT CHANGE
+  ========================================================= */
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -275,119 +306,334 @@ const MyProfile = () => {
     }));
   };
 
+  /* =========================================================
+     UPLOAD AVATAR
+     
+     PUT /api/auth/avatar
+     
+     FormData key:
+     image
+     
+     Backend:
+     upload.single("image")
+  ========================================================= */
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    /* ---------------------------------------------
+       VALIDATE FILE TYPE
+    --------------------------------------------- */
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      alert(
+        "Please select a JPG, PNG or WEBP image."
+      );
+
+      e.target.value = "";
+      return;
+    }
+
+    /* ---------------------------------------------
+       VALIDATE FILE SIZE
+    --------------------------------------------- */
+
+    const maxSize =
+      5 * 1024 * 1024;
+
+    if (file.size > maxSize) {
+      alert(
+        "Image size must be less than 5MB."
+      );
+
+      e.target.value = "";
+      return;
+    }
+
+    try {
+      setAvatarUploading(true);
+
+      /* ---------------------------------------------
+         CREATE FORM DATA
+      --------------------------------------------- */
+
+      const imageFormData =
+        new FormData();
+
+      imageFormData.append(
+        "image",
+        file
+      );
+
+      /* ---------------------------------------------
+         UPLOAD TO BACKEND
+      --------------------------------------------- */
+
+      const response =
+        await API.put(
+          "/auth/avatar",
+          imageFormData,
+          {
+            headers: {
+              "Content-Type":
+                "multipart/form-data",
+            },
+          }
+        );
+
+      /* ---------------------------------------------
+         HANDLE RESPONSE
+      --------------------------------------------- */
+
+      if (
+        response.data?.success &&
+        response.data?.avatar
+      ) {
+        const avatarPath =
+          response.data.avatar;
+
+        const avatarUrl =
+          getImageUrl(avatarPath);
+
+        /* -----------------------------------------
+           UPDATE CURRENT PROFILE
+        ----------------------------------------- */
+
+        setCurrentProfile((prev) => ({
+          ...prev,
+          avatar: avatarUrl,
+        }));
+
+        /* -----------------------------------------
+           UPDATE FORM DATA
+
+           Store backend path only.
+           NEVER store Base64.
+        ----------------------------------------- */
+
+        setFormData((prev) => ({
+          ...prev,
+          avatar: avatarPath,
+        }));
+
+        alert(
+          response.data.message ||
+            "Profile picture updated successfully!"
+        );
+      } else {
+        throw new Error(
+          response.data?.message ||
+            "Avatar upload failed."
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Avatar upload failed:",
+        error
+      );
+
+      if (
+        error.response?.status === 413
+      ) {
+        alert(
+          "Image is too large. Please select a smaller image."
+        );
+      } else {
+        alert(
+          error.response?.data?.message ||
+            "Failed to upload profile picture."
+        );
+      }
+    } finally {
+      setAvatarUploading(false);
+
+      // Allow same image to be selected again
+      e.target.value = "";
+    }
+  };
+
+  /* =========================================================
+     PROFILE UPDATE
+
+     IMPORTANT:
+     Avatar is NOT uploaded here.
+
+     Avatar uses:
+     PUT /auth/avatar
+
+     Profile uses:
+     PUT /auth/profile
+  ========================================================= */
+
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
 
     try {
-      setSavingProfile(true);
+      setProfileSaving(true);
 
-      const response = await API.put(
-        "/auth/profile",
-        {
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          address: formData.address,
-          language: formData.language,
-          timeZone: formData.timeZone,
-          bio: formData.bio,
-          avatar: formData.avatar,
-        }
-      );
+      /* ---------------------------------------------
+         DO NOT SEND AVATAR
+         
+         This prevents Base64 / 413 issue.
+      --------------------------------------------- */
 
-      const admin =
-        response.data?.admin;
+      const profilePayload = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        language: formData.language,
+        timeZone: formData.timeZone,
+        bio: formData.bio,
+      };
 
-      if (admin) {
-        const updatedProfile = {
-          id: admin._id || admin.id,
+      const response =
+        await API.put(
+          "/auth/profile",
+          profilePayload
+        );
+
+      if (
+        response.data?.success &&
+        response.data?.admin
+      ) {
+        const admin =
+          response.data.admin;
+
+        const updatedAvatar =
+          admin.avatar
+            ? getImageUrl(admin.avatar)
+            : currentProfile.avatar;
+
+        const updated = {
+          ...currentProfile,
+
+          id:
+            admin._id ||
+            currentProfile.id,
+
           name:
             admin.name ||
-            admin.username ||
             formData.name,
+
           email:
-            admin.email || formData.email,
+            admin.email ||
+            formData.email,
+
           phone:
-            admin.phone || formData.phone,
+            admin.phone ||
+            formData.phone,
+
           role:
-            admin.role || formData.role,
+            admin.role ||
+            currentProfile.role,
+
           address:
-            admin.address || "",
+            admin.address ||
+            "",
+
           language:
-            admin.language || "English",
+            admin.language ||
+            "English",
+
           timeZone:
             admin.timeZone ||
             "(UTC+05:30) India Standard Time",
-          bio: admin.bio || "",
+
+          bio:
+            admin.bio ||
+            "",
+
           status:
             admin.isActive === false
               ? "Inactive"
               : "Active",
-          created:
-            formatDate(admin.createdAt) ||
-            currentProfile.created,
-          lastLogin:
-            formatDate(
-              admin.loginActivity?.[0]?.loginAt
-            ) ||
-            currentProfile.lastLogin,
-          avatar:
-            admin.avatar ||
-            formData.avatar ||
-            null,
+
+          avatar: updatedAvatar,
         };
 
-        setCurrentProfile(updatedProfile);
-        setFormData(updatedProfile);
-        setProfiles([updatedProfile]);
+        setCurrentProfile(updated);
 
-        localStorage.setItem(
-          "adminUser",
-          JSON.stringify({
-            id: admin._id || admin.id,
-            username: admin.username,
-            name:
-              admin.name ||
-              admin.username,
-            email: admin.email || "",
-            phone: admin.phone || "",
-            role:
-              admin.role || "Super Admin",
-            avatar: admin.avatar || null,
-          })
+        setFormData((prev) => ({
+          ...prev,
+
+          name:
+            admin.name ||
+            prev.name,
+
+          email:
+            admin.email ||
+            prev.email,
+
+          phone:
+            admin.phone ||
+            prev.phone,
+
+          address:
+            admin.address ||
+            "",
+
+          language:
+            admin.language ||
+            prev.language,
+
+          timeZone:
+            admin.timeZone ||
+            prev.timeZone,
+
+          bio:
+            admin.bio ||
+            "",
+
+          avatar:
+            admin.avatar ||
+            prev.avatar,
+        }));
+
+        alert(
+          response.data.message ||
+            "Profile updated successfully!"
+        );
+      } else {
+        alert(
+          response.data?.message ||
+            "Profile update failed."
         );
       }
-
-      alert(
-        response.data?.message ||
-          "Profile updated successfully!"
-      );
     } catch (error) {
       console.error(
-        "PROFILE UPDATE ERROR:",
+        "Profile update failed:",
         error
       );
 
-      if (error.response?.status === 401) {
-        localStorage.removeItem("adminToken");
-        localStorage.removeItem("adminAuth");
-        localStorage.removeItem("adminUser");
-
-        navigate("/login", {
-          replace: true,
-        });
-
-        return;
+      if (
+        error.response?.status === 413
+      ) {
+        alert(
+          "Request is too large. Please try again without uploading the image from this form."
+        );
+      } else {
+        alert(
+          error.response?.data?.message ||
+            "Failed to update profile."
+        );
       }
-
-      alert(
-        error.response?.data?.message ||
-          "Failed to update profile"
-      );
     } finally {
-      setSavingProfile(false);
+      setProfileSaving(false);
     }
   };
+
+  /* =========================================================
+     PASSWORD UPDATE
+  ========================================================= */
 
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
@@ -408,32 +654,37 @@ const MyProfile = () => {
       passwordData.newPass !==
       passwordData.confirm
     ) {
-      alert("New passwords don't match!");
+      alert(
+        "New passwords don't match!"
+      );
 
       return;
     }
 
-    if (passwordData.newPass.length < 5) {
+    if (
+      passwordData.newPass.length < 6
+    ) {
       alert(
-        "New password must be at least 5 characters"
+        "New password must contain at least 6 characters."
       );
 
       return;
     }
 
     try {
-      setSavingPassword(true);
+      setPasswordSaving(true);
 
-      const response = await API.put(
-        "/auth/password",
-        {
-          currentPassword:
-            passwordData.current,
+      const response =
+        await API.put(
+          "/auth/password",
+          {
+            currentPassword:
+              passwordData.current,
 
-          newPassword:
-            passwordData.newPass,
-        }
-      );
+            newPassword:
+              passwordData.newPass,
+          }
+        );
 
       alert(
         response.data?.message ||
@@ -445,109 +696,24 @@ const MyProfile = () => {
         newPass: "",
         confirm: "",
       });
-
-      localStorage.removeItem("adminToken");
-      localStorage.removeItem("adminAuth");
-      localStorage.removeItem("adminUser");
-
-      navigate("/login", {
-        replace: true,
-      });
     } catch (error) {
       console.error(
-        "PASSWORD UPDATE ERROR:",
+        "Password update failed:",
         error
       );
 
-      if (error.response?.status === 401) {
-        const message =
-          error.response?.data?.message ||
-          "";
-
-        if (
-          message
-            .toLowerCase()
-            .includes("current password")
-        ) {
-          alert(message);
-          return;
-        }
-
-        localStorage.removeItem(
-          "adminToken"
-        );
-        localStorage.removeItem(
-          "adminAuth"
-        );
-        localStorage.removeItem(
-          "adminUser"
-        );
-
-        navigate("/login", {
-          replace: true,
-        });
-
-        return;
-      }
-
       alert(
         error.response?.data?.message ||
-          "Failed to change password"
+          "Failed to change password."
       );
     } finally {
-      setSavingPassword(false);
+      setPasswordSaving(false);
     }
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    if (file.size > 2 * 1024 * 1024) {
-      alert(
-        "Image size must be less than 2MB."
-      );
-
-      e.target.value = "";
-      return;
-    }
-
-    const allowedTypes = [
-      "image/png",
-      "image/jpeg",
-      "image/webp",
-    ];
-
-    if (!allowedTypes.includes(file.type)) {
-      alert(
-        "Only JPG, PNG or WEBP images are allowed."
-      );
-
-      e.target.value = "";
-      return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      const image = reader.result;
-
-      setFormData((prev) => ({
-        ...prev,
-        avatar: image,
-      }));
-
-      setCurrentProfile((prev) => ({
-        ...prev,
-        avatar: image,
-      }));
-    };
-
-    reader.readAsDataURL(file);
-  };
+  /* =========================================================
+     PREFERENCE CHANGE
+  ========================================================= */
 
   const handlePreferenceChange = (key) => {
     setPreferences((prev) => ({
@@ -556,16 +722,24 @@ const MyProfile = () => {
     }));
   };
 
+  /* =========================================================
+     SAVE PREFERENCES
+  ========================================================= */
+
   const handlePreferencesUpdate = async () => {
     try {
-      setSavingPreferences(true);
+      setPreferencesSaving(true);
 
-      const response = await API.put(
-        "/auth/preferences",
-        preferences
-      );
+      const response =
+        await API.put(
+          "/auth/preferences",
+          preferences
+        );
 
-      if (response.data?.preferences) {
+      if (
+        response.data?.success &&
+        response.data?.preferences
+      ) {
         setPreferences(
           response.data.preferences
         );
@@ -577,246 +751,62 @@ const MyProfile = () => {
       );
     } catch (error) {
       console.error(
-        "PREFERENCES UPDATE ERROR:",
+        "Preferences update failed:",
         error
       );
 
-      if (error.response?.status === 401) {
-        localStorage.removeItem("adminToken");
-        localStorage.removeItem("adminAuth");
-        localStorage.removeItem("adminUser");
-
-        navigate("/login", {
-          replace: true,
-        });
-
-        return;
-      }
-
       alert(
         error.response?.data?.message ||
-          "Failed to save preferences"
+          "Failed to save preferences."
       );
     } finally {
-      setSavingPreferences(false);
+      setPreferencesSaving(false);
     }
   };
 
-  const handleSecuritySettings = () => {
-    setShowSecuritySettings(
-      (prev) => !prev
-    );
-  };
-
-  const handleLoginActivity = async () => {
-    await loadLoginActivity();
-
-    setShowLoginActivity(
-      (prev) => !prev
-    );
-  };
-
-  const handleNewProfileChange = (e) => {
-    const { name, value } = e.target;
-
-    setNewProfile((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleAddProfile = async (e) => {
-    e.preventDefault();
-
-    if (
-      !newProfile.name.trim() ||
-      !newProfile.email.trim() ||
-      !newProfile.phone.trim() ||
-      !newProfile.role
-    ) {
-      alert(
-        "Please fill all profile fields."
-      );
-
-      return;
-    }
-
-    try {
-      setAddingProfile(true);
-
-      const response = await API.post(
-        "/auth/profiles",
-        {
-          name: newProfile.name.trim(),
-          email:
-            newProfile.email
-              .trim()
-              .toLowerCase(),
-          phone: newProfile.phone.trim(),
-          role: newProfile.role,
-        }
-      );
-
-      const createdProfile =
-        response.data?.profile;
-
-      if (createdProfile) {
-        const profile = {
-          id:
-            createdProfile._id ||
-            createdProfile.id,
-
-          name:
-            createdProfile.name ||
-            newProfile.name,
-
-          email:
-            createdProfile.email ||
-            newProfile.email,
-
-          phone:
-            createdProfile.phone ||
-            newProfile.phone,
-
-          role:
-            createdProfile.role ||
-            newProfile.role,
-
-          address:
-            createdProfile.address || "",
-
-          language:
-            createdProfile.language ||
-            "English",
-
-          timeZone:
-            createdProfile.timeZone ||
-            "(UTC+05:30) India Standard Time",
-
-          bio:
-            createdProfile.bio || "",
-
-          status:
-            createdProfile.isActive === false
-              ? "Inactive"
-              : "Active",
-
-          created:
-            formatDate(
-              createdProfile.createdAt
-            ),
-
-          lastLogin: "",
-
-          avatar:
-            createdProfile.avatar || null,
-        };
-
-        setProfiles((prev) => [
-          ...prev,
-          profile,
-        ]);
-      }
-
-      alert(
-        response.data?.message ||
-          "New profile added successfully!"
-      );
-
-      setNewProfile({
-        name: "",
-        email: "",
-        phone: "",
-        role: "Super Admin",
-      });
-
-      setShowAddModal(false);
-    } catch (error) {
-      console.error(
-        "ADD PROFILE ERROR:",
-        error
-      );
-
-      if (error.response?.status === 401) {
-        localStorage.removeItem("adminToken");
-        localStorage.removeItem("adminAuth");
-        localStorage.removeItem("adminUser");
-
-        navigate("/login", {
-          replace: true,
-        });
-
-        return;
-      }
-
-      alert(
-        error.response?.data?.message ||
-          "Failed to add new profile"
-      );
-    } finally {
-      setAddingProfile(false);
-    }
-  };
-
-  const filteredProfiles =
-    profiles.filter((profile) => {
-      const query =
-        searchQuery.trim().toLowerCase();
-
-      if (!query) {
-        return true;
-      }
-
-      return (
-        profile.name
-          ?.toLowerCase()
-          .includes(query) ||
-        profile.email
-          ?.toLowerCase()
-          .includes(query) ||
-        profile.phone
-          ?.toLowerCase()
-          .includes(query) ||
-        profile.role
-          ?.toLowerCase()
-          .includes(query)
-      );
-    });
+  /* =========================================================
+     LOADING
+  ========================================================= */
 
   if (loading) {
     return (
       <div className="myprofile-container">
-        <div className="myprofile-header-wrapper">
-          <div className="myprofile-title-group">
-            <h1 className="myprofile-title">
-              Settings
-            </h1>
-
-            <p className="myprofile-subtitle">
-              Manage your profile and account
-              security
-            </p>
-          </div>
-        </div>
-
-        <div className="myprofile-tab-content-card">
-          <h3>Loading Profile...</h3>
-          <p>
-            Please wait while your account
-            information is loaded.
-          </p>
+        <div
+          style={{
+            padding: "60px",
+            textAlign: "center",
+          }}
+        >
+          Loading profile...
         </div>
       </div>
     );
   }
 
+  /* =========================================================
+     AVATAR FOR PREVIEW
+  ========================================================= */
+
+  const profileAvatar =
+    getImageUrl(formData.avatar);
+
+  const currentAvatar =
+    getImageUrl(currentProfile.avatar);
+
+  /* =========================================================
+     UI
+  ========================================================= */
+
   return (
     <div className="myprofile-container">
+
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
 
       <div className="myprofile-header-wrapper">
 
         <div className="myprofile-title-group">
-
           <h1 className="myprofile-title">
             Settings
           </h1>
@@ -824,27 +814,19 @@ const MyProfile = () => {
           <p className="myprofile-subtitle">
             Manage your profile and account security
           </p>
-
         </div>
 
         <div className="myprofile-header-right">
-
           <span className="myprofile-breadcrumb">
             Settings &gt; Profile &amp; Security
           </span>
-
-          <button
-            className="myprofile-add-btn"
-            onClick={() =>
-              setShowAddModal(true)
-            }
-          >
-            <FiPlus /> Add New Profile
-          </button>
-
         </div>
 
       </div>
+
+      {/* =====================================================
+          TABS
+      ===================================================== */}
 
       <div className="myprofile-tabs-bar">
 
@@ -862,7 +844,6 @@ const MyProfile = () => {
             icon: <FiSettings />,
           },
         ].map((tab) => (
-
           <button
             key={tab.name}
             className={`myprofile-tab-btn ${
@@ -874,15 +855,18 @@ const MyProfile = () => {
               setActiveTab(tab.name)
             }
           >
-            {tab.icon} {tab.name}
+            {tab.icon}
+            {tab.name}
           </button>
-
         ))}
 
       </div>
 
-      {activeTab === "Profile Settings" && (
+      {/* =====================================================
+          PROFILE SETTINGS
+      ===================================================== */}
 
+      {activeTab === "Profile Settings" && (
         <div
           className={`myprofile-main-grid ${
             !isRightPanelVisible
@@ -891,11 +875,17 @@ const MyProfile = () => {
           }`}
         >
 
+          {/* =================================================
+              LEFT FORM
+          ================================================= */}
+
           <div className="myprofile-form-card">
 
             <div className="myprofile-card-header">
 
-              <h3>Profile Information</h3>
+              <h3>
+                Profile Information
+              </h3>
 
               <p>
                 Update your personal information
@@ -909,26 +899,28 @@ const MyProfile = () => {
               className="myprofile-form"
             >
 
+              {/* =================================================
+                  AVATAR
+              ================================================= */}
+
               <div className="myprofile-avatar-upload-section">
 
                 <div className="myprofile-avatar-preview">
 
-                  {formData.avatar ? (
-
+                  {profileAvatar ? (
                     <img
-                      src={formData.avatar}
+                      src={profileAvatar}
                       alt="Avatar"
                       className="myprofile-avatar-img"
                     />
-
                   ) : (
-
                     <div className="myprofile-avatar-fallback">
                       {formData.name
-                        ? formData.name.charAt(0)
+                        ? formData.name
+                            .charAt(0)
+                            .toUpperCase()
                         : "A"}
                     </div>
-
                   )}
 
                   <button
@@ -937,14 +929,23 @@ const MyProfile = () => {
                     onClick={() =>
                       fileInputRef.current?.click()
                     }
+                    disabled={avatarUploading}
                   >
-                    <FiCamera />
+                    {avatarUploading ? (
+                      <span className="myprofile-avatar-loader">
+                        ...
+                      </span>
+                    ) : (
+                      <FiCamera />
+                    )}
                   </button>
 
                   <input
                     type="file"
                     ref={fileInputRef}
-                    onChange={handleImageUpload}
+                    onChange={
+                      handleImageUpload
+                    }
                     accept="image/png, image/jpeg, image/webp"
                     style={{
                       display: "none",
@@ -954,22 +955,32 @@ const MyProfile = () => {
                 </div>
 
                 <span className="myprofile-upload-hint">
-                  JPG, PNG or WEBP. Max size 2MB.
+                  {avatarUploading
+                    ? "Uploading profile picture..."
+                    : "JPG, PNG or WEBP. Max size 5MB."}
                 </span>
 
               </div>
+
+              {/* =================================================
+                  NAME + EMAIL
+              ================================================= */}
 
               <div className="myprofile-form-row">
 
                 <div className="myprofile-form-group">
 
-                  <label>Full Name *</label>
+                  <label>
+                    Full Name *
+                  </label>
 
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
-                    onChange={handleInputChange}
+                    onChange={
+                      handleInputChange
+                    }
                     required
                   />
 
@@ -977,13 +988,17 @@ const MyProfile = () => {
 
                 <div className="myprofile-form-group">
 
-                  <label>Email Address *</label>
+                  <label>
+                    Email Address *
+                  </label>
 
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleInputChange}
+                    onChange={
+                      handleInputChange
+                    }
                     required
                   />
 
@@ -991,16 +1006,21 @@ const MyProfile = () => {
 
               </div>
 
+              {/* =================================================
+                  PHONE + ROLE
+              ================================================= */}
+
               <div className="myprofile-form-row">
 
                 <div className="myprofile-form-group">
 
-                  <label>Phone Number *</label>
+                  <label>
+                    Phone Number *
+                  </label>
 
                   <div className="myprofile-phone-input-wrap">
 
                     <select className="myprofile-country-code">
-
                       <option value="+1">
                         +1
                       </option>
@@ -1012,14 +1032,15 @@ const MyProfile = () => {
                       <option value="+91">
                         +91
                       </option>
-
                     </select>
 
                     <input
                       type="text"
                       name="phone"
                       value={formData.phone}
-                      onChange={handleInputChange}
+                      onChange={
+                        handleInputChange
+                      }
                       required
                     />
 
@@ -1029,7 +1050,9 @@ const MyProfile = () => {
 
                 <div className="myprofile-form-group">
 
-                  <label>Role</label>
+                  <label>
+                    Role
+                  </label>
 
                   <input
                     type="text"
@@ -1042,29 +1065,46 @@ const MyProfile = () => {
 
               </div>
 
+              {/* =================================================
+                  ADDRESS
+              ================================================= */}
+
               <div className="myprofile-form-group">
 
-                <label>Address</label>
+                <label>
+                  Address
+                </label>
 
                 <input
                   type="text"
                   name="address"
                   value={formData.address}
-                  onChange={handleInputChange}
+                  onChange={
+                    handleInputChange
+                  }
+                  placeholder="Enter your address"
                 />
 
               </div>
+
+              {/* =================================================
+                  LANGUAGE + TIMEZONE
+              ================================================= */}
 
               <div className="myprofile-form-row">
 
                 <div className="myprofile-form-group">
 
-                  <label>Language</label>
+                  <label>
+                    Language
+                  </label>
 
                   <select
                     name="language"
                     value={formData.language}
-                    onChange={handleInputChange}
+                    onChange={
+                      handleInputChange
+                    }
                   >
                     <option value="English">
                       English
@@ -1077,37 +1117,45 @@ const MyProfile = () => {
                     <option value="French">
                       French
                     </option>
+
+                    <option value="Hindi">
+                      Hindi
+                    </option>
+
+                    <option value="Odia">
+                      Odia
+                    </option>
                   </select>
 
                 </div>
 
                 <div className="myprofile-form-group">
 
-                  <label>Time Zone</label>
+                  <label>
+                    Time Zone
+                  </label>
 
                   <select
                     name="timeZone"
                     value={formData.timeZone}
-                    onChange={handleInputChange}
+                    onChange={
+                      handleInputChange
+                    }
                   >
+                    <option value="(UTC+05:30) India Standard Time">
+                      (UTC+05:30) India Standard Time
+                    </option>
+
                     <option value="(UTC-05:00) Eastern Time (US & Canada)">
                       (UTC-05:00) Eastern Time
-                      (US & Canada)
                     </option>
 
                     <option value="(UTC-08:00) Pacific Time (US & Canada)">
                       (UTC-08:00) Pacific Time
-                      (US & Canada)
                     </option>
 
                     <option value="(UTC+00:00) Greenwich Mean Time">
-                      (UTC+00:00) Greenwich Mean
-                      Time
-                    </option>
-
-                    <option value="(UTC+05:30) India Standard Time">
-                      (UTC+05:30) India Standard
-                      Time
+                      (UTC+00:00) Greenwich Mean Time
                     </option>
                   </select>
 
@@ -1115,26 +1163,42 @@ const MyProfile = () => {
 
               </div>
 
+              {/* =================================================
+                  BIO
+              ================================================= */}
+
               <div className="myprofile-form-group">
 
-                <label>Bio</label>
+                <label>
+                  Bio
+                </label>
 
                 <textarea
                   name="bio"
                   rows="3"
                   value={formData.bio}
-                  onChange={handleInputChange}
+                  onChange={
+                    handleInputChange
+                  }
+                  placeholder="Write something about yourself..."
                 ></textarea>
 
               </div>
 
+              {/* =================================================
+                  SUBMIT
+              ================================================= */}
+
               <button
                 type="submit"
                 className="myprofile-submit-btn"
-                disabled={savingProfile}
+                disabled={
+                  profileSaving ||
+                  avatarUploading
+                }
               >
-                {savingProfile
-                  ? "Updating..."
+                {profileSaving
+                  ? "Updating Profile..."
                   : "Update Profile"}
               </button>
 
@@ -1142,8 +1206,11 @@ const MyProfile = () => {
 
           </div>
 
-          {isRightPanelVisible && (
+          {/* =================================================
+              RIGHT PANEL
+          ================================================= */}
 
+          {isRightPanelVisible && (
             <div className="myprofile-right-panels">
 
               <button
@@ -1155,9 +1222,15 @@ const MyProfile = () => {
                 <FiX />
               </button>
 
+              {/* =================================================
+                  PROFILE PREVIEW
+              ================================================= */}
+
               <div className="myprofile-preview-card">
 
-                <h4>Profile Preview</h4>
+                <h4>
+                  Profile Preview
+                </h4>
 
                 <p className="myprofile-preview-sub">
                   This is how your profile appears
@@ -1167,21 +1240,19 @@ const MyProfile = () => {
 
                   <div className="myprofile-preview-avatar">
 
-                    {currentProfile.avatar ? (
-
+                    {currentAvatar ? (
                       <img
-                        src={currentProfile.avatar}
+                        src={currentAvatar}
                         alt="Avatar"
                       />
-
                     ) : (
-
                       <div className="myprofile-preview-fallback">
                         {currentProfile.name
-                          ? currentProfile.name.charAt(0)
+                          ? currentProfile.name
+                              .charAt(0)
+                              .toUpperCase()
                           : "A"}
                       </div>
-
                     )}
 
                   </div>
@@ -1197,17 +1268,17 @@ const MyProfile = () => {
                   <div className="myprofile-preview-details">
 
                     <p>
-                      <FiMail />{" "}
+                      <FiMail />
                       {currentProfile.email}
                     </p>
 
                     <p>
-                      <FiPhone />{" "}
+                      <FiPhone />
                       {currentProfile.phone}
                     </p>
 
                     <p>
-                      <FiMapPin />{" "}
+                      <FiMapPin />
                       {currentProfile.address ||
                         "Address not added"}
                     </p>
@@ -1216,9 +1287,10 @@ const MyProfile = () => {
 
                   <div className="myprofile-preview-footer">
 
-                    <FiCalendar /> Member since{" "}
-                    {currentProfile.created ||
-                      "N/A"}
+                    <FiCalendar />
+
+                    Member since{" "}
+                    {currentProfile.created}
 
                   </div>
 
@@ -1226,19 +1298,25 @@ const MyProfile = () => {
 
               </div>
 
+              {/* =================================================
+                  ACCOUNT INFORMATION
+              ================================================= */}
+
               <div className="myprofile-info-card">
 
-                <h4>Account Information</h4>
+                <h4>
+                  Account Information
+                </h4>
 
                 <div className="myprofile-info-row">
 
                   <span>
-                    <FiUser /> User ID
+                    <FiUser />
+                    User ID
                   </span>
 
                   <span className="myprofile-info-val">
-                    {currentProfile.id ||
-                      "DRVX-ADM-001"}
+                    {currentProfile.id}
                   </span>
 
                 </div>
@@ -1246,12 +1324,12 @@ const MyProfile = () => {
                 <div className="myprofile-info-row">
 
                   <span>
-                    <FiCalendar /> Account Created
+                    <FiCalendar />
+                    Account Created
                   </span>
 
                   <span className="myprofile-info-val">
-                    {currentProfile.created ||
-                      "N/A"}
+                    {currentProfile.created}
                   </span>
 
                 </div>
@@ -1259,12 +1337,12 @@ const MyProfile = () => {
                 <div className="myprofile-info-row">
 
                   <span>
-                    <FiClock /> Last Login
+                    <FiClock />
+                    Last Login
                   </span>
 
                   <span className="myprofile-info-val">
-                    {currentProfile.lastLogin ||
-                      "N/A"}
+                    {currentProfile.lastLogin}
                   </span>
 
                 </div>
@@ -1272,12 +1350,12 @@ const MyProfile = () => {
                 <div className="myprofile-info-row">
 
                   <span>
-                    <FiShield /> Account Status
+                    <FiShield />
+                    Account Status
                   </span>
 
                   <span className="myprofile-badge-active">
-                    {currentProfile.status ||
-                      "Active"}
+                    {currentProfile.status}
                   </span>
 
                 </div>
@@ -1285,7 +1363,8 @@ const MyProfile = () => {
                 <div className="myprofile-info-row">
 
                   <span>
-                    <FiLock /> Two-Factor Authentication
+                    <FiLock />
+                    Two-Factor Authentication
                   </span>
 
                   <span
@@ -1305,18 +1384,21 @@ const MyProfile = () => {
               </div>
 
             </div>
-
           )}
 
         </div>
-
       )}
 
-      {activeTab === "Change Password" && (
+      {/* =====================================================
+          CHANGE PASSWORD
+      ===================================================== */}
 
+      {activeTab === "Change Password" && (
         <div className="myprofile-tab-content-card">
 
-          <h3>Change Password</h3>
+          <h3>
+            Change Password
+          </h3>
 
           <p>
             Ensure your account is using a long,
@@ -1330,7 +1412,9 @@ const MyProfile = () => {
 
             <div className="myprofile-form-group">
 
-              <label>Current Password *</label>
+              <label>
+                Current Password *
+              </label>
 
               <input
                 type="password"
@@ -1338,7 +1422,8 @@ const MyProfile = () => {
                 onChange={(e) =>
                   setPasswordData({
                     ...passwordData,
-                    current: e.target.value,
+                    current:
+                      e.target.value,
                   })
                 }
                 required
@@ -1348,7 +1433,9 @@ const MyProfile = () => {
 
             <div className="myprofile-form-group">
 
-              <label>New Password *</label>
+              <label>
+                New Password *
+              </label>
 
               <input
                 type="password"
@@ -1356,7 +1443,8 @@ const MyProfile = () => {
                 onChange={(e) =>
                   setPasswordData({
                     ...passwordData,
-                    newPass: e.target.value,
+                    newPass:
+                      e.target.value,
                   })
                 }
                 required
@@ -1376,7 +1464,8 @@ const MyProfile = () => {
                 onChange={(e) =>
                   setPasswordData({
                     ...passwordData,
-                    confirm: e.target.value,
+                    confirm:
+                      e.target.value,
                   })
                 }
                 required
@@ -1387,28 +1476,32 @@ const MyProfile = () => {
             <button
               type="submit"
               className="myprofile-submit-btn"
-              disabled={savingPassword}
+              disabled={passwordSaving}
             >
-              {savingPassword
-                ? "Updating..."
+              {passwordSaving
+                ? "Updating Password..."
                 : "Update Password"}
             </button>
 
           </form>
 
         </div>
-
       )}
 
-      {activeTab === "Account Preferences" && (
+      {/* =====================================================
+          ACCOUNT PREFERENCES
+      ===================================================== */}
 
+      {activeTab === "Account Preferences" && (
         <div className="myprofile-tab-content-card">
 
-          <h3>Account Preferences</h3>
+          <h3>
+            Account Preferences
+          </h3>
 
           <p>
-            Manage your notification settings and
-            display options.
+            Manage your notification settings
+            and display options.
           </p>
 
           <div className="myprofile-preferences-list">
@@ -1427,8 +1520,8 @@ const MyProfile = () => {
                 }
               />
 
-              Receive Email Notifications for
-              system updates
+              Receive Email Notifications
+              for system updates
 
             </label>
 
@@ -1446,8 +1539,8 @@ const MyProfile = () => {
                 }
               />
 
-              Receive SMS Alerts for booking
-              activities
+              Receive SMS Alerts for
+              booking activities
 
             </label>
 
@@ -1465,7 +1558,8 @@ const MyProfile = () => {
                 }
               />
 
-              Enable Dark Mode Theme interface
+              Enable Dark Mode Theme
+              interface
 
             </label>
 
@@ -1483,8 +1577,8 @@ const MyProfile = () => {
                 }
               />
 
-              Require Two-Factor Authentication
-              on login
+              Require Two-Factor
+              Authentication on login
 
             </label>
 
@@ -1495,20 +1589,25 @@ const MyProfile = () => {
             onClick={
               handlePreferencesUpdate
             }
-            disabled={savingPreferences}
+            disabled={preferencesSaving}
           >
-            {savingPreferences
-              ? "Saving..."
+            {preferencesSaving
+              ? "Saving Preferences..."
               : "Save Preferences"}
           </button>
 
         </div>
-
       )}
+
+      {/* =====================================================
+          QUICK ACTIONS
+      ===================================================== */}
 
       <div className="myprofile-quick-actions-card">
 
-        <h4>Quick Actions</h4>
+        <h4>
+          Quick Actions
+        </h4>
 
         <p>
           Manage your account security and
@@ -1520,7 +1619,9 @@ const MyProfile = () => {
           <div
             className="myprofile-quick-item"
             onClick={() =>
-              setActiveTab("Change Password")
+              setActiveTab(
+                "Change Password"
+              )
             }
           >
 
@@ -1529,13 +1630,13 @@ const MyProfile = () => {
             </div>
 
             <div>
-
-              <h5>Change Password</h5>
+              <h5>
+                Change Password
+              </h5>
 
               <p>
                 Update your account password
               </p>
-
             </div>
 
             <FiArrowRight className="myprofile-arrow" />
@@ -1544,8 +1645,8 @@ const MyProfile = () => {
 
           <div
             className="myprofile-quick-item"
-            onClick={
-              handleSecuritySettings
+            onClick={() =>
+              setShowSecuritySettings(true)
             }
           >
 
@@ -1554,13 +1655,13 @@ const MyProfile = () => {
             </div>
 
             <div>
-
-              <h5>Security Settings</h5>
+              <h5>
+                Security Settings
+              </h5>
 
               <p>
                 Manage 2FA and login security
               </p>
-
             </div>
 
             <FiArrowRight className="myprofile-arrow" />
@@ -1569,8 +1670,8 @@ const MyProfile = () => {
 
           <div
             className="myprofile-quick-item"
-            onClick={
-              handleLoginActivity
+            onClick={() =>
+              setShowLoginActivity(true)
             }
           >
 
@@ -1579,13 +1680,13 @@ const MyProfile = () => {
             </div>
 
             <div>
-
-              <h5>Login Activity</h5>
+              <h5>
+                Login Activity
+              </h5>
 
               <p>
                 View recent login sessions
               </p>
-
             </div>
 
             <FiArrowRight className="myprofile-arrow" />
@@ -1596,8 +1697,11 @@ const MyProfile = () => {
 
       </div>
 
-      {showSecuritySettings && (
+      {/* =====================================================
+          SECURITY MODAL
+      ===================================================== */}
 
+      {showSecuritySettings && (
         <div
           className="myprofile-modal-overlay"
           onClick={() =>
@@ -1614,7 +1718,9 @@ const MyProfile = () => {
 
             <div className="myprofile-modal-header">
 
-              <h3>Security Settings</h3>
+              <h3>
+                Security Settings
+              </h3>
 
               <button
                 onClick={() =>
@@ -1644,50 +1750,51 @@ const MyProfile = () => {
                 type="button"
                 className="myprofile-modal-save-btn"
                 onClick={async () => {
-                  const nextValue =
-                    !preferences.twoFactor;
+
+                  const updated = {
+                    ...preferences,
+                    twoFactor:
+                      !preferences.twoFactor,
+                  };
 
                   try {
-                    setSavingPreferences(true);
 
-                    const updated = {
-                      ...preferences,
-                      twoFactor: nextValue,
-                    };
-
-                    const response =
+                    const res =
                       await API.put(
                         "/auth/preferences",
                         updated
                       );
 
-                    setPreferences(
-                      response.data
-                        ?.preferences ||
-                        updated
-                    );
+                    if (
+                      res.data?.preferences
+                    ) {
+                      setPreferences(
+                        res.data.preferences
+                      );
+                    }
 
                     alert(
-                      response.data
-                        ?.message ||
-                        "Security settings updated successfully!"
-                    );
-                  } catch (error) {
-                    console.error(
-                      "SECURITY UPDATE ERROR:",
-                      error
+                      "Security settings updated successfully!"
                     );
 
-                    alert(
-                      error.response?.data
-                        ?.message ||
-                        "Failed to update security settings"
-                    );
-                  } finally {
-                    setSavingPreferences(
+                    setShowSecuritySettings(
                       false
                     );
+
+                  } catch (err) {
+
+                    console.error(
+                      "Failed to update security settings:",
+                      err
+                    );
+
+                    alert(
+                      err.response?.data
+                        ?.message ||
+                        "Failed to update security settings."
+                    );
                   }
+
                 }}
               >
                 {preferences.twoFactor
@@ -1700,11 +1807,13 @@ const MyProfile = () => {
           </div>
 
         </div>
-
       )}
 
-      {showLoginActivity && (
+      {/* =====================================================
+          LOGIN ACTIVITY MODAL
+      ===================================================== */}
 
+      {showLoginActivity && (
         <div
           className="myprofile-modal-overlay"
           onClick={() =>
@@ -1721,13 +1830,13 @@ const MyProfile = () => {
 
             <div className="myprofile-modal-header">
 
-              <h3>Login Activity</h3>
+              <h3>
+                Login Activity
+              </h3>
 
               <button
                 onClick={() =>
-                  setShowLoginActivity(
-                    false
-                  )
+                  setShowLoginActivity(false)
                 }
               >
                 <FiX />
@@ -1738,16 +1847,12 @@ const MyProfile = () => {
             <div className="myprofile-modal-form">
 
               {loginActivity.length === 0 ? (
-
                 <p>
                   No login activity found.
                 </p>
-
               ) : (
-
                 loginActivity.map(
                   (activity, index) => (
-
                     <div
                       key={
                         activity._id ||
@@ -1762,8 +1867,7 @@ const MyProfile = () => {
                     >
 
                       <strong>
-                        Login{" "}
-                        {index + 1}
+                        Login {index + 1}
                       </strong>
 
                       <p>
@@ -1780,10 +1884,8 @@ const MyProfile = () => {
                       </p>
 
                     </div>
-
                   )
                 )
-
               )}
 
             </div>
@@ -1791,129 +1893,6 @@ const MyProfile = () => {
           </div>
 
         </div>
-
-      )}
-
-      {showAddModal && (
-
-        <div
-          className="myprofile-modal-overlay"
-          onClick={() =>
-            setShowAddModal(false)
-          }
-        >
-
-          <div
-            className="myprofile-modal-content"
-            onClick={(e) =>
-              e.stopPropagation()
-            }
-          >
-
-            <div className="myprofile-modal-header">
-
-              <h3>Add New Profile</h3>
-
-              <button
-                onClick={() =>
-                  setShowAddModal(false)
-                }
-              >
-                <FiX />
-              </button>
-
-            </div>
-
-            <form
-              onSubmit={handleAddProfile}
-              className="myprofile-modal-form"
-            >
-
-              <input
-                type="text"
-                name="name"
-                placeholder="Full Name *"
-                value={newProfile.name}
-                onChange={
-                  handleNewProfileChange
-                }
-                required
-              />
-
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address *"
-                value={newProfile.email}
-                onChange={
-                  handleNewProfileChange
-                }
-                required
-              />
-
-              <input
-                type="text"
-                name="phone"
-                placeholder="Phone Number *"
-                value={newProfile.phone}
-                onChange={
-                  handleNewProfileChange
-                }
-                required
-              />
-
-              <select
-                name="role"
-                value={newProfile.role}
-                onChange={
-                  handleNewProfileChange
-                }
-              >
-
-                <option value="Super Admin">
-                  Super Admin
-                </option>
-
-                <option value="Manager">
-                  Manager
-                </option>
-
-                <option value="Support Agent">
-                  Support Agent
-                </option>
-
-              </select>
-
-              <div className="myprofile-modal-actions">
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setShowAddModal(false)
-                  }
-                  disabled={addingProfile}
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  className="myprofile-modal-save-btn"
-                  disabled={addingProfile}
-                >
-                  {addingProfile
-                    ? "Saving..."
-                    : "Save Profile"}
-                </button>
-
-              </div>
-
-            </form>
-
-          </div>
-
-        </div>
-
       )}
 
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import {
   FaCar,
@@ -69,6 +69,166 @@ const emptyForm = {
   fullDesc: "",
 };
 
+/* =====================================================
+   RICH TEXT HELPERS
+   The editor displays formatting directly while typing.
+   Before save, HTML is converted to the same Markdown format
+   already used by the existing backend.
+===================================================== */
+
+const escapeHtml = (value = "") =>
+  String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+const safeMarkdownUrl = (url = "") => {
+  const cleanUrl = String(url).trim();
+  return /^(https?:\/\/|mailto:)/i.test(cleanUrl) ? cleanUrl : "#";
+};
+
+const formatInlineMarkdown = (value = "") => {
+  let html = escapeHtml(value);
+
+  html = html.replace(
+    /!\[([^\]]*)\]\((https?:\/\/[^)]+)\)/gi,
+    (_, alt, url) =>
+      `<img class="FeatureListing-editor-image" src="${safeMarkdownUrl(url)}" alt="${escapeHtml(alt)}" />`
+  );
+
+  html = html.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/gi,
+    (_, label, url) =>
+      `<a class="FeatureListing-editor-link" href="${safeMarkdownUrl(url)}" target="_blank" rel="noopener noreferrer">${label}</a>`
+  );
+
+  html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, "$1<em>$2</em>");
+
+  return html;
+};
+
+const markdownToEditorHtml = (markdown = "") => {
+  if (!String(markdown).trim()) return "";
+
+  const lines = String(markdown).replace(/\r\n/g, "\n").split("\n");
+  const html = [];
+  let index = 0;
+
+  while (index < lines.length) {
+    const line = lines[index];
+
+    if (!line.trim()) {
+      index += 1;
+      continue;
+    }
+
+    if (/^\s*\d+\.\s+/.test(line)) {
+      const items = [];
+      while (index < lines.length && /^\s*\d+\.\s+/.test(lines[index])) {
+        items.push(`<li>${formatInlineMarkdown(lines[index].replace(/^\s*\d+\.\s+/, ""))}</li>`);
+        index += 1;
+      }
+      html.push(`<ol>${items.join("")}</ol>`);
+      continue;
+    }
+
+    if (/^\s*[-*]\s+/.test(line)) {
+      const items = [];
+      while (index < lines.length && /^\s*[-*]\s+/.test(lines[index])) {
+        items.push(`<li>${formatInlineMarkdown(lines[index].replace(/^\s*[-*]\s+/, ""))}</li>`);
+        index += 1;
+      }
+      html.push(`<ul>${items.join("")}</ul>`);
+      continue;
+    }
+
+    const paragraphLines = [];
+    while (
+      index < lines.length &&
+      lines[index].trim() &&
+      !/^\s*\d+\.\s+/.test(lines[index]) &&
+      !/^\s*[-*]\s+/.test(lines[index])
+    ) {
+      paragraphLines.push(formatInlineMarkdown(lines[index]));
+      index += 1;
+    }
+
+    html.push(`<p>${paragraphLines.join("<br />")}</p>`);
+  }
+
+  return html.join("");
+};
+
+const nodeToMarkdown = (node) => {
+  if (!node) return "";
+  if (node.nodeType === Node.TEXT_NODE) return node.nodeValue || "";
+  if (node.nodeType !== Node.ELEMENT_NODE) return "";
+
+  const tag = node.tagName.toLowerCase();
+  const children = Array.from(node.childNodes).map(nodeToMarkdown).join("");
+
+  switch (tag) {
+    case "strong":
+    case "b":
+      return children.trim() ? `**${children}**` : "";
+    case "em":
+    case "i":
+      return children.trim() ? `*${children}*` : "";
+    case "br":
+      return "\n";
+    case "a": {
+      const href = node.getAttribute("href") || "";
+      const label = children.trim() || "link text";
+      return href ? `[${label}](${href})` : label;
+    }
+    case "img": {
+      const src = node.getAttribute("src") || "";
+      const alt = node.getAttribute("alt") || "image";
+      return src ? `![${alt}](${src})` : "";
+    }
+    case "li":
+      return children;
+    case "ul":
+      return Array.from(node.children)
+        .filter((child) => child.tagName.toLowerCase() === "li")
+        .map((li) => `- ${nodeToMarkdown(li).trim()}`)
+        .join("\n") + "\n";
+    case "ol":
+      return Array.from(node.children)
+        .filter((child) => child.tagName.toLowerCase() === "li")
+        .map((li, i) => `${i + 1}. ${nodeToMarkdown(li).trim()}`)
+        .join("\n") + "\n";
+    case "p":
+    case "div":
+      return `${children.trim()}\n`;
+    case "span":
+      return children;
+    default:
+      return children;
+  }
+};
+
+const htmlToMarkdown = (html = "") => {
+  if (!String(html).trim()) return "";
+  const container = document.createElement("div");
+  container.innerHTML = html;
+  return nodeToMarkdown(container)
+    .replace(/\u00a0/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+};
+
+const renderMarkdownPreview = (markdown = "") => {
+  const html = markdownToEditorHtml(markdown);
+  if (!html) {
+    return `<div class="FeatureListing-preview-empty"><span>Live preview</span><p>Your formatted description will appear here.</p></div>`;
+  }
+  return html;
+};
+
 // =====================================================
 // COMPONENT
 // =====================================================
@@ -94,6 +254,8 @@ export function FeatureListing() {
 
   const [formData, setFormData] =
     useState(emptyForm);
+
+  const fullDescEditorRef = useRef(null);
 
   const [isEditing, setIsEditing] =
     useState(false);
@@ -322,6 +484,10 @@ export function FeatureListing() {
     setNewImagePreviews([]);
 
     setIsEditing(false);
+
+    requestAnimationFrame(() => {
+      if (fullDescEditorRef.current) fullDescEditorRef.current.innerHTML = "";
+    });
   };
 
   // =====================================================
@@ -514,6 +680,10 @@ export function FeatureListing() {
         setNewImageFiles([]);
         setNewImagePreviews([]);
         setIsEditing(false);
+
+        requestAnimationFrame(() => {
+          if (fullDescEditorRef.current) fullDescEditorRef.current.innerHTML = "";
+        });
       }
     } catch (error) {
       console.error(
@@ -658,6 +828,12 @@ export function FeatureListing() {
         "",
     });
 
+    requestAnimationFrame(() => {
+      if (fullDescEditorRef.current) {
+        fullDescEditorRef.current.innerHTML = markdownToEditorHtml(listing.fullDesc || "");
+      }
+    });
+
     // ---------------------------------------------------
     // IMAGES
     // ---------------------------------------------------
@@ -756,93 +932,61 @@ export function FeatureListing() {
   // FORMAT TEXT
   // =====================================================
 
-  const handleFormatText = (
-    wrapperTag
-  ) => {
-    const textarea =
-      document.getElementById(
-        "FeatureListing-fullDescTextarea"
-      );
+  const syncRichEditorToForm = () => {
+    const editor = fullDescEditorRef.current;
+    if (!editor) return;
 
-    if (!textarea) {
-      return;
-    }
+    setFormData((prev) => ({
+      ...prev,
+      fullDesc: htmlToMarkdown(editor.innerHTML),
+    }));
+  };
 
-    const start =
-      textarea.selectionStart;
+  const handleFormatText = (wrapperTag) => {
+    const editor = fullDescEditorRef.current;
+    if (!editor) return;
 
-    const end =
-      textarea.selectionEnd;
-
-    const text =
-      textarea.value;
-
-    let replacement = "";
+    editor.focus();
 
     switch (wrapperTag) {
       case "bold":
-        replacement = `**${
-          text.substring(
-            start,
-            end
-          ) || "Bold text"
-        }**`;
+        document.execCommand("bold", false, null);
         break;
-
       case "italic":
-        replacement = `*${
-          text.substring(
-            start,
-            end
-          ) || "Italic text"
-        }*`;
+        document.execCommand("italic", false, null);
         break;
-
       case "ul":
-        replacement = `\n- ${
-          text.substring(
-            start,
-            end
-          ) || "List item"
-        }`;
+        document.execCommand("insertUnorderedList", false, null);
         break;
-
       case "ol":
-        replacement = `\n1. ${
-          text.substring(
-            start,
-            end
-          ) || "List item"
-        }`;
+        document.execCommand("insertOrderedList", false, null);
         break;
-
-      case "link":
-        replacement = `[${
-          text.substring(
-            start,
-            end
-          ) || "link text"
-        }](https://example.com)`;
+      case "link": {
+        const selection = window.getSelection();
+        const selectedText = selection?.toString().trim();
+        if (!selectedText) {
+          document.execCommand("insertText", false, "link text");
+        }
+        const url = window.prompt("Enter the URL:", "https://example.com");
+        if (url) document.execCommand("createLink", false, url.trim());
         break;
-
-      case "image":
-        replacement =
-          "![alt text](https://images.unsplash.com/photo-...)";
+      }
+      case "image": {
+        const url = window.prompt("Enter image URL:", "https://images.unsplash.com/photo-...");
+        if (url && /^https?:\/\//i.test(url.trim())) {
+          document.execCommand("insertImage", false, url.trim());
+        }
         break;
-
+      }
       default:
         return;
     }
 
-    const updatedText =
-      text.substring(0, start) +
-      replacement +
-      text.substring(end);
+    syncRichEditorToForm();
 
-    setFormData((prev) => ({
-      ...prev,
-      fullDesc: updatedText,
-    }));
+    requestAnimationFrame(() => {
+      fullDescEditorRef.current?.focus();
+    });
   };
 
   // =====================================================
@@ -1752,93 +1896,68 @@ export function FeatureListing() {
               <div className="FeatureListing-editor-wrapper">
 
                 <div className="FeatureListing-editor-toolbar">
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleFormatText(
-                        "bold"
-                      )
-                    }
-                    title="Bold"
-                  >
+                  <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => handleFormatText("bold")} title="Bold" aria-label="Bold">
                     <FaBold />
                   </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleFormatText(
-                        "italic"
-                      )
-                    }
-                    title="Italic"
-                  >
+                  <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => handleFormatText("italic")} title="Italic" aria-label="Italic">
                     <FaItalic />
                   </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleFormatText(
-                        "ul"
-                      )
-                    }
-                    title="Bullet List"
-                  >
+                  <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => handleFormatText("ul")} title="Bullet List" aria-label="Bullet List">
                     <FaListUl />
                   </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleFormatText(
-                        "ol"
-                      )
-                    }
-                    title="Numbered List"
-                  >
+                  <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => handleFormatText("ol")} title="Numbered List" aria-label="Numbered List">
                     <FaListOl />
                   </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleFormatText(
-                        "link"
-                      )
-                    }
-                    title="Insert Link"
-                  >
+                  <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => handleFormatText("link")} title="Insert Link" aria-label="Insert Link">
                     <FaLink />
                   </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleFormatText(
-                        "image"
-                      )
-                    }
-                    title="Insert Image"
-                  >
+                  <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => handleFormatText("image")} title="Insert Image" aria-label="Insert Image">
                     <FaImage />
                   </button>
-
                 </div>
 
-                <textarea
-                  id="FeatureListing-fullDescTextarea"
-                  name="fullDesc"
-                  rows="4"
-                  placeholder="Write detailed description about the vehicle..."
-                  value={
-                    formData.fullDesc
-                  }
-                  onChange={
-                    handleInputChange
-                  }
+                <div
+                  ref={fullDescEditorRef}
+                  id="FeatureListing-fullDescEditor"
+                  className="FeatureListing-rich-editor"
+                  contentEditable
+                  role="textbox"
+                  aria-multiline="true"
+                  data-placeholder="Write detailed description about the vehicle..."
+                  spellCheck="true"
+                  onInput={syncRichEditorToForm}
+                  onKeyDown={(e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") {
+                      e.preventDefault();
+                      handleFormatText("bold");
+                    }
+                    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "i") {
+                      e.preventDefault();
+                      handleFormatText("italic");
+                    }
+                  }}
                 />
+
+                <div className="FeatureListing-editor-hint">
+                  <span>
+                    <strong>Tip:</strong> Select text and click <b>B</b> for bold, <b>I</b> for italic, or use the list, link and image tools.
+                  </span>
+                  <span className="FeatureListing-editor-count">{formData.fullDesc.length} characters</span>
+                </div>
+
+                <div className="FeatureListing-live-preview">
+                  <div className="FeatureListing-preview-header">
+                    <div>
+                      <span className="FeatureListing-preview-eyebrow">LIVE PREVIEW</span>
+                      <h4>Formatted Description</h4>
+                    </div>
+                    <span className="FeatureListing-preview-status">Preview</span>
+                  </div>
+                  <div
+                    className="FeatureListing-preview-content"
+                    dangerouslySetInnerHTML={{ __html: renderMarkdownPreview(formData.fullDesc) }}
+                  />
+                </div>
 
               </div>
 

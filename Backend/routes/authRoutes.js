@@ -1,42 +1,89 @@
 const express = require("express");
 
+const router = express.Router();
+
+/* =====================================================
+   UPLOAD MIDDLEWARE
+   ===================================================== */
+
 const {
-  setupAdmin,
-  getSetupStatus,
-  loginAdmin,
+  upload,
+  convertAvatarToWebp,
+} = require("../middleware/upload");
+
+/* =====================================================
+   AUTH CONTROLLER
+   ===================================================== */
+
+const {
   getMe,
   updateProfile,
   updatePassword,
   updatePreferences,
+  createProfile,
   getLoginActivity,
+  updateAvatar,
 } = require("../controllers/authController");
 
-const protect = require("../middleware/authMiddleware");
+/* =====================================================
+   GET CURRENT SUPER ADMIN
+   GET /api/auth/me
+   ===================================================== */
 
-const router = express.Router();
+router.get("/me", getMe);
 
-router.post("/setup", setupAdmin);
+/* =====================================================
+   UPDATE PROFILE
+   PUT /api/auth/profile
+   ===================================================== */
 
-router.get("/setup-status", getSetupStatus);
+router.put("/profile", updateProfile);
 
-router.post("/login", loginAdmin);
+/* =====================================================
+   UPDATE PASSWORD
+   PUT /api/auth/password
+   ===================================================== */
 
-router.get("/me", protect, getMe);
+router.put("/password", updatePassword);
 
-router.put("/profile", protect, updateProfile);
+/* =====================================================
+   UPDATE PREFERENCES
+   PUT /api/auth/preferences
+   ===================================================== */
 
-router.put("/password", protect, updatePassword);
+router.put("/preferences", updatePreferences);
+
+/* =====================================================
+   CREATE PROFILE
+   POST /api/auth/profiles
+   ===================================================== */
+
+router.post("/profiles", createProfile);
+
+/* =====================================================
+   LOGIN ACTIVITY
+   GET /api/auth/login-activity
+   ===================================================== */
+
+router.get("/login-activity", getLoginActivity);
+
+/* =====================================================
+   UPDATE ADMIN AVATAR
+   PUT /api/auth/avatar
+
+   FormData field:
+   image
+   ===================================================== */
 
 router.put(
-  "/preferences",
-  protect,
-  updatePreferences
+  "/avatar",
+  upload.single("image"),
+  convertAvatarToWebp,
+  updateAvatar
 );
 
-router.get(
-  "/login-activity",
-  protect,
-  getLoginActivity
-);
+/* =====================================================
+   EXPORT ROUTER
+   ===================================================== */
 
 module.exports = router;

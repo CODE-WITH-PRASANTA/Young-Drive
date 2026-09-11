@@ -43,36 +43,35 @@
   margin: 0;
 }
 
-/* --- VIEW MORE BUTTON --- */
+/* --- CONTACT MORE BUTTON (REPLACES VIEW MORE) --- */
 .view-more-btn {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   background-color: #5be161;
-  color: #000000;
+  color: #071108;
   border: 1px solid #5be161;
-  padding: 12px 24px;
+  padding: 12px 22px;
   border-radius: 12px;
   font-size: 14px;
   font-weight: 700;
+  text-decoration: none;
   cursor: pointer;
+  box-shadow: 0 7px 20px rgba(91, 225, 97, 0.18);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .view-more-btn:hover {
-  background-color: #f4f5f7;
-  color: #121212;
-  border-color: #e0e0e0;
   transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(91, 225, 97, 0.25);
 }
 
-.btn-arrow {
-  font-size: 16px;
-  transition: transform 0.2s ease;
+.view-more-btn svg {
+  transition: transform 0.25s ease;
 }
 
-.view-more-btn:hover .btn-arrow {
-  transform: translateX(3px);
+.view-more-btn:hover svg {
+  transform: scale(1.1);
 }
 
 /* --- CAR GRID --- */
@@ -142,29 +141,6 @@
   font-weight: 600;
   padding: 6px 12px;
   border-radius: 10px;
-}
-
-/* --- CARD ARROW BUTTON --- */
-.card-arrow-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: #f4f5f7;
-  color: #121212;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Change color ONLY when pointing directly on the round arrow button */
-.card-arrow-btn:hover {
-  background-color: #5be161;
-  color: #000000;
-  transform: scale(1.12);
 }
 
 /* --- HOW IT WORKS SECTION --- */
@@ -258,6 +234,11 @@
   .section-title,
   .how-title {
     font-size: 28px;
+  }
+
+  .view-more-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 

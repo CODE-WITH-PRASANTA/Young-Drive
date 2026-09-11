@@ -1,7 +1,6 @@
 import React, {
   useState,
   useEffect,
-  useCallback,
 } from "react";
 
 import {
@@ -24,23 +23,13 @@ import {
   X,
 } from "lucide-react";
 
-import axios from "axios";
-
 import "./Sidebar.css";
 
 const MOBILE_BREAKPOINT = 768;
 
-/* =====================================================
-   API CONFIG
-===================================================== */
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:5000/api";
-
-/* =====================================================
-   MENU CONFIG
-===================================================== */
+// =====================================================
+// MENU CONFIG
+// =====================================================
 
 const menuConfig = [
   {
@@ -130,9 +119,9 @@ const menuConfig = [
   },
 ];
 
-/* =====================================================
-   SIDEBAR
-===================================================== */
+// =====================================================
+// SIDEBAR
+// =====================================================
 
 const Sidebar = ({
   isCollapsed = false,
@@ -143,9 +132,9 @@ const Sidebar = ({
 }) => {
   const location = useLocation();
 
-  /* ===================================================
-     ADMIN STATE
-  =================================================== */
+  // ===================================================
+  // ADMIN
+  // ===================================================
 
   const [admin, setAdmin] = useState({
     username: "Admin User",
@@ -155,100 +144,58 @@ const Sidebar = ({
   const [adminLoading, setAdminLoading] =
     useState(true);
 
-  /* ===================================================
-     FETCH CURRENT ADMIN
-  =================================================== */
-
-  const fetchCurrentAdmin = useCallback(
-    async () => {
-      const token =
-        localStorage.getItem(
-          "adminToken"
-        );
-
-      if (!token) {
-        setAdminLoading(false);
-        return;
-      }
-
-      try {
-        const response =
-          await axios.get(
-            `${API_BASE_URL}/auth/me`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-        if (
-          response.data?.success &&
-          response.data?.admin
-        ) {
-          setAdmin({
-            username:
-              response.data.admin.username ||
-              "Admin User",
-
-            role:
-              response.data.admin.role ||
-              "Super Admin",
-          });
-        }
-      } catch (error) {
-        console.error(
-          "GET CURRENT ADMIN ERROR:",
-          error
-        );
-
-        /* =============================================
-           TOKEN EXPIRED / INVALID
-        ============================================== */
-
-        if (
-          error?.response?.status === 401
-        ) {
-          localStorage.removeItem(
-            "adminToken"
-          );
-
-          localStorage.removeItem(
-            "adminAuth"
-          );
-
-          window.location.href =
-            "/login";
-        }
-      } finally {
-        setAdminLoading(false);
-      }
-    },
-    []
-  );
-
-  /* ===================================================
-     LOAD ADMIN
-  =================================================== */
+  // ===================================================
+  // LOAD ADMIN FROM LOCAL STORAGE
+  // ===================================================
 
   useEffect(() => {
-    fetchCurrentAdmin();
-  }, [fetchCurrentAdmin]);
+    try {
+      const savedAdmin =
+        localStorage.getItem("adminUser");
 
-  /* ===================================================
-     ACTIVE PARENT
-  =================================================== */
+      if (savedAdmin) {
+        const parsedAdmin =
+          JSON.parse(savedAdmin);
 
-  const activeParent =
-    menuConfig.find(
+        setAdmin({
+          username:
+            parsedAdmin.username ||
+            parsedAdmin.name ||
+            "Admin User",
+
+          role:
+            parsedAdmin.role ||
+            "Super Admin",
+        });
+      }
+    } catch (error) {
+      console.error(
+        "ADMIN DATA ERROR:",
+        error
+      );
+    } finally {
+      setAdminLoading(false);
+    }
+  }, []);
+
+  // ===================================================
+  // ACTIVE PARENT
+  // ===================================================
+
+  const getActiveParent = () => {
+    return menuConfig.find(
       (item) =>
         item.type === "dropdown" &&
-        item.children.some(
+        item.children?.some(
           (child) =>
             location.pathname ===
             child.path
         )
     );
+  };
+
+  const activeParent =
+    getActiveParent();
 
   const [
     openSubMenu,
@@ -262,16 +209,16 @@ const Sidebar = ({
   const [flyout, setFlyout] =
     useState(null);
 
-  /* ===================================================
-     OPEN ACTIVE SUBMENU
-  =================================================== */
+  // ===================================================
+  // OPEN ACTIVE SUBMENU
+  // ===================================================
 
   useEffect(() => {
     const match =
       menuConfig.find(
         (item) =>
           item.type === "dropdown" &&
-          item.children.some(
+          item.children?.some(
             (child) =>
               location.pathname ===
               child.path
@@ -279,74 +226,34 @@ const Sidebar = ({
       );
 
     if (match) {
-      setOpenSubMenu(
-        match.text
-      );
+      setOpenSubMenu(match.text);
     }
-  }, [
-    location.pathname,
-  ]);
+  }, [location.pathname]);
 
-  /* ===================================================
-     MOBILE CLOSE
-  =================================================== */
+  // ===================================================
+  // NAV CLICK
+  // ===================================================
 
-  useEffect(() => {
+  const handleNavClick = () => {
     if (
       window.innerWidth <=
       MOBILE_BREAKPOINT
     ) {
       onClose();
     }
-  }, [
-    location.pathname,
-    onClose,
-  ]);
-
-  /* ===================================================
-     TOGGLE SUBMENU
-  =================================================== */
-
-  const toggleSubMenu = (
-    title
-  ) => {
-    setOpenSubMenu(
-      (prev) =>
-        prev === title
-          ? null
-          : title
-    );
   };
 
-  /* ===================================================
-     NAV CLICK
-  =================================================== */
-
-  const handleNavClick =
-    useCallback(() => {
-      if (
-        window.innerWidth <=
-        MOBILE_BREAKPOINT
-      ) {
-        onClose();
-      }
-    }, [onClose]);
-
-  /* ===================================================
-     ESCAPE KEY
-  =================================================== */
+  // ===================================================
+  // ESCAPE KEY + BODY SCROLL
+  // ===================================================
 
   useEffect(() => {
     if (!isMobileOpen) {
       return undefined;
     }
 
-    const handleKeyDown = (
-      e
-    ) => {
-      if (
-        e.key === "Escape"
-      ) {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
         onClose();
       }
     };
@@ -373,9 +280,9 @@ const Sidebar = ({
     onClose,
   ]);
 
-  /* ===================================================
-     RESIZE
-  =================================================== */
+  // ===================================================
+  // RESIZE
+  // ===================================================
 
   useEffect(() => {
     const handleResize = () => {
@@ -393,39 +300,34 @@ const Sidebar = ({
       handleResize
     );
 
-    return () =>
+    return () => {
       window.removeEventListener(
         "resize",
         handleResize
       );
+    };
   }, [
     isMobileOpen,
     onClose,
   ]);
 
-  /* ===================================================
-     CHILD ACTIVE
-  =================================================== */
+  // ===================================================
+  // CHILD ACTIVE
+  // ===================================================
 
-  const isChildActive = (
-    item
-  ) =>
+  const isChildActive = (item) =>
     item.children?.some(
       (child) =>
         location.pathname ===
         child.path
     );
 
-  /* ===================================================
-     LOGOUT
-  =================================================== */
+  // ===================================================
+  // LOGOUT
+  // ===================================================
 
   const handleLogoutClick = () => {
-    /*
-      Remove all authentication
-      information.
-    */
-
+    // Remove every old authentication key
     localStorage.removeItem(
       "adminToken"
     );
@@ -434,21 +336,37 @@ const Sidebar = ({
       "adminAuth"
     );
 
-    /*
-      Call parent logout handler
-      if MainLayout has one.
-    */
+    localStorage.removeItem(
+      "isAdminAuthenticated"
+    );
 
+    localStorage.removeItem(
+      "adminUser"
+    );
+
+    sessionStorage.removeItem(
+      "isAdminAuthenticated"
+    );
+
+    // Close sidebar
+    onClose();
+
+    // Parent logout callback
     onLogout();
+
+    // Completely leave protected admin panel
+    window.location.replace("/login");
   };
 
-  /* ===================================================
-     RETURN
-  =================================================== */
+  // ===================================================
+  // RETURN
+  // ===================================================
 
   return (
     <>
-      {/* MOBILE BACKDROP */}
+      {/* =================================================
+          MOBILE BACKDROP
+      ================================================= */}
 
       {isMobileOpen && (
         <div
@@ -457,6 +375,10 @@ const Sidebar = ({
           aria-hidden="true"
         />
       )}
+
+      {/* =================================================
+          SIDEBAR
+      ================================================= */}
 
       <aside
         className={`Sidebar ${
@@ -471,9 +393,7 @@ const Sidebar = ({
         aria-label="Main navigation"
       >
 
-        {/* =========================================
-            MOBILE CLOSE
-        ========================================== */}
+        {/* MOBILE CLOSE */}
 
         <button
           type="button"
@@ -484,9 +404,9 @@ const Sidebar = ({
           <X size={20} />
         </button>
 
-        {/* =========================================
+        {/* =================================================
             BRAND HEADER
-        ========================================== */}
+        ================================================= */}
 
         <div className="Sidebar-header">
 
@@ -500,7 +420,7 @@ const Sidebar = ({
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M19 17H5M19 17C20.1046 17 21 16.1046 21 15V11C21 9.89543 20.1046 9 19 9H18.2807C17.587 9 16.9472 8.64131 16.5811 8.05562L15.1182 5.71495C14.5691 4.83637 13.6095 4.3 12.5736 4.3H11.4264C10.3905 4.3 9.43093 4.83637 8.88179 5.71495L7.41886 8.05562C7.0528 8.64131 6.41298 9 5.7193 9H5C3.89543 9 3 9.89543 3 11V15C3 16.1046 3.89543 17 5 17M19 17V18C19 18.5523 18.5523 19 18 19H17C16.4477 19 16 18.5523 16 18V17M5 17V18C5 18.5523 5.44772 19 6 19H7C7.55228 19 8 18.5523 8 18V17"
+                d="M19 17H5M19 17C20.1046 17 21 16.1046 21 15V11C21 9.89543 20.1046 9 19 9H18.2807C17.587 9 16.9472 8.64131 16.5811 8.05562L15.1182 5.71495C14.5691 4.83637 13.6095 4.3 12.5736 4.3H11.4264C10.3905 4.3 9.43093 4.83637 8.88179 5.71495L7.41886 8.05562C7.0528 8.64131 6.41298 9 5.7193 9H5C3.89543 9 3 9.89543 3 11V15C3 16.1046 3.89543 17 5 17M19 17V18C19 18.5523 18.5523 19 18 19H17C16.4477 19 16 18.5523 16 18V17M5 17V18C5 18.5523 5.44772 19 6 19H7C7.55228 19 8 18.5523 8 17"
                 stroke="#fff"
                 strokeWidth="2"
                 strokeLinecap="round"
@@ -543,241 +463,178 @@ const Sidebar = ({
 
         </div>
 
-        {/* =========================================
+        {/* =================================================
             NAVIGATION
-        ========================================== */}
+        ================================================= */}
 
         <nav className="Sidebar-nav">
 
-          {menuConfig.map(
-            (item) => {
+          {menuConfig.map((item) => {
 
-              /* =====================================
-                 NORMAL LINK
-              ====================================== */
+            {/* =================================================
+                NORMAL LINK
+            ================================================= */}
 
-              if (
-                item.type ===
-                "link"
-              ) {
-
-                const isActive =
-                  location.pathname ===
-                  item.path;
-
-                return (
-                  <Link
-                    key={item.text}
-                    to={item.path}
-                    onClick={
-                      handleNavClick
-                    }
-                    className={`Sidebar-link ${
-                      isActive
-                        ? "active"
-                        : ""
-                    }`}
-                    title={
-                      isCollapsed
-                        ? item.text
-                        : undefined
-                    }
-                    aria-current={
-                      isActive
-                        ? "page"
-                        : undefined
-                    }
-                  >
-
-                    <span className="Sidebar-icon">
-                      {item.icon}
-                    </span>
-
-                    {!isCollapsed && (
-                      <span className="Sidebar-text">
-                        {item.text}
-                      </span>
-                    )}
-
-                  </Link>
-                );
-              }
-
-              /* =====================================
-                 DROPDOWN
-              ====================================== */
-
-              const isSubOpen =
-                openSubMenu ===
-                item.text;
-
-              const childActive =
-                isChildActive(
-                  item
-                );
-
-              const showFlyout =
-                isCollapsed &&
-                flyout ===
-                  item.text;
+            if (
+              item.type === "link"
+            ) {
+              const isActive =
+                location.pathname ===
+                item.path;
 
               return (
-                <div
+                <Link
                   key={item.text}
-                  className={`Sidebar-dropdown-wrapper ${
-                    isSubOpen
-                      ? "is-open"
+                  to={item.path}
+                  onClick={
+                    handleNavClick
+                  }
+                  className={`Sidebar-link ${
+                    isActive
+                      ? "active"
                       : ""
                   }`}
-                  onMouseEnter={() =>
-                    isCollapsed &&
-                    setFlyout(
-                      item.text
-                    )
+                  title={
+                    isCollapsed
+                      ? item.text
+                      : undefined
                   }
-                  onMouseLeave={() =>
-                    isCollapsed &&
-                    setFlyout(null)
+                  aria-current={
+                    isActive
+                      ? "page"
+                      : undefined
                   }
                 >
 
-                  <button
-                    type="button"
-                    className={`Sidebar-link ${
-                      childActive ||
-                      isSubOpen
-                        ? "parent-active"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      !isCollapsed &&
-                      toggleSubMenu(
-                        item.text
-                      )
-                    }
-                    title={
-                      isCollapsed
-                        ? item.text
-                        : undefined
-                    }
-                    aria-expanded={
-                      isSubOpen
-                    }
-                  >
+                  <span className="Sidebar-icon">
+                    {item.icon}
+                  </span>
 
-                    <span className="Sidebar-icon">
+                  {!isCollapsed && (
+                    <span className="Sidebar-text">
+                      {item.text}
+                    </span>
+                  )}
 
-                      {item.icon}
+                </Link>
+              );
+            }
 
-                      {isCollapsed &&
-                      item.badge ? (
-                        <span className="Sidebar-dot" />
+            {/* =================================================
+                DROPDOWN
+            ================================================= */}
+
+            const isSubOpen =
+              openSubMenu ===
+              item.text;
+
+            const childActive =
+              isChildActive(item);
+
+            const showFlyout =
+              isCollapsed &&
+              flyout ===
+                item.text;
+
+            return (
+              <div
+                key={item.text}
+                className={`Sidebar-dropdown-wrapper ${
+                  isSubOpen
+                    ? "is-open"
+                    : ""
+                }`}
+                onMouseEnter={() =>
+                  isCollapsed &&
+                  setFlyout(
+                    item.text
+                  )
+                }
+                onMouseLeave={() =>
+                  isCollapsed &&
+                  setFlyout(null)
+                }
+              >
+
+                {/* PARENT BUTTON */}
+
+                <button
+                  type="button"
+                  className={`Sidebar-link ${
+                    childActive ||
+                    isSubOpen
+                      ? "parent-active"
+                      : ""
+                  }`}
+                  onClick={() => {
+                    if (!isCollapsed) {
+                      setOpenSubMenu(
+                        (prev) =>
+                          prev ===
+                          item.text
+                            ? null
+                            : item.text
+                      );
+                    }
+                  }}
+                  title={
+                    isCollapsed
+                      ? item.text
+                      : undefined
+                  }
+                  aria-expanded={
+                    isSubOpen
+                  }
+                >
+
+                  <span className="Sidebar-icon">
+
+                    {item.icon}
+
+                    {isCollapsed &&
+                    item.badge ? (
+                      <span className="Sidebar-dot" />
+                    ) : null}
+
+                  </span>
+
+                  {!isCollapsed && (
+                    <>
+                      <span className="Sidebar-text">
+                        {item.text}
+                      </span>
+
+                      {item.badge ? (
+                        <span className="Sidebar-badge">
+                          {item.badge}
+                        </span>
                       ) : null}
 
-                    </span>
+                      <ChevronDown
+                        size={15}
+                        className={`Sidebar-chevron ${
+                          isSubOpen
+                            ? "rotated"
+                            : ""
+                        }`}
+                      />
+                    </>
+                  )}
 
-                    {!isCollapsed && (
-                      <>
-                        <span className="Sidebar-text">
-                          {item.text}
-                        </span>
+                </button>
 
-                        {item.badge ? (
-                          <span className="Sidebar-badge">
-                            {item.badge}
-                          </span>
-                        ) : null}
+                {/* =================================================
+                    NORMAL SUBMENU
+                ================================================= */}
 
-                        <ChevronDown
-                          size={15}
-                          className={`Sidebar-chevron ${
-                            isSubOpen
-                              ? "rotated"
-                              : ""
-                          }`}
-                        />
-                      </>
-                    )}
+                {!isCollapsed &&
+                  isSubOpen && (
+                    <div className="Sidebar-submenu">
 
-                  </button>
-
-                  {/* SUBMENU */}
-
-                  {!isCollapsed &&
-                    isSubOpen && (
-                      <div className="Sidebar-submenu">
-
-                        <div className="submenu-tree-line" />
-
-                        {item.children.map(
-                          (
-                            child
-                          ) => {
-
-                            const isSubActive =
-                              location.pathname ===
-                              child.path;
-
-                            return (
-                              <Link
-                                key={
-                                  child.path
-                                }
-                                to={
-                                  child.path
-                                }
-                                onClick={
-                                  handleNavClick
-                                }
-                                className={`Sidebar-sublink ${
-                                  isSubActive
-                                    ? "active"
-                                    : ""
-                                }`}
-                                aria-current={
-                                  isSubActive
-                                    ? "page"
-                                    : undefined
-                                }
-                              >
-
-                                <span className="sublink-text">
-                                  {
-                                    child.text
-                                  }
-                                </span>
-
-                                {child.badge ? (
-                                  <span className="Sidebar-badge sub-badge">
-                                    {
-                                      child.badge
-                                    }
-                                  </span>
-                                ) : null}
-
-                              </Link>
-                            );
-                          }
-                        )}
-
-                      </div>
-                    )}
-
-                  {/* COLLAPSED FLYOUT */}
-
-                  {showFlyout && (
-                    <div className="Sidebar-flyout">
-
-                      <div className="Sidebar-flyout-title">
-                        {
-                          item.text
-                        }
-                      </div>
+                      <div className="submenu-tree-line" />
 
                       {item.children.map(
-                        (
-                          child
-                        ) => {
+                        (child) => {
 
                           const isSubActive =
                             location.pathname ===
@@ -794,16 +651,23 @@ const Sidebar = ({
                               onClick={
                                 handleNavClick
                               }
-                              className={`Sidebar-flyout-link ${
+                              className={`Sidebar-sublink ${
                                 isSubActive
                                   ? "active"
                                   : ""
                               }`}
+                              aria-current={
+                                isSubActive
+                                  ? "page"
+                                  : undefined
+                              }
                             >
 
-                              {
-                                child.text
-                              }
+                              <span className="sublink-text">
+                                {
+                                  child.text
+                                }
+                              </span>
 
                               {child.badge ? (
                                 <span className="Sidebar-badge sub-badge">
@@ -821,16 +685,69 @@ const Sidebar = ({
                     </div>
                   )}
 
-                </div>
-              );
-            }
-          )}
+                {/* =================================================
+                    COLLAPSED FLYOUT
+                ================================================= */}
+
+                {showFlyout && (
+                  <div className="Sidebar-flyout">
+
+                    <div className="Sidebar-flyout-title">
+                      {item.text}
+                    </div>
+
+                    {item.children.map(
+                      (child) => {
+
+                        const isSubActive =
+                          location.pathname ===
+                          child.path;
+
+                        return (
+                          <Link
+                            key={
+                              child.path
+                            }
+                            to={
+                              child.path
+                            }
+                            onClick={
+                              handleNavClick
+                            }
+                            className={`Sidebar-flyout-link ${
+                              isSubActive
+                                ? "active"
+                                : ""
+                            }`}
+                          >
+
+                            {child.text}
+
+                            {child.badge ? (
+                              <span className="Sidebar-badge sub-badge">
+                                {
+                                  child.badge
+                                }
+                              </span>
+                            ) : null}
+
+                          </Link>
+                        );
+                      }
+                    )}
+
+                  </div>
+                )}
+
+              </div>
+            );
+          })}
 
         </nav>
 
-        {/* =========================================
-            UPGRADE CARD
-        ========================================== */}
+        {/* =================================================
+            PREMIUM CARD
+        ================================================= */}
 
         {!isCollapsed && (
           <div className="Sidebar-upgrade-card">
@@ -863,9 +780,9 @@ const Sidebar = ({
           </div>
         )}
 
-        {/* =========================================
+        {/* =================================================
             ADMIN PROFILE FOOTER
-        ========================================== */}
+        ================================================= */}
 
         <div className="Sidebar-footer">
 

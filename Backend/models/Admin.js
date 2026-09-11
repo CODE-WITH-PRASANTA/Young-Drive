@@ -1,64 +1,109 @@
 const mongoose = require("mongoose");
 
-const adminSchema = new mongoose.Schema(
+const loginActivitySchema = new mongoose.Schema(
   {
-    username: {
+    loginAt: {
+      type: Date,
+      default: Date.now,
+    },
+
+    ipAddress: {
       type: String,
-      required: true,
-      unique: true,
+      default: "127.0.0.1",
       trim: true,
     },
+  },
+  {
+    _id: true,
+  }
+);
 
-    password: {
-      type: String,
-      required: true,
-    },
-
+const adminSchema = new mongoose.Schema(
+  {
     name: {
       type: String,
-      default: "Admin User",
+      required: true,
+      trim: true,
+      minlength: 2,
+      maxlength: 100,
+    },
+
+    username: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      default: "admin",
     },
 
     email: {
       type: String,
-      default: "",
+      required: true,
+      unique: true,
       trim: true,
+      lowercase: true,
     },
 
     phone: {
       type: String,
-      default: "",
+      required: true,
+      trim: true,
     },
 
     role: {
       type: String,
-      enum: ["Super Admin", "Manager", "Support Agent"],
+      required: true,
+      enum: [
+        "Super Admin",
+        "Manager",
+        "Support Agent",
+      ],
       default: "Super Admin",
     },
 
     address: {
       type: String,
+      trim: true,
       default: "",
     },
 
     language: {
       type: String,
+      trim: true,
       default: "English",
     },
 
     timeZone: {
       type: String,
-      default: "(UTC+05:30) India Standard Time",
+      trim: true,
+      default:
+        "(UTC+05:30) India Standard Time",
     },
 
     bio: {
       type: String,
+      trim: true,
+      maxlength: 500,
       default: "",
     },
 
+    password: {
+      type: String,
+      required: true,
+      default: "password123",
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+
+    /* ================================================
+       ADMIN AVATAR
+       ================================================ */
+
     avatar: {
       type: String,
-      default: "",
+      default: null,
     },
 
     preferences: {
@@ -83,28 +128,18 @@ const adminSchema = new mongoose.Schema(
       },
     },
 
-    loginActivity: [
-      {
-        loginAt: {
-          type: Date,
-          default: Date.now,
-        },
-
-        ipAddress: {
-          type: String,
-          default: "",
-        },
-
-        userAgent: {
-          type: String,
-          default: "",
-        },
-      },
-    ],
+    loginActivity: {
+      type: [loginActivitySchema],
+      default: [],
+    },
   },
+
   {
     timestamps: true,
   }
 );
 
-module.exports = mongoose.model("Admin", adminSchema);
+module.exports = mongoose.model(
+  "Admin",
+  adminSchema
+);

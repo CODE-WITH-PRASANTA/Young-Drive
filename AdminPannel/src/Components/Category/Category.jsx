@@ -38,6 +38,37 @@ const Category = () => {
     useState("");
 
   /* =====================================================
+     PAGINATION
+     ===================================================== */
+
+  const [currentPage, setCurrentPage] =
+    useState(1);
+
+  const [cardsPerPage, setCardsPerPage] =
+    useState(
+      window.innerWidth <= 650 ? 1 : 3
+    );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setCardsPerPage(
+        window.innerWidth <= 650 ? 1 : 3
+      );
+    };
+
+    window.addEventListener(
+      "resize",
+      handleResize
+    );
+
+    return () =>
+      window.removeEventListener(
+        "resize",
+        handleResize
+      );
+  }, []);
+
+  /* =====================================================
      API IMAGE URL
      ===================================================== */
 
@@ -560,6 +591,77 @@ const Category = () => {
     );
 
   /* =====================================================
+     PAGINATION DERIVED STATE
+     ===================================================== */
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(
+      filteredCategories.length /
+        cardsPerPage
+    )
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, cardsPerPage]);
+
+  useEffect(() => {
+    setCurrentPage((prev) =>
+      Math.min(prev, totalPages)
+    );
+  }, [totalPages]);
+
+  const paginatedCategories =
+    filteredCategories.slice(
+      (currentPage - 1) *
+        cardsPerPage,
+      currentPage * cardsPerPage
+    );
+
+  const goToPage = (page) => {
+    if (
+      page < 1 ||
+      page > totalPages
+    ) {
+      return;
+    }
+
+    setCurrentPage(page);
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+
+    let start = Math.max(
+      1,
+      currentPage -
+        Math.floor(maxVisible / 2)
+    );
+
+    let end = Math.min(
+      totalPages,
+      start + maxVisible - 1
+    );
+
+    start = Math.max(
+      1,
+      end - maxVisible + 1
+    );
+
+    for (
+      let i = start;
+      i <= end;
+      i++
+    ) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
+
+  /* =====================================================
      RENDER
      ===================================================== */
 
@@ -913,7 +1015,7 @@ const Category = () => {
 
             </div>
           ) : (
-            filteredCategories.map(
+            paginatedCategories.map(
               (category) => {
                 const categoryId =
                   category?._id ||
@@ -1110,6 +1212,77 @@ const Category = () => {
           )}
 
         </div>
+
+        {/* PAGINATION */}
+
+        {!fetchLoading &&
+          filteredCategories.length >
+            0 &&
+          totalPages > 1 && (
+            <div className="category-pagination">
+
+              <span className="category-pagination-info">
+                Page {currentPage} of{" "}
+                {totalPages}
+              </span>
+
+              <div className="category-pagination-controls">
+
+                <button
+                  type="button"
+                  className="category-pagination-btn"
+                  onClick={() =>
+                    goToPage(
+                      currentPage - 1
+                    )
+                  }
+                  disabled={
+                    currentPage === 1
+                  }
+                >
+                  ‹
+                </button>
+
+                {getPageNumbers().map(
+                  (page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      className={`category-pagination-btn ${
+                        page ===
+                        currentPage
+                          ? "active"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        goToPage(page)
+                      }
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
+
+                <button
+                  type="button"
+                  className="category-pagination-btn"
+                  onClick={() =>
+                    goToPage(
+                      currentPage + 1
+                    )
+                  }
+                  disabled={
+                    currentPage ===
+                    totalPages
+                  }
+                >
+                  ›
+                </button>
+
+              </div>
+
+            </div>
+          )}
 
       </div>
 
