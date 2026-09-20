@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import API from "../../api/axios";
 
 import {
   FaCar,
@@ -26,14 +27,6 @@ import {
 } from "react-icons/fa";
 
 import "./FeatureListing.css";
-
-// =====================================================
-// API
-// =====================================================
-
-const API_URL = "http://localhost:5000/api/listings";
-const CATEGORY_API_URL = "http://localhost:5000/api/car-categories";
-const BASE_URL = "http://localhost:5000";
 
 // =====================================================
 // EMPTY FORM
@@ -318,9 +311,8 @@ export function FeatureListing() {
 
   const fetchListings = async () => {
     try {
-      const response = await fetch(API_URL);
-
-      const data = await response.json();
+      const response = await API.get("/listings");
+      const data = response.data;
 
       console.log(
         "LISTINGS RESPONSE:",
@@ -356,11 +348,8 @@ export function FeatureListing() {
     try {
       setCategoriesLoading(true);
 
-      const response = await fetch(
-        CATEGORY_API_URL
-      );
-
-      const data = await response.json();
+      const response = await API.get("/car-categories");
+      const data = response.data;
 
       console.log(
         "CAR CATEGORIES RESPONSE:",
@@ -596,29 +585,17 @@ export function FeatureListing() {
       // =================================================
 
       if (isEditing) {
-        const response = await fetch(
-          `${API_URL}/${formData._id}`,
-          {
-            method: "PUT",
-            body: submitData,
-          }
+        const response = await API.put(
+          `/listings/${formData._id}`,
+          submitData
         );
 
-        const data = await response
-          .json()
-          .catch(() => ({}));
+        const data = response.data || {};
 
         console.log(
           "UPDATE LISTING RESPONSE:",
           data
         );
-
-        if (!response.ok) {
-          throw new Error(
-            data?.message ||
-              "Failed to update listing."
-          );
-        }
 
         alert(
           "Featured listing updated successfully!"
@@ -630,29 +607,17 @@ export function FeatureListing() {
       // =================================================
 
       else {
-        const response = await fetch(
-          API_URL,
-          {
-            method: "POST",
-            body: submitData,
-          }
+        const response = await API.post(
+          "/listings",
+          submitData
         );
 
-        const data = await response
-          .json()
-          .catch(() => ({}));
+        const data = response.data || {};
 
         console.log(
           "CREATE LISTING RESPONSE:",
           data
         );
-
-        if (!response.ok) {
-          throw new Error(
-            data?.message ||
-              "Failed to create listing."
-          );
-        }
 
         alert(
           "New listing added successfully!"
@@ -692,8 +657,9 @@ export function FeatureListing() {
       );
 
       alert(
+        error.response?.data?.message ||
         error?.message ||
-          "Error saving listing."
+        "Error saving listing."
       );
     }
   };
@@ -873,30 +839,13 @@ export function FeatureListing() {
     }
 
     try {
-      const response =
-        await fetch(
-          `${API_URL}/${id}`,
-          {
-            method: "DELETE",
-          }
-        );
-
-      const data =
-        await response
-          .json()
-          .catch(() => ({}));
+      const response = await API.delete(`/listings/${id}`);
+      const data = response.data || {};
 
       console.log(
         "DELETE RESPONSE:",
         data
       );
-
-      if (!response.ok) {
-        throw new Error(
-          data?.message ||
-            "Failed to delete listing."
-        );
-      }
 
       setListings((prev) =>
         prev.filter(
@@ -922,8 +871,9 @@ export function FeatureListing() {
       );
 
       alert(
+        error.response?.data?.message ||
         error?.message ||
-          "Error deleting listing."
+        "Error deleting listing."
       );
     }
   };
@@ -1262,7 +1212,7 @@ export function FeatureListing() {
                       className="FeatureListing-thumb-box"
                     >
                       <img
-                        src={`${BASE_URL}${img}`}
+                        src={img.startsWith("http") ? img : `${API.defaults.baseURL || ""}${img}`}
                         alt={`Thumbnail ${idx}`}
                       />
 
@@ -2322,7 +2272,7 @@ export function FeatureListing() {
                               item.images
                                 ?.length >
                               0
-                                ? `${BASE_URL}${item.images[0]}`
+                                ? (item.images[0].startsWith("http") ? item.images[0] : `${API.defaults.baseURL || ""}${item.images[0]}`)
                                 : ""
                             }
                             alt={
