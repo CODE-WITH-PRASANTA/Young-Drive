@@ -29,6 +29,15 @@ import {
 import "./FeatureListing.css";
 
 // =====================================================
+// HELPER: GET BASE URL WITHOUT /API FOR STATIC UPLOADS
+// =====================================================
+
+const getUploadsBaseUrl = () => {
+  const baseURL = API.defaults.baseURL || "";
+  return baseURL.replace(/\/api\/?$/, "");
+};
+
+// =====================================================
 // EMPTY FORM
 // =====================================================
 
@@ -1212,7 +1221,7 @@ export function FeatureListing() {
                       className="FeatureListing-thumb-box"
                     >
                       <img
-                        src={img.startsWith("http") ? img : `${API.defaults.baseURL || ""}${img}`}
+                        src={img.startsWith("http") ? img : `${getUploadsBaseUrl()}${img}`}
                         alt={`Thumbnail ${idx}`}
                       />
 
@@ -1350,7 +1359,7 @@ export function FeatureListing() {
                     .filter(
                       (category) =>
                         category.status !==
-                          "Inactive"
+                        "Inactive"
                     )
                     .map(
                       (category) => (
@@ -2272,7 +2281,7 @@ export function FeatureListing() {
                               item.images
                                 ?.length >
                               0
-                                ? (item.images[0].startsWith("http") ? item.images[0] : `${API.defaults.baseURL || ""}${item.images[0]}`)
+                                ? (item.images[0].startsWith("http") ? item.images[0] : `${getUploadsBaseUrl()}${item.images[0]}`)
                                 : ""
                             }
                             alt={
